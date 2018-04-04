@@ -1,0 +1,6 @@
+CLUSTER = False
+DAYS_PER_MONTH = 1 # 'MAX'
+SIZE = ['small'] # 'large'
+IMAGES_PER_DAY = 32
+PATCH_W = 128
+PATCH_H = 128
