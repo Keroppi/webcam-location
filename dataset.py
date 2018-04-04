@@ -1,7 +1,9 @@
-import os, sys, cv2, skimage
+import os, sys, cv2, skimage, calendar, glob, datetime, time
 
 CLUSTER = False
-DAYS_PER_MONTH = 1
+DAYS_PER_MONTH = 1 # 'MAX'
+SIZE = ['small'] # 'large'
+IMAGES_PER_DAY = 32
 
 if CLUSTER:
     image_dir = '/scratch_net/biwidl103/vli/data/'
@@ -45,9 +47,31 @@ for data_source in data_sources:
                     for month in months:
                         month_dir = year_dir + month + '/'
 
-                        days = next(os.walk(month_dir))[1]
+                        if DAYS_PER_MONTH == 'MAX':
+                            DAYS_PER_MONTH = calendar.monthrange(int(year), int(month))[1]
 
-                        print(days)
+                        for day in range(1, DAYS_PER_MONTH + 1):
+                            day = "{0:0=2d}".format(day)
+
+                            day_dir = month_dir + day + '/'
+
+                            with open(day_dir + 'sun.txt') as sun_f:
+                                sun_lines = sun_f.read().splitlines()
+                                sunrise_str = sun_lines[4]
+                                sunset_str = sun_lines[5]
+                                sunrise = datetime.datetime.strptime(sunrise_str, "%Y-%m-%d %H:%M:%S")
+                                sunset = datetime.datetime.strptime(sunset_str, "%Y-%m-%d %H:%M:%S")
+
+                            for size in SIZE:
+                                image_dir = day_dir + size + '/'
+                                images = glob.glob(image_dir + '*.jpg')
+
+                                print(images)
+
+                                # Sort by time?
+
+                                #for image in images:
+                                #    cv2.imread(image)
 
 
 
