@@ -1,4 +1,4 @@
-import constants, numpy as np, cv2
+import constants, numpy as np, cv2, sys
 from sklearn.feature_extraction.image import extract_patches_2d
 
 class Day():
@@ -14,14 +14,12 @@ class Day():
                 break
 
             sunrise_idx += 1
-            sunset_idx += 1
 
         for time in times:
             if sunset < time:
                 max_sunset_idx = sunset_idx
                 break
 
-            sunrise_idx += 1
             sunset_idx +=1
 
         if max_sunrise_idx is None:
@@ -39,6 +37,17 @@ class Day():
         else:
             remainder = (sunset - times[max_sunset_idx - 1]) / (times[max_sunset_idx] - times[max_sunset_idx - 1])
             sunset_idx = remainder + max_sunset_idx - 1
+
+        #print(sunrise_idx)
+        #print(sunrise)
+        #print(times[max_sunrise_idx - 1])
+        #print(times[max_sunrise_idx])
+
+        #print(sunset_idx)
+        #print(sunset)
+        #print(times[max_sunset_idx - 1])
+        #print(times[max_sunset_idx])
+        #print('')
 
         return (sunrise_idx, sunset_idx)
 
@@ -70,14 +79,14 @@ class Day():
         self.patch_stack = np.array([]) # Stack patches along the color channel depth.
         for i in range(0, constants.IMAGES_PER_DAY * constants.NUM_CHANNELS, constants.NUM_CHANNELS):
             img = subset_img_stack[:, :, i:i+constants.NUM_CHANNELS]
-            #cv2.imwrite('/home/vli/patches/test' + str(-i) + '.jpg', img)
+            #cv2.imwrite('/home/vli/patches/test' + str(int(i / constants.NUM_CHANNELS)) + '.jpg', img)
 
             patch = extract_patches_2d(img, (constants.PATCH_H, constants.PATCH_W), 1)[0]
             #cv2.imwrite('/home/vli/patches/test' + str(i) + '.jpg', patch)
 
             self.patch_stack = np.dstack((self.patch_stack, patch)) if self.patch_stack.size else patch
 
-        
+            # Does it make sense to save these patches - save time? # VLI
 
 
 

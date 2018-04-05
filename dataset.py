@@ -71,7 +71,6 @@ for data_source in data_sources:
                         else:
                             numDays = constants.DAYS_PER_MONTH
 
-                        img_stack = np.array([]) # Stack all images along the color channel depth.
                         for day in range(1, numDays + 1):
                             day = "{0:0=2d}".format(day)
 
@@ -84,6 +83,7 @@ for data_source in data_sources:
                                 sunrise = datetime.datetime.strptime(sunrise_str, "%Y-%m-%d %H:%M:%S")
                                 sunset = datetime.datetime.strptime(sunset_str, "%Y-%m-%d %H:%M:%S")
 
+                            img_stack = np.array([])  # Stack all images along the color channel depth.
                             for size in constants.SIZE:
                                 image_dir = day_dir + size + '/'
                                 images = glob.glob(image_dir + '*.jpg')
