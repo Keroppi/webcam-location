@@ -2,6 +2,17 @@ import constants, numpy as np, cv2, sys
 from sklearn.feature_extraction.image import extract_patches_2d
 
 class Day():
+    # Hashes the first channel of the first image to a number which determines TRAIN, TEST, OR VALIDATION set.
+    def hash(self, img):
+        value = np.sum(img) % constants.SPLIT_TOTAL
+
+        if value <= constants.SPLIT_TRAIN:
+            return 'train'
+        elif value <= constants.SPLIT_TEST:
+            return 'test'
+        else:
+            return 'valid'
+
     def get_sun_idx(self, times, sunrise, sunset):
         sunrise_idx = 0
         sunset_idx = 0
@@ -52,6 +63,12 @@ class Day():
         return (sunrise_idx, sunset_idx)
 
     def __init__(self, times, img_stack, sunrise, sunset):
+        middle_col = int(img_stack.shape[1] / 2)
+        middle_channel = int(img_stack.shape[2] / 2) # Use one in the middle because it's less likely to be just black.
+
+        self.train_test_valid = self.hash(img_stack[:, middle_col, middle_channel])
+        print(self.train_test_valid)
+
         self.date = times[0].date()
         #self.img_stack = img_stack
         self.sunrise = sunrise
@@ -86,7 +103,6 @@ class Day():
 
             self.patch_stack = np.dstack((self.patch_stack, patch)) if self.patch_stack.size else patch
 
-            # Does it make sense to save these patches - save time? # VLI
 
 
 

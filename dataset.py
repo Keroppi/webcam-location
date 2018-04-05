@@ -31,7 +31,7 @@ def extract_times(images):
 
     return times
 
-
+data = []
 for data_source in data_sources:
     curr_image_dir = image_dir + data_source + '/'
 
@@ -107,6 +107,14 @@ for data_source in data_sources:
 
                             day_obj = Day(times, img_stack, sunrise, sunset) # One training / test example.
 
+# Pickle or whatever all day objs?
+# Does it make sense to save these patches to disk? # VLI
+
+# Converting Pytorch from Numpy doesn't require extra memory
+# b = torch.from_numpy(a)
+
+# How to take the day_obj and split into train, dev, test?
+# Hashing?
 
 
 
