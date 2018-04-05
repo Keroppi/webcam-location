@@ -71,7 +71,7 @@ for data_source in data_sources:
                         else:
                             numDays = constants.DAYS_PER_MONTH
 
-                        img_stack = np.array([]) # Stack all images along the BGR depth.
+                        img_stack = np.array([]) # Stack all images along the color channel depth.
                         for day in range(1, numDays + 1):
                             day = "{0:0=2d}".format(day)
 
@@ -91,7 +91,7 @@ for data_source in data_sources:
                                 # Not enough images!
                                 if len(images) < constants.IMAGES_PER_DAY:
                                     #print("NOT ENOUGH IMAGES!")
-                                    continue # MAY NEED FURTHER ATTENTION
+                                    continue # MAY NEED FURTHER ATTENTION # VLI
 
                                 # Sort by time.
                                 images.sort(key=functools.cmp_to_key(compare_images))
@@ -105,7 +105,9 @@ for data_source in data_sources:
 
                                     img_stack = np.dstack((img_stack, img)) if img_stack.size else img
 
-                            day_obj = Day(times, img_stack, sunrise, sunset)
+                            day_obj = Day(times, img_stack, sunrise, sunset) # One training / test example.
+
+
 
 
 

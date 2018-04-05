@@ -4,3 +4,4 @@ SIZE = ['small'] # 'large'
 IMAGES_PER_DAY = 32
 PATCH_W = 128
 PATCH_H = 128
+NUM_CHANNELS = 3 # BGR

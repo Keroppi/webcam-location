@@ -1,4 +1,5 @@
-import constants
+import constants, numpy as np, cv2
+from sklearn.feature_extraction.image import extract_patches_2d
 
 class Day():
     def get_sun_idx(self, times, sunrise, sunset):
@@ -43,14 +44,46 @@ class Day():
 
     def __init__(self, times, img_stack, sunrise, sunset):
         self.date = times[0].date()
-        self.img_stack = img_stack
+        #self.img_stack = img_stack
         self.sunrise = sunrise
         self.sunset = sunset
 
         # Randomly select IMAGES_PER_DAY images from times.
+        subset_time_idx = np.random.choice(len(times), constants.IMAGES_PER_DAY, replace=False)
+        subset_time_idx.sort()
+
+        subset_times = [times[x] for x in subset_time_idx]
+        self.sunrise_idx, self.sunset_idx = self.get_sun_idx(subset_times, sunrise, sunset)
+
+        # Extract only the subset of images.
+        subset_img_idx = []
+        for idx in subset_time_idx:
+            for channel in range(constants.NUM_CHANNELS):
+                subset_img_idx += [constants.NUM_CHANNELS * idx + channel]
+
+        subset_img_stack = np.take(img_stack, subset_img_idx, axis=2)
+
+        #print(subset_time_idx)
+        #print(subset_img_idx)
+
+        # Cut out patches from the images.
+        self.patch_stack = np.array([]) # Stack patches along the color channel depth.
+        for i in range(0, constants.IMAGES_PER_DAY * constants.NUM_CHANNELS, constants.NUM_CHANNELS):
+            img = subset_img_stack[:, :, i:i+constants.NUM_CHANNELS]
+            #cv2.imwrite('/home/vli/patches/test' + str(-i) + '.jpg', img)
+
+            patch = extract_patches_2d(img, (constants.PATCH_H, constants.PATCH_W), 1)[0]
+            #cv2.imwrite('/home/vli/patches/test' + str(i) + '.jpg', patch)
+
+            self.patch_stack = np.dstack((self.patch_stack, patch)) if self.patch_stack.size else patch
+
+        
 
 
-        self.sunrise_idx, self.sunset_idx = self.get_sun_idx(times, sunrise, sunset)
+
+
+
+
 
 
 
