@@ -2,7 +2,10 @@ import os, sys, cv2, calendar, glob, datetime, time, functools, numpy as np, con
 from day import Day
 from torch.utils.data.dataset import Dataset
 
-class WebcamDataset(Dataset):
+class WebcamData():
+    def compare_data_types(a, b):
+        return (a.train_test_valid > b.train_test_valid) - (a.train_test_valid < b.train_test_valid)
+
     def compare_images(a, b):
         filename1 = a.split('/')[-1]
         filename2 = b.split('/')[-1]
@@ -36,7 +39,7 @@ class WebcamDataset(Dataset):
         else:
             return 'valid'
 
-    def load_images():
+    def load_images(self):
         if constants.CLUSTER:
             image_dir = '/scratch_net/biwidl103/vli/data/'
         else:
@@ -88,7 +91,8 @@ class WebcamDataset(Dataset):
 
                                     day_dir = month_dir + day + '/'
 
-                                    train_test_valid = WebcamDataset.determine_train_test_valid(day_dir)
+                                    train_test_valid = WebcamData.determine_train_test_valid(day_dir)
+                                    self.types[train_test_valid] += 1
 
                                     with open(day_dir + 'sun.txt') as sun_f:
                                         sun_lines = sun_f.read().splitlines()
@@ -108,10 +112,10 @@ class WebcamDataset(Dataset):
                                             continue  # MAY NEED FURTHER ATTENTION # VLI
 
                                         # Sort by time.
-                                        images.sort(key=functools.cmp_to_key(WebcamDataset.compare_images))
+                                        images.sort(key=functools.cmp_to_key(WebcamData.compare_images))
 
                                         # Get the list of times associated with the images.
-                                        times = WebcamDataset.extract_times(images)
+                                        times = WebcamData.extract_times(images)
 
                                         # Randomly select IMAGES_PER_DAY images from times / images.
                                         subset_idx = np.random.choice(len(times), constants.IMAGES_PER_DAY,
@@ -131,10 +135,59 @@ class WebcamDataset(Dataset):
                                                       train_test_valid)  # One training / test example.
                                         data.append(day_obj)
 
+        self.data.sort(key=functools.cmp_to_key(WebcamData.compare_data_types)) # Sorted in order of test, train, valid
         return data
 
-    def __init__(self, transforms=None):
-        self.data = WebcamDataset.load_images()
+    def __init__(self):
+        self.types = {'train': 0, 'test': 0, 'valid':0}
+        self.days = self.load_images()
+
+class Train(Dataset):
+    def __init__(self, data, transforms=None):
+        num_test = data.types['test']
+        num_train = data.types['train']
+        self.data = data.days[num_test:num_train]
+        self.sunrise_label = np.asarray([x.sunrise_idx for x in self.data])
+        self.sunset_label = np.asarray([x.sunset_idx for x in self.data])
+        self.transforms = transforms
+
+    def __getitem__(self, index):
+        # Return image and the label
+
+        data = self.data[index].img_stack
+        if self.transforms is not None:
+            data = self.transforms(data)
+
+        return (data, self.sunrise_label[index]) # SKIP SUNSET FOR NOW # VLI
+
+    def __len__(self):
+        return len(self.data)
+
+class Test(Dataset):
+    def __init__(self, data, transforms=None):
+        num_test = data.types['test']
+        self.data = data.days[:num_test]
+        self.sunrise_label = np.asarray([x.sunrise_idx for x in self.data])
+        self.sunset_label = np.asarray([x.sunset_idx for x in self.data])
+        self.transforms = transforms
+
+    def __getitem__(self, index):
+        # Return image and the label
+
+        data = self.data[index].img_stack
+        if self.transforms is not None:
+            data = self.transforms(data)
+
+        return (data, self.sunrise_label[index]) # SKIP SUNSET FOR NOW # VLI
+
+    def __len__(self):
+        return len(self.data)
+
+class Validation(Dataset):
+    def __init__(self, data, transforms=None):
+        num_test = data.types['test']
+        num_train = data.types['train']
+        self.data = data.days[num_train + num_test:]
         self.sunrise_label = np.asarray([x.sunrise_idx for x in self.data])
         self.sunset_label = np.asarray([x.sunset_idx for x in self.data])
         self.transforms = transforms

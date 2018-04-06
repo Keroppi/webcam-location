@@ -1,8 +1,16 @@
-from webcam_dataset import WebcamDataset
+from webcam_dataset import WebcamData
+from webcam_dataset import Train
+from webcam_dataset import Test
+from webcam_dataset import Validation
+from torchvision import transforms
 
-dataset = WebcamDataset()
+data = WebcamData()
 
+# TO DO: transforms
 
+train = Train(data)
+test = Test(data)
+valid = Valid(data)
 
 
 # Pickle or whatever all day objs?
