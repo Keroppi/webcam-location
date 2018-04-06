@@ -10,7 +10,7 @@ data = WebcamData()
 
 train = Train(data)
 test = Test(data)
-valid = Valid(data)
+valid = Validation(data)
 
 
 # Pickle or whatever all day objs?
