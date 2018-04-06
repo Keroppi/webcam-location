@@ -12,7 +12,6 @@ train = Train(data)
 test = Test(data)
 valid = Validation(data)
 
-
 # Pickle or whatever all day objs?
 # Does it make sense to save these patches to disk?
 

@@ -135,7 +135,7 @@ class WebcamData():
                                                       train_test_valid)  # One training / test example.
                                         data.append(day_obj)
 
-        self.data.sort(key=functools.cmp_to_key(WebcamData.compare_data_types)) # Sorted in order of test, train, valid
+        data.sort(key=functools.cmp_to_key(WebcamData.compare_data_types)) # Sorted in order of test, train, valid
         return data
 
     def __init__(self):
