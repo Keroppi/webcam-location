@@ -1,6 +1,7 @@
 CLUSTER = False
 DAYS_PER_MONTH = 1 # 'MAX'
 SIZE = ['small'] # 'large'
+DATA_SOURCES = ['roundshot'] # 'panomax'
 IMAGES_PER_DAY = 32
 PATCH_W = 128
 PATCH_H = 128
@@ -10,3 +11,5 @@ SPLIT_TOTAL = 10
 SPLIT_TRAIN = 7
 SPLIT_TEST = 8
 SPLIT_VALID = 9
+
+
