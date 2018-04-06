@@ -102,7 +102,7 @@ class WebcamData():
                                         sunset = datetime.datetime.strptime(sunset_str, "%Y-%m-%d %H:%M:%S")
 
                                     for size in constants.SIZE:
-                                        img_stack = np.array([])  # Stack all images along the color channel depth.
+                                        #img_stack = np.array([])  # Stack all images along the color channel depth.
                                         image_dir = day_dir + size + '/'
                                         images = glob.glob(image_dir + '*.jpg')
 
@@ -124,14 +124,7 @@ class WebcamData():
                                         subset_times = [times[x] for x in subset_idx]
                                         subset_images = [images[x] for x in subset_idx]
 
-                                        for image in subset_images:
-                                            img = cv2.imread(image)
-                                            # print(img.shape)
-                                            # cv2.imwrite('/home/vli/test.jpg', img)
-
-                                            img_stack = np.dstack((img_stack, img)) if img_stack.size else img
-
-                                        day_obj = Day(subset_times, img_stack, sunrise, sunset,
+                                        day_obj = Day(subset_times, subset_images, sunrise, sunset,
                                                       train_test_valid)  # One training / test example.
                                         data.append(day_obj)
 
@@ -153,12 +146,23 @@ class Train(Dataset):
 
     def __getitem__(self, index):
         # Return image and the label
+        #width = self.data[index].width
+        #height = self.data[index].height
+        img_paths = self.data[index].img_paths
 
-        data = self.data[index].img_stack
+        #img_stack = np.asarray([])
+        img_stack = [0] * constants.IMAGES_PER_DAY
+        for i, image in enumerate(img_paths):
+            img = cv2.imread(image)
+            #cv2.imwrite('/home/vli/test.jpg', img)
+            img_stack[i] = img
+            #img_stack = np.stack(img_stack, img), axis=2) if img_stack.size else img # should this be 3D stack or 4D?
+        img_stack = np.stack(img_stack, axis=-1)
+
         if self.transforms is not None:
-            data = self.transforms(data)
+            img_stack = self.transforms(img_stack)
 
-        return (data, self.sunrise_label[index]) # SKIP SUNSET FOR NOW # VLI
+        return (img_stack, self.sunrise_label[index]) # SKIP SUNSET FOR NOW # VLI
 
     def __len__(self):
         return len(self.data)

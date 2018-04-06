@@ -1,20 +1,7 @@
-import constants, numpy as np, cv2, sys
+import constants, numpy as np, cv2, sys, PIL
 from sklearn.feature_extraction.image import extract_patches_2d
 
 class Day():
-    '''
-    # Hashes the first channel of the first image to a number which determines TRAIN, TEST, OR VALIDATION set.
-    def hash(self, img):
-        value = np.sum(img) % constants.SPLIT_TOTAL
-
-        if value <= constants.SPLIT_TRAIN:
-            return 'train'
-        elif value <= constants.SPLIT_TEST:
-            return 'test'
-        else:
-            return 'valid'
-    '''
-
     def get_sun_idx(self, times, sunrise, sunset):
         sunrise_idx = 0
         sunset_idx = 0
@@ -64,14 +51,15 @@ class Day():
 
         return (sunrise_idx, sunset_idx)
 
-    def __init__(self, times, img_stack, sunrise, sunset, train_test_valid):
-        #middle_col = int(img_stack.shape[1] / 2)
-        #middle_channel = int(img_stack.shape[2] / 2) # Use one in the middle because it's less likely to be just black.
-
+    def __init__(self, times, img_paths, sunrise, sunset, train_test_valid):
         self.train_test_valid = train_test_valid
-
         self.date = times[0].date()
-        self.img_stack = img_stack
+        self.img_paths = img_paths
+
+        # Determine height / width
+        example_img = PIL.Image.open(img_paths[0]) # lazily loads - the entire image is not read into memory
+        self.width, self.height = example_img.size
+
         self.sunrise = sunrise
         self.sunset = sunset
         self.sunrise_idx, self.sunset_idx = self.get_sun_idx(times, sunrise, sunset)
