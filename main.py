@@ -3,13 +3,13 @@ from webcam_dataset import WebcamData
 from webcam_dataset import Train
 from webcam_dataset import Test
 from webcam_dataset import Validation
-from CustomTransforms import RandomPatch
+from CustomTransforms import RandomPatch, ToTensor
 from torchvision import transforms
 
 data = WebcamData()
 
 # TO DO: transforms
-transformations = transforms.Compose([RandomPatch((constants.PATCH_H, constants.PATCH_W))])
+transformations = transforms.Compose([RandomPatch(constants.PATCH_SIZE), ToTensor()])
 
 
 train_dataset = Train(data, transformations)
