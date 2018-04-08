@@ -124,6 +124,9 @@ class WebcamData():
                                         subset_times = [times[x] for x in subset_idx]
                                         subset_images = [images[x] for x in subset_idx]
 
+                                        #test = PIL.Image.open(subset_images[5]) # VLI DELETE THIS
+                                        #test.save('/home/vli/patches/original' + place + '.jpg' ) # DELETE
+
                                         day_obj = Day(subset_times, subset_images, sunrise, sunset,
                                                       train_test_valid)  # One training / test example.
                                         data.append(day_obj)
@@ -153,7 +156,7 @@ class Train(Dataset):
         #img_stack = np.asarray([])
         img_stack = [0] * constants.IMAGES_PER_DAY
         for i, image in enumerate(img_paths):
-            img = cv2.imread(image)
+            img = np.asarray(PIL.Image.open(image)) #cv2.imread(image)
             #cv2.imwrite('/home/vli/test.jpg', img)
             img_stack[i] = img
             #img_stack = np.stack(img_stack, img), axis=2) if img_stack.size else img # should this be 3D stack or 4D?
@@ -185,7 +188,7 @@ class Test(Dataset):
 
         img_stack = [0] * constants.IMAGES_PER_DAY
         for i, image in enumerate(img_paths):
-            img = cv2.imread(image)
+            img = np.asarray(PIL.Image.open(image)) #cv2.imread(image)
             img_stack[i] = img
         img_stack = np.stack(img_stack, axis=0)
 
@@ -212,7 +215,7 @@ class Validation(Dataset):
 
         img_stack = [0] * constants.IMAGES_PER_DAY
         for i, image in enumerate(img_paths):
-            img = cv2.imread(image)
+            img = np.asarray(PIL.Image.open(image)) #cv2.imread(image)
             img_stack[i] = img
         img_stack = np.stack(img_stack, axis=0)
 

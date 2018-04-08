@@ -1,6 +1,5 @@
-import constants, torch, numpy as np
+import constants, torch, torchvision, numpy as np, cv2, PIL, sys
 from sklearn.feature_extraction.image import extract_patches_2d
-
 
 class RandomPatch():
     def __init__(self, output_size): # int for square, else (height, width)
@@ -26,8 +25,21 @@ class RandomPatch():
 class ToTensor():
     def __call__(self, sample):
         num_images, height, width, num_channels = sample.shape
-        reshaped = sample.reshape(constants.NUM_CHANNELS * constants.IMAGES_PER_DAY, height, width)
-        #print(np.shares_memory(reshaped, sample))
-        #print(reshaped.shape)
+        transposed = sample.transpose(0, 3, 1, 2) # NUM_IMAGES_PER_DAY x C x H x W
+        reshaped = transposed.reshape(constants.IMAGES_PER_DAY * 3, height, width) # C x H x W
 
-        return torch.from_numpy(reshaped)
+        #original = PIL.Image.fromarray(np.uint8(sample[5]))
+        #original.save('/home/vli/patches/sample.jpg')
+
+        #print(np.shares_memory(transposed, sample))
+        #print(transposed.shape)
+
+        torch_image = torch.from_numpy(reshaped)
+        #print(sample[5, :, :, 1])
+        #print(torch_image.numpy()[16:17, :, :])
+
+        #tensor = PIL.Image.fromarray(np.uint8(torch_image.numpy()[5, :, :, :].transpose(1, 2, 0)))
+        #tensor.save('/home/vli/patches/torch.jpg')
+        #torchvision.utils.save_image(torch_image[5], '/home/vli/patches/torch.jpg', padding=0, normalize=True, range=(0, 255))
+
+        return torch_image
