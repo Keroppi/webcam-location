@@ -1,18 +1,20 @@
+import constants
 from webcam_dataset import WebcamData
 from webcam_dataset import Train
 from webcam_dataset import Test
 from webcam_dataset import Validation
+from CustomTransforms import RandomPatch
 from torchvision import transforms
 
 data = WebcamData()
 
 # TO DO: transforms
+transformations = transforms.Compose([RandomPatch((constants.PATCH_H, constants.PATCH_W))])
 
 
-train_dataset = Train(data)
-test_dataset = Test(data)
-valid_dataset = Validation(data)
-
+train_dataset = Train(data, transformations)
+test_dataset = Test(data, transformations)
+valid_dataset = Validation(data, transformations)
 train_dataset[0]
 
 # Pickle or whatever all day objs?

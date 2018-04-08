@@ -146,8 +146,8 @@ class Train(Dataset):
 
     def __getitem__(self, index):
         # Return image and the label
-        #width = self.data[index].width
-        #height = self.data[index].height
+        width = self.data[index].width
+        height = self.data[index].height
         img_paths = self.data[index].img_paths
 
         #img_stack = np.asarray([])
@@ -157,7 +157,11 @@ class Train(Dataset):
             #cv2.imwrite('/home/vli/test.jpg', img)
             img_stack[i] = img
             #img_stack = np.stack(img_stack, img), axis=2) if img_stack.size else img # should this be 3D stack or 4D?
-        img_stack = np.stack(img_stack, axis=-1)
+        img_stack = np.stack(img_stack, axis=0)
+
+        #print(img_stack.shape)
+        #frogs = img_stack.reshape(height, width, 32 * 3)
+        #print(np.shares_memory(img_stack, frogs))
 
         if self.transforms is not None:
             img_stack = self.transforms(img_stack)
@@ -177,12 +181,18 @@ class Test(Dataset):
 
     def __getitem__(self, index):
         # Return image and the label
+        img_paths = self.data[index].img_paths
 
-        data = self.data[index].img_stack
+        img_stack = [0] * constants.IMAGES_PER_DAY
+        for i, image in enumerate(img_paths):
+            img = cv2.imread(image)
+            img_stack[i] = img
+        img_stack = np.stack(img_stack, axis=0)
+
         if self.transforms is not None:
-            data = self.transforms(data)
+            img_stack = self.transforms(img_stack)
 
-        return (data, self.sunrise_label[index]) # SKIP SUNSET FOR NOW # VLI
+        return (img_stack, self.sunrise_label[index]) # SKIP SUNSET FOR NOW # VLI
 
     def __len__(self):
         return len(self.data)
@@ -198,12 +208,18 @@ class Validation(Dataset):
 
     def __getitem__(self, index):
         # Return image and the label
+        img_paths = self.data[index].img_paths
 
-        data = self.data[index].img_stack
+        img_stack = [0] * constants.IMAGES_PER_DAY
+        for i, image in enumerate(img_paths):
+            img = cv2.imread(image)
+            img_stack[i] = img
+        img_stack = np.stack(img_stack, axis=0)
+
         if self.transforms is not None:
-            data = self.transforms(data)
+            img_stack = self.transforms(img_stack)
 
-        return (data, self.sunrise_label[index]) # SKIP SUNSET FOR NOW # VLI
+        return (img_stack, self.sunrise_label[index]) # SKIP SUNSET FOR NOW # VLI
 
     def __len__(self):
         return len(self.data)
