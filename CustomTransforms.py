@@ -25,8 +25,8 @@ class RandomPatch():
 class ToTensor():
     def __call__(self, sample):
         num_images, height, width, num_channels = sample.shape
-        transposed = sample.transpose(0, 3, 1, 2) # NUM_IMAGES_PER_DAY x C x H x W
-        reshaped = transposed.reshape(constants.IMAGES_PER_DAY * 3, height, width) # C x H x W
+        transposed = sample.transpose(3, 0, 1, 2) # NUM_IMAGES_PER_DAY x C x H x W
+        #reshaped = transposed.reshape(constants.IMAGES_PER_DAY * 3, height, width) # C x H x W
 
         #original = PIL.Image.fromarray(np.uint8(sample[5]))
         #original.save('/home/vli/patches/sample.jpg')
@@ -34,7 +34,9 @@ class ToTensor():
         #print(np.shares_memory(transposed, sample))
         #print(transposed.shape)
 
-        torch_image = torch.from_numpy(reshaped)
+        torch_image = torch.from_numpy(transposed)
+        #torch_image = torch.from_numpy(reshaped)
+
         #print(sample[5, :, :, 1])
         #print(torch_image.numpy()[16:17, :, :])
 

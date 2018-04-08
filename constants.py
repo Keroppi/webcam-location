@@ -1,10 +1,12 @@
 CLUSTER = False
-DAYS_PER_MONTH = 1 # 'MAX'
+DAYS_PER_MONTH = 2 # 'MAX'
 SIZE = ['small'] # 'large'
 DATA_SOURCES = ['roundshot'] # 'panomax'
 IMAGES_PER_DAY = 32
-PATCH_SIZE = (5, 5)#(128, 128) # height, width
+PATCH_SIZE = (128, 128) # height, width
 NUM_CHANNELS = 3 # BGR
+BATCH_SIZE = 10
+NUM_LOADER_WORKERS = 8
 
 SPLIT_TOTAL = 10
 SPLIT_TRAIN = 7
