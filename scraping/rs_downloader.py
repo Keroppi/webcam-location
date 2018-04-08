@@ -78,6 +78,7 @@ def download_day(country, name, lat, lng, storage_id, year, month, day):
                         print('Exceed Google API quota - sleeping.') # Exceed quota for the day.
                         sys.stdout.flush()
                         time.sleep(3600) # 1 hour
+                        retries = 0
 
         offset = time_data['dstOffset'] + time_data['rawOffset']; # seconds
     
