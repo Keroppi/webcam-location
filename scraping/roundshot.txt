@@ -1,0 +1,1562 @@
+Switzerland
+# Webcams: 191
+Bellevue Wengen Hotel - Bellevue
+https://bellevue.roundshot.com/
+46.60861111111111 7.9158333333333335
+53a0470748e768.32694332
+
+Belvedere Hotel Grindelwald
+https://belvederegrindelwald.roundshot.com/
+46.625 8.029444444444445
+56dffea8826120.23800639
+
+Belvedère Scuol Hotel - Belvedère
+https://belvedere.roundshot.com/
+46.79722222222222 10.2975
+53ce5956663437.97348915
+
+CRESTA PALACE
+https://crestapalace.roundshot.com/
+46.511944444444445 9.8575
+56c729bb5096f4.46498272
+
+Edelweiss Mürren Hotel - Edelweiss
+https://hoteledelweiss.roundshot.com/
+46.561388888888885 7.8966666666666665
+53a9860b3a5780.45862775
+
+Huus AG - Huus Hotel Gstaad
+https://huusgstaad.roundshot.com/
+46.49305555555556 7.266944444444444
+582c2692c86f40.73389854
+
+Kirchbühl Grindelwald Hotel - Kirchbühl
+https://kirchbuehl.roundshot.com/
+46.62694444444445 8.045833333333333
+53a9904e274b39.54073038
+
+Kurt Weber AG
+https://glashaushotel.roundshot.com/
+47.242222222222225 8.187222222222223
+56a7eb845e67a6.56453199
+
+Palace Hotel Gstaad - Palace Gstaad
+https://palacegstaad.roundshot.com/
+46.47277777777778 7.289166666666667
+53a97aadc548e7.20618519
+
+Uto Kulm - Uetliberg
+https://uetliberg.roundshot.com/
+47.349444444444444 8.491388888888888
+53aacd05e65407.10715840
+
+Frauenfeld Stadt - Frauenfeld
+https://frauenfeld.roundshot.com/
+47.555277777777775 8.897499999999999
+5a1d1dbc399048.56566075
+
+Regionalwerke AG Baden - Wasserturm Baldegg
+https://baden.roundshot.com/turm-baldegg/
+47.47 8.2825
+59a56f8c2d2ae9.90088670
+
+Winterthur Stadt - Altstadt
+https://winterthur.roundshot.com/altstadt/
+47.499722222222225 8.731944444444444
+53aad57c366e91.47175005
+
+GZO Spital Wetzikon
+https://gzo.roundshot.com/
+47.321111111111115 8.8025
+53a979853ab391.41220151
+
+Kantonsspital Graubünden - Chur
+https://ksgr.roundshot.com/
+46.861111111111114 9.541666666666666
+53ce69426227f6.12098355
+
+Kantonsspital Nidwalden
+https://ksnw.roundshot.com/
+46.96 8.357222222222221
+57e2b1fa117222.19088566
+
+Luzerner Höhenklinik Montana
+https://lhm.roundshot.com/
+46.31666666666667 7.498055555555555
+53aa92f61b1e20.59753483
+
+Luzerner Kantonsspital - Luzern
+https://luks-luzern.roundshot.com/
+47.05972222222222 8.296666666666667
+57d678c7c86300.66693662
+
+Luzerner Kantonsspital - Sursee
+https://luks-sursee.roundshot.com/
+47.168055555555554 8.1175
+577237af68bd21.05107756
+
+Luzerner Kantonsspital - Wolhusen
+https://luks-wolhusen.roundshot.com/
+47.06638888888889 8.074444444444444
+57728075972f06.76882974
+
+Maiengarten - Bertschikon
+https://maiengarten.roundshot.com/
+47.52333333333333 8.838333333333335
+53aa94ace7c186.24562765
+
+Kachelmannwetter - Rotenflue
+https://kachelmannwetter.roundshot.com/rotenflue/
+47.02111111111111 8.703055555555554
+548ea1876fbaa7.33455027
+
+Kachelmannwetter - Sattel
+https://kachelmannwetter.roundshot.com/sattel/
+47.06722222222223 8.649444444444445
+54807463306128.35577150
+
+Kachelmannwetter - Tierpark Goldau
+https://kachelmannwetter.roundshot.com/tierparkgoldau/
+47.050555555555555 8.555000000000001
+58347af425afe1.04345042
+
+Andermatt Sedrun - Ski Arena - Gemsstock
+https://andermatt-sedrun.roundshot.com/gemsstock/
+46.602222222222224 8.611666666666666
+550ea97a839c41.16439903
+
+Anzère Tourisme - Anzère Pistes
+https://anzere.roundshot.com/pistes/
+46.31194444444444 7.385833333333334
+531f37f9368025.33250381
+
+Anzère Tourisme - Anzère Village
+https://anzere.roundshot.com/village/
+46.29722222222222 7.4
+531f37804d07d3.91324329
+
+Arosa Bergbahnen - Hörnli Berg
+https://hoernliberg.roundshot.com/
+46.76722222222222 9.620000000000001
+59b264f297a104.65661067
+
+Arosa Bergbahnen - Tschuggen
+https://tschuggen.roundshot.com/
+46.783055555555556 9.66388888888889
+53a04101be4002.64521781
+
+Arosa Bergbahnen - Weisshorn
+https://weisshorn.roundshot.com/
+46.788888888888884 9.637222222222222
+585bec33968fe0.94963985
+
+Autoverkehr Grindelwald - Grindelwald Bus
+https://grindelwaldbus.roundshot.com/
+46.649166666666666 7.9911111111111115
+53a0446509fab0.00534517
+
+Berghotel Sellamatt Lötscher AG - Alp Sellamatt
+https://alpsellamatt.roundshot.com/
+47.1825 9.296666666666667
+59412dabdc2347.53111703
+
+Berghotel Sellamatt Lötscher AG - Zinggen
+https://alpsellamatt.roundshot.com/zinggen/
+47.176944444444445 9.298055555555555
+59414d28dcec26.26414798
+
+Biel Kinzig AG - Weissenboden
+https://bielkinzig.roundshot.com/weissenboden/
+46.89972222222222 8.709166666666667
+563cccc4d6dde3.19689514
+
+Braunwald Sportbahnen - Gumen
+https://braunwald.roundshot.com/gumen/
+46.955555555555556 8.985555555555555
+57dfbb86b9b081.59321175
+
+Chur-Dreibündenstein Bergbahnen AG - Brambrüesch
+https://brambruesch.roundshot.com/
+46.81222222222222 9.502777777777778
+582d8268ab87f6.88941696
+
+Churwalden - Parpan Gemeinde - Gemeinde Parpan
+https://lenzerheide.roundshot.com/parpan/
+46.75888888888889 9.563055555555556
+545ce166cfcab0.97806627
+
+Château-d'Oex Télé SA - La Braye
+https://telechateaudoex.roundshot.com/la-braye/
+46.447222222222216 7.1450000000000005
+55911a68b6e3b0.87363835
+
+Crans Montana Tourisme - Grand Signal
+https://cma.roundshot.com/grandsignal/
+46.33638888888889 7.478611111111111
+53a837162f8ce9.23016414
+
+Fürenalp LSB Engelberg - Fürenalp
+https://fuerenalp.roundshot.com/
+46.80083333333333 8.467777777777778
+53a83ab613b499.51177756
+
+Gemmi Bahnen - Gemmi
+https://gemmi.roundshot.com/
+46.3975 7.615555555555555
+53a97832ca3462.76027122
+
+Gstaad 3000 - Glacier3000
+https://glacier3000.roundshot.com/
+46.32666666666667 7.203611111111111
+53ce6a088e0b28.00564708
+
+Hohsaas Bergbahnen - Hohsaas 3200m
+https://hohsaas.roundshot.com/3200/
+46.13944444444444 7.990555555555556
+5523f38c8a5d50.60990359
+
+Hohsaas Bergbahnen - Kreuzboden 2400m
+https://hohsaas.roundshot.com/kreuzboden/
+46.13972222222222 7.965
+5a1599033c9fd1.83623272
+
+Laax Flims Falera - Weisse Arena - Berghaus Nagens
+https://laax.roundshot.com/berghaus-nagens/
+46.861666666666665 9.23361111111111
+53a9975b58ebb0.66139522
+
+Laax Flims Falera - Weisse Arena - Caumasee
+https://laax.roundshot.com/caumasee/
+46.82277777777778 9.295
+55812d7391ce13.12122046
+
+Laax Flims Falera - Weisse Arena - Crap Masegn
+https://laax.roundshot.com/crap-masegn/
+46.842222222222226 9.18
+53a996c10ed670.35746690
+
+Laax Flims Falera - Weisse Arena - Crap Sogn Gion Park
+https://laax.roundshot.com/crap-sogn-gion-park/
+46.83444444444444 9.216111111111111
+53a99501edd533.09911744
+
+Laax Flims Falera - Weisse Arena - Crap Sogn Gion Plaun
+https://laax.roundshot.com/crap-sogn-gion-plaun/
+46.83527777777778 9.215555555555556
+53a9962e8aa056.47025501
+
+Laax Flims Falera - Weisse Arena - La Siala
+https://laax.roundshot.com/la-siala/
+46.88055555555555 9.204166666666666
+5644bef8354f91.84288184
+
+Laax Flims Falera - Weisse Arena - Mutta Rodunda
+https://laax.roundshot.com/mutta-rodunda/
+46.86055555555556 9.236944444444443
+53a997e1013c14.63553348
+
+Laax Flims Falera - Weisse Arena - Rheinschlucht - Conn
+https://laax.roundshot.com/conn/
+46.80444444444444 9.230277777777777
+55812ec3db6989.48256032
+
+Laax Flims Falera - Weisse Arena - Rocksresort
+https://laax.roundshot.com/rocksresort/
+46.81944444444445 9.26361111111111
+53a993ada74135.72602423
+
+Laax Flims Falera - Weisse Arena - Rocksresort 3 - Baustelle
+https://rocksresort3.roundshot.com/baustelle/
+46.81861111111112 9.26388888888889
+59ca25a401f5b7.03023171
+
+Laax Flims Falera - Weisse Arena - Talstation Flims
+https://laax.roundshot.com/talstation-flims/
+46.83388888888889 9.28138888888889
+53a99192aeeba9.80818547
+
+Laax Flims Falera - Weisse Arena - Vorab Gletscher
+https://laax.roundshot.com/vorab-gletscher/
+46.87305555555555 9.179722222222221
+53a9986ade03f6.46565419
+
+Lantsch - Lenz Skiliftgesellschaft AG - Lantsch - Lenz
+https://lantsch-lenz.roundshot.com/
+46.68194444444444 9.566111111111113
+5655c81aa4a884.57008188
+
+Lantsch - Lenz Tourismus - Biathlon Arena - Biathlon Arena
+https://biathlonarena.roundshot.com/
+46.69277777777778 9.556111111111111
+5421625b91dc77.83333402
+
+Lenzerheide Bergbahnen - Alp Stätz
+https://lenzerheide.roundshot.com/alpstaetz/
+46.75888888888889 9.534722222222221
+53aa8d33466fa9.62099805
+
+Lenzerheide Bergbahnen - Parpaner Rothorn
+https://lenzerheide.roundshot.com/rothorn/
+46.7425 9.597222222222223
+53aa8e920dd9e7.40757090
+
+Lenzerheide Bergbahnen - Piz Scalottas
+https://lenzerheide.roundshot.com/pizscalottas/
+46.72166666666667 9.511111111111111
+53aa8fcedea3b9.09671656
+
+Lenzerheide Bergbahnen - Talstation
+https://lenzerheide.roundshot.com/talstation/
+46.74 9.556944444444445
+54788dfab13ae0.67443619
+
+Lenzerheide Bergbahnen - Urdenfuerggli
+https://lenzerheide.roundshot.com/urdenfuerggli/
+46.769444444444446 9.595
+53aa8f32c64ec5.88423204
+
+Leysin Télé - Kuklos
+https://tlml.roundshot.com/
+46.359722222222224 7.001944444444445
+53ce6a73d7cc75.56101023
+
+Leysin Télé - Les Mosses
+https://lesmosses.roundshot.com/
+46.39611111111111 7.096111111111111
+5421713e33b861.96403086
+
+MOB - CCF Montreux Oberland Bernois - Rochers de Naye
+https://mob.roundshot.com/rochersdenaye/
+46.431666666666665 6.976111111111111
+54ef421ae3cdd3.25550945
+
+Marbachegg Sportbahnen - Marbachegg
+https://marbachegg.roundshot.com/
+46.835 7.9061111111111115
+59bf8d45e99462.32929904
+
+Meiringen Hasliberg Bergbahnen - Alpen Tower
+https://alpentower.roundshot.com/
+46.736666666666665 8.255
+564f0328b9b989.00509554
+
+Meiringen Hasliberg Bergbahnen - Käserstatt
+https://kaeserstatt.roundshot.com/
+46.7575 8.21861111111111
+55799ba6e211b2.16310487
+
+Meiringen Hasliberg Bergbahnen - Maegisalp
+https://maegisalp.roundshot.com/
+46.74916666666667 8.236666666666666
+53ce59bee8e0e9.48135677
+
+Melchsee-Frutt Sportbahnen - Bonistock
+https://bonistock.roundshot.com/
+46.777499999999996 8.289722222222222
+53ce6d3f058424.34843416
+
+Melchsee-Frutt Sportbahnen - Melchsee-Frutt Dorf
+https://melchseefrutt.roundshot.com/
+46.77444444444444 8.268333333333334
+53ce6e2b79e7b2.42704522
+
+Pilatus Bergbahnen
+https://pilatus.roundshot.com/
+46.97916666666667 8.25611111111111
+53ce6af5ae1835.21533240
+
+Schilthorn - Allmendhubel
+https://schilthorn.roundshot.com/allmendhubel/
+46.56388888888888 7.887499999999999
+5639f2dbddec02.49212452
+
+Schilthorn - Birg
+https://schilthorn.roundshot.com/birg/
+46.561388888888885 7.857222222222222
+5639f2324797c3.98380703
+
+Splügen Bergbahnen - Tanatzhöhe
+https://spluegen.roundshot.com/
+46.53055555555555 9.313611111111111
+53ce5a7155c4f4.57507300
+
+Sörenberg Bergbahnen - Rothorn Gipfel
+https://soerenberg.roundshot.com/rothorn/
+46.78722222222222 8.044444444444444
+58c17d5df15144.54606734
+
+Toggenburg Bergbahnen - Chaeserrugg
+https://chaeserrugg.roundshot.com/
+47.15472222222222 9.313055555555556
+53aac874be36f1.86083713
+
+Toggenburg Bergbahnen - Iltios
+https://iltios.roundshot.com/
+47.184999999999995 9.311666666666667
+58ee238ec0fbd8.86947325
+
+Télé Villars Gryon Diablerets - Isenau
+https://villars.roundshot.com/isenau/
+46.36333333333334 7.183055555555556
+544f809ea788f8.47106013
+
+Télé Villars Gryon Diablerets - Les Chaux
+https://villars.roundshot.com/leschaux/
+46.294999999999995 7.104444444444444
+59d7889324a395.24481950
+
+Télé Villars Gryon Diablerets - Meilleret
+https://villars.roundshot.com/chaux-ronde/
+46.33305555555556 7.1211111111111105
+53aac4deacefa4.49887477
+
+Télé Villars Gryon Diablerets - Petit Chamossaire
+https://villars.roundshot.com/pt-chamossaire/
+46.331388888888895 7.066944444444444
+53aabfac9d5614.13900910
+
+Télé Villars Gryon Diablerets - Place de Bretaye
+https://villars.roundshot.com/bretaye/
+46.32277777777778 7.074722222222222
+53aac613088ab7.11272659
+
+Vaz/Obervaz Elektrizitätswerk - Bargias
+https://lenzerheide.roundshot.com/bargias/
+46.73638888888889 9.546666666666667
+541151ad734342.21140197
+
+Wasserfallen Bahn
+https://wasserfallenbahn.roundshot.com/
+47.37361111111111 7.699722222222222
+54e70d752c80c0.27201828
+
+Wildhaus Bergbahnen AG - Gamsalp
+https://wildhaus.roundshot.com/gamsalp/
+47.17361111111111 9.338055555555556
+5953c9a6dfb078.82403998
+
+Wildhaus Bergbahnen AG - Oberdorf
+https://wildhaus.roundshot.com/oberdorf/
+47.19194444444444 9.345
+593ed5cbe5c930.24637295
+
+Musée Suisse de l'Appareil Photographique - Vevey
+https://msap.roundshot.com/
+46.45916666666667 6.842777777777777
+53aa96f2f15927.24244761
+
+AeCS Regionalverband Fricktal - Flugplatz Fricktal Schupfart
+https://flugplatzschupfart.roundshot.com/
+47.50888888888889 7.950277777777778
+58eb4481605615.63926737
+
+Birrfeld Flughafen - Flughafen Birrfeld
+https://birrfeld.roundshot.com/
+47.443888888888885 8.229722222222222
+552530f44d6fc3.49354975
+
+Engadin Airport AG
+https://engadin-airport.roundshot.com/
+46.53 9.878333333333334
+56c702736d2025.83338463
+
+Grenchen Flugschule - Grenchen Flughafen
+https://fliegen.roundshot.com/
+47.183055555555555 7.413611111111112
+53a974414ddfe7.48910878
+
+Gstaad Airport
+https://gstaad-airport.roundshot.com/
+46.48694444444445 7.245555555555556
+597f429a769f71.06054879
+
+Hausen am Albis Flugplatz
+https://albiswings.roundshot.com/
+47.23777777777778 8.514166666666666
+53a9735033ee93.12581862
+
+Sion Aéroport
+https://sionairport.roundshot.com/
+46.222500000000004 7.337222222222222
+5773b57ae23510.59080675
+
+Hergiswil Gemeindebootshafen
+https://bootshafen-hergiswil.roundshot.com/
+46.97944444444445 8.311944444444444
+55eedc131faae2.46543702
+
+Jack Beck SA - Hafen Faoug
+https://hafen-faoug.roundshot.com/
+46.908055555555556 7.071111111111111
+571dd53eb2df46.76825106
+
+La Tour-de-Peilz Ville
+https://latourdepeilz.roundshot.com/
+46.45166666666667 6.8549999999999995
+577ccac598a9e0.63895671
+
+Luzerner SGV - Lake Lucerne
+https://sgv.roundshot.com/
+47.05138888888889 8.312222222222223
+53aa90f797be63.63524585
+
+Rheinunternehmen - Rheinspitz
+https://hafenamrheinspitz.roundshot.com/
+47.50083333333333 9.56027777777778
+56991377702513.34463660
+
+Vengeron.net - Plage du Vengeron
+https://vengeron.roundshot.com/
+46.245555555555555 6.153611111111111
+55dc1f2e90dab7.10934373
+
+Adliswil-Felsenegg Luftseilbahn LAF AG
+https://laf.roundshot.com/
+47.309999999999995 8.507222222222222
+56b9ece79a26e1.84509009
+
+Berner Reha Zentrum Heiligenschwendi - Berner Reha Zentrum Heiligschwendi
+https://rehabern.roundshot.com/
+46.74944444444444 7.693333333333333
+595e3fe12059f0.23556672
+
+Computechnic - Rorschacherberg
+https://computechnic.roundshot.com/
+47.474444444444444 9.508055555555556
+53a838bc15a356.87772279
+
+Foto Pro Colora - Bendern
+https://fotoprocolora.roundshot.com/
+47.205555555555556 9.502222222222223
+54fd73e5c777b0.47904938
+
+Kloster Disentis
+https://klosterdisentis.roundshot.com/
+46.6875 8.847222222222223
+5751307a705e43.33797960
+
+NZZ - Zürich
+https://nzz.roundshot.com/
+47.36527777777778 8.547222222222222
+53aa9f913d42d6.52047249
+
+SWL Energie AG
+https://swl.roundshot.com/
+47.394444444444446 8.168055555555554
+550839db5ed455.21642846
+
+Seitz Phototechnik - Lustdorf
+https://lustdorf.roundshot.com/
+47.55027777777777 8.987222222222222
+531f17c98aeba5.30442284
+
+Seitz Phototechnik - Lustdorf Downtown
+https://lustdorf.roundshot.com/downtown/
+47.54972222222222 8.987499999999999
+591db43d2291a3.51779168
+
+Swisscom Broadcast AG - Bantiger
+https://bantiger.roundshot.com/
+46.978611111111114 7.528333333333333
+5979c2b57c9276.64654717
+
+Swisscom Broadcast AG - St. Chrischona
+https://chrischona.roundshot.com/
+47.57166666666667 7.686944444444444
+59c2394391a003.21626272
+
+Tissot - Tissot - Le Locle
+https://tissot.roundshot.com/
+47.05638888888888 6.747777777777777
+53aaa7b3bf3941.38807850
+
+Celerina Gemeinde - Celerina
+https://celerina.roundshot.com/
+46.511944444444445 9.8575
+57beb39a03f7e3.01158735
+
+Chax Commune - Château d'Oex
+https://chax.roundshot.com/
+46.47638888888889 7.124444444444444
+53a8361fdc63a5.45691356
+
+Chexbres Commune - Chexbres
+https://chexbres.roundshot.com/
+46.481388888888894 6.780555555555556
+56d71b7f379aa6.71088040
+
+Commune Coppet
+https://coppet.roundshot.com/
+46.31638888888889 6.193333333333333
+582991391a6025.23290039
+
+Heiden Gemeinde - Heiden
+https://heiden.roundshot.com/
+47.440555555555555 9.53888888888889
+53a98066017d32.91292386
+
+Municipalité de Sauge - Plagne
+https://plagne.roundshot.com/
+47.18805555555555 7.286111111111111
+58d8e0a8f11161.85004104
+
+Oensingen Gemeinde - Roggenberg
+https://roggenberg.roundshot.com/
+47.305 7.7186111111111115
+53a97525aa0020.79298090
+
+Sils Maria Gemeinde - Sils Maria
+https://sils.roundshot.com/
+46.42833333333333 9.761111111111111
+5451f591921dc1.17691328
+
+Stalden Gemeinde - Stalden
+https://gemeindestalden.roundshot.com/
+46.22944444444445 7.870277777777778
+54f5817d50d515.12730100
+
+Vallorbe Commune
+https://vallorbe.roundshot.com/
+46.71222222222222 6.378333333333333
+5968960185e656.86133759
+
+Zuoz Gemeinde
+https://zuozgemeinde.roundshot.com/
+46.6 9.954166666666666
+571e62649d6bb1.46208224
+
+El Paradiso St. Moritz - El Paradiso
+https://elparadiso.roundshot.com/
+46.489444444444445 9.808055555555557
+53a83993e8f550.94843394
+
+Le Carrefour Verbier - Le Carrefour
+https://lecarrefour.roundshot.com/
+46.10166666666667 7.241666666666667
+53aa7acb4e6e11.56280419
+
+Wildspitz Berghaus - Wildspitz
+https://wildspitz.roundshot.com/
+47.08444444444444 8.577222222222222
+5595515f75aba9.83008277
+
+Andermatt Swiss Alps - Baezberg
+https://andermatt.roundshot.com/baezberg/
+46.645833333333336 8.5875
+5322dcaec2f0b3.73101337
+
+Bürgenstock Resort
+https://buergenstock.roundshot.com/
+46.99638888888889 8.377500000000001
+53a8348147a752.77568194
+
+CFF Immobilier - Parc du Simplon
+https://cffimmobilier.roundshot.com/parcdusimplon/
+46.53361111111111 6.585
+59bf8b77acc047.07576534
+
+CFF Immobilier - Pont Rouge Lancy
+https://cffimmobilier.roundshot.com/pontrouge/
+46.18694444444444 6.126666666666666
+54eb4eaf91d597.57556581
+
+CFF Immobilier - Quai Ouest
+https://cffimmobilier.roundshot.com/quaiouest/
+46.53666666666666 6.578888888888889
+5a1849da8d46c0.44991524
+
+CFF Immobilier - Quartier Des Halles
+https://cffimmobilier.roundshot.com/quartierdeshalles/
+46.51111111111111 6.496111111111111
+58905c65139f56.25776070
+
+GZO Spital Wetzikon - GZO Baustelle
+https://gzo.roundshot.com/baustelle/
+47.321111111111115 8.800833333333333
+5a2162b41e48d5.64345084
+
+Halter - Les Terrasses Volantes
+https://halter.roundshot.com/terrasses-volantes/
+47.01444444444444 6.978888888888889
+5a5890e4325739.60111218
+
+Halter - Zwicky Areal - 10. Stock
+https://halter.roundshot.com/zwickyareal-10/
+47.40472222222222 8.604722222222222
+5953b173a65432.07242137
+
+Halter - Zwicky Areal - 12. Stock
+https://halter.roundshot.com/zwickyareal-12/
+47.40472222222222 8.604722222222222
+5953b27a4093c2.34604996
+
+Halter - Zwicky Areal - 14. Stock
+https://halter.roundshot.com/zwickyareal-14/
+47.40472222222222 8.604722222222222
+5953b3163bbc80.93144769
+
+Halter - Zwicky-Areal
+https://halter.roundshot.com/zwickyareal/
+47.404444444444444 8.601666666666667
+57b6c76b2e55d8.98074954
+
+Kaufmann Oberholzer AG - Säntisblick
+https://saentisblick.roundshot.com/
+47.520833333333336 9.200833333333332
+57b1bd53014d37.02836144
+
+Pilet & Renaud
+https://pilet-renaud.roundshot.com/placedescharmilles/
+46.20777777777778 6.127222222222222
+58b45a36f41be9.30639411
+
+Rhätische Bahn - Albulatunnel
+https://albulatunnel.roundshot.com/
+46.588055555555556 9.777222222222223
+54746c4b1386b2.69857289
+
+UNESCO - Naters
+https://unesco.roundshot.com/naters/
+46.32194444444445 7.984444444444445
+53aacc0e0593e5.49047923
+
+Uffer Savognin
+https://uffer.roundshot.com/
+46.59388888888889 9.604722222222222
+53aacabc0e2534.81303209
+
+Aigle Gemeinde
+https://aigle.roundshot.com/
+46.316944444444445 6.978055555555556
+53ce585c3fa260.21080772
+
+Andermatt Swiss Alps - Golfplatz
+https://andermatt.roundshot.com/golfplatz/
+46.632222222222225 8.5775
+593ea21240c693.00870888
+
+Avenches Tourisme - Camping-plage
+https://avenches.roundshot.com/camping-plage/
+46.905833333333334 7.049722222222222
+558a9f2a2dac68.32713755
+
+Bern Tourismus - Hotel Bellevue
+https://berntourismus.roundshot.com/hotelbellevuepalace/
+46.946666666666665 7.446666666666667
+53ce5bb64a2b86.45979144
+
+Bern Tourismus - Restaurant Rosengarten
+https://berntourismus.roundshot.com/rosengarten/
+46.950833333333335 7.460555555555556
+53ce5bd90d50b1.35697840
+
+Biel Tourismus - Bözingenberg
+https://boezingenberg.roundshot.com/
+47.17166666666667 7.283888888888889
+54be2cc7bfcda5.21048119
+
+Châtel-St-Denis Office de Tourisme - Corbetta
+https://lespaccots.roundshot.com/corbetta/
+46.511944444444445 6.934722222222223
+581c769894e563.94438889
+
+Châtel-St-Denis Office de Tourisme - Rathvel
+https://lespaccots.roundshot.com/rathvel/
+46.543055555555554 6.976944444444444
+581c79f0d5ebe6.47666640
+
+Gruyère Tourisme - Gruyère
+https://lagruyere.roundshot.com/
+46.58416666666667 7.081944444444444
+55d1b40261ad01.27632489
+
+Jura Tourisme - Aventure Jura Parc Rebeuvelier
+https://juratourisme.roundshot.com/aventurejuraparc/
+47.319722222222225 7.4077777777777785
+53a98831407ef7.01773470
+
+Jura Tourisme - Delémont
+https://juratourisme.roundshot.com/delemont/
+47.36194444444445 7.349722222222222
+53a98f4446b735.41328334
+
+Jura Tourisme - Le Noirmont
+https://juratourisme.roundshot.com/noirmont/
+47.21055555555556 6.953333333333333
+53a98c92345e05.26825052
+
+Jura Tourisme - Les Ordons
+https://juratourisme.roundshot.com/lesordons/
+47.38777777777778 7.231111111111111
+59a71f1732c727.80171059
+
+Jura Tourisme - Porrentruy
+https://juratourisme.roundshot.com/porrentruy/
+47.41083333333333 7.075833333333333
+53a98d163ad896.35321075
+
+Jura Tourisme - Saignelégier
+https://juratourisme.roundshot.com/saignelegier/
+47.25361111111111 6.998333333333333
+53a98bf55c82c2.44826551
+
+Jura Tourisme - St Ursanne
+https://juratourisme.roundshot.com/st-ursanne/
+47.367222222222225 7.168055555555556
+53a98dc1797129.48576895
+
+Luzern Tourismus - Luzern
+https://luzerntourismus.roundshot.com/
+47.05083333333333 8.308611111111112
+53aa922da49ec7.57439399
+
+Luzern Tourismus - Weggis
+https://weggis.roundshot.com/
+47.03138888888889 8.433055555555555
+54bd09aee73172.33986649
+
+Morat - Association Régionale du Lac - Morat
+https://morat.roundshot.com/
+46.92805555555555 7.114999999999999
+53aa962719f593.63804350
+
+Morat - Association Régionale du Lac - Vully les Lacs
+https://montmagny.roundshot.com/
+46.92666666666666 7.009166666666666
+558a84216fe385.16758722
+
+Morges Région Tourisme - Morges - Port
+https://morgesregion.roundshot.com/
+46.507777777777775 6.498611111111111
+553b32b0bc3173.33224654
+
+Morges Région Tourisme - Morges Ville
+https://morgesregion.roundshot.com/ville/
+46.51222222222222 6.490833333333334
+567036de01a748.73591800
+
+Nyon Région Tourisme - Nyon
+https://nyon-tourisme.roundshot.com/
+46.38055555555555 6.2411111111111115
+55dae11ef1e736.84215477
+
+Obergoms Tourismus - Oberwald
+https://obergoms.roundshot.com/oberwald/
+46.53 8.344444444444445
+5a0afd597aaf75.90842617
+
+Obergoms Tourismus - Ulrichen - Nordisches Zentrum
+https://obergoms.roundshot.com/ulrichen/
+46.50055555555556 8.301666666666668
+5a0afc4ded6a20.59282611
+
+Pays de Neuchâtel - Chaumont
+https://chaumont.roundshot.com/
+47.02583333333333 6.958055555555556
+53aa9a99658453.62437888
+
+Pays de Neuchâtel - La Brévine
+https://labrevine.roundshot.com/
+46.97944444444445 6.606944444444444
+53aa9cec7c9672.81431459
+
+Pays de Neuchâtel - La Chaux-de-Fonds
+https://lachauxdefonds.roundshot.com/
+47.102222222222224 6.828611111111111
+54663aac8b1a77.11089022
+
+Pays de Neuchâtel - La Robella
+https://larobella.roundshot.com/
+46.876111111111115 6.549722222222222
+5a3a48a303ccc2.51790966
+
+Pays de Neuchâtel - Lac de Neuchâtel
+https://lacdeneuchatel.roundshot.com/
+47.00944444444445 6.986111111111112
+55eeeaac99d4b4.39247684
+
+Pays de Neuchâtel - Lac des Taillères
+https://tailleres.roundshot.com/
+46.97083333333334 6.586111111111111
+53aa9c299d9823.87728304
+
+Pays de Neuchâtel - Les Brenets
+https://lesbrenets.roundshot.com/
+47.068333333333335 6.697500000000001
+53aa9d904d01d0.81806281
+
+Pays de Neuchâtel - Neuchâtel
+https://neuchatel.roundshot.com/
+46.99666666666667 6.937222222222222
+54748cca0a3387.37093644
+
+Pays de Neuchâtel - Tête de Ran
+https://tete-de-ran.roundshot.com/
+47.05416666666667 6.85361111111111
+543509554a8bb2.55362362
+
+Sierre Office de Tourisme - Sierre Tourisme
+https://sierre-tourisme.roundshot.com/
+46.30722222222222 7.532222222222222
+56cd98f98805d9.46784144
+
+Säntis Schwebebahn - Säntis
+https://saentis.roundshot.com/
+47.24916666666667 9.341944444444445
+53ce6b5b69eda2.07649423
+
+Vallée de Joux Tourisme - Vallée de Joux
+https://valleedejoux.roundshot.com/
+46.66111111111111 6.336666666666666
+55f823bc084b99.49667631
+
+Verein Wil Tourismus - Wiler Turm
+https://wilerturm.roundshot.com/
+47.478611111111114 9.049444444444445
+545b7dcf9cedf1.10734711
+
+Yverdon-les-Bains Region Jura-Lac - Les Rasses
+https://yverdon.roundshot.com/lesrasses/
+46.84277777777778 6.528888888888889
+5751200cdce293.99758065
+
+Yverdon-les-Bains Region Jura-Lac - Ville
+https://yverdon.roundshot.com/ville/
+46.77833333333333 6.640833333333333
+56df104a526836.52840206
+
+Zürich Tourismus - Zürich Stadthaus
+https://zuerichtourismus.roundshot.com/stadthaus/
+47.369166666666665 8.54138888888889
+53aad7f638ecd6.53792695
+
+Zürich Tourismus - Zürich West
+https://zuerichtourismus.roundshot.com/zuerichwest/
+47.382222222222225 8.54
+53aad6578ec082.95526880
+
+Aiglon College
+https://aigloncollege.roundshot.com/
+46.302499999999995 7.046944444444445
+576c4aa94999f3.08977207
+
+Beausoleil Collège - Villars
+https://beausoleil.roundshot.com/
+46.29888888888889 7.0525
+53a045ff4fbbe6.64488555
+
+Bäumlihof Gymnasium
+https://baeumlihof.roundshot.com/
+47.5675 7.626388888888889
+5804de7f346cd2.01986444
+
+EPFL
+https://epfl.roundshot.com/
+46.51833333333333 6.5616666666666665
+57a460b47e2e65.46913349
+
+-----
+
+Germany
+# Webcams: 8
+Burg Gössweinstein
+https://burggoessweinstein.roundshot.com/
+49.769999999999996 11.334166666666667
+56ab6a13ca09a7.70752717
+
+Guido Gegg Werbefotografie
+https://guidogegg.roundshot.com/
+48.478611111111114 7.939444444444445
+54c22445161396.51737181
+
+ImageType NewMedia GmbH - Chiemsee
+https://chiemgau.roundshot.com/chiemsee/
+47.867777777777775 12.397499999999999
+5587fc6b6112f0.27710113
+
+Stamm - Hannover
+https://ulrich-stamm.roundshot.com/
+52.41166666666666 9.823333333333332
+53aaa53f8c4d45.31056026
+
+Mittagbahn
+https://mittagbahn.roundshot.com/
+47.53666666666666 10.215833333333332
+56b895c6b08f57.71487130
+
+Ofterschwang Bergbahnen
+https://bog.roundshot.com/
+47.49861111111111 10.21361111111111
+53a0484c83cca8.79039817
+
+Bundeskunsthalle Bonn - Wetterausstellung
+https://wetterausstellung.roundshot.com/
+50.71416666666667 7.121388888888888
+59d38f27bb2619.57506634
+
+Eggensberger Hotel
+https://hoteleggensberger.roundshot.com/
+47.60888888888889 10.681944444444444
+53ce6812a43508.11453786
+
+-----
+
+Norway
+# Webcams: 28
+ARCTIC STUDSAMSK
+https://arctic-studsamsk.roundshot.com/
+69.6725 18.9625
+5583e0588bc099.03380212
+
+Honningsvag - HVG REPPVÅGK
+https://honningsvag.roundshot.com/
+70.98166666666667 25.973611111111108
+53ac203c9ef3b4.07250425
+
+Kapp Amsterdam
+https://kappamsterdam.roundshot.com/
+77.86166666666666 16.646666666666665
+53ac213576fad3.82073422
+
+Nordkapp
+https://nordkapp.roundshot.com/
+71.17 25.783611111111114
+53ac22c77a3ad1.21130028
+
+Port of Alta
+https://portalta.roundshot.com/
+69.98388888888888 23.283333333333335
+53ac2be3706915.52383240
+
+Port of Batsfjord
+https://portbatsfjord.roundshot.com/
+70.63277777777778 29.725277777777777
+53ac2c7241a5e1.95150251
+
+Port of Berlevag
+https://portberlevog.roundshot.com/
+70.85888888888888 29.100833333333334
+53ac2ce87ba6d1.92575120
+
+Port of Hammerfest
+https://porthammerfest.roundshot.com/
+70.66722222222222 23.65888888888889
+53ac2d69e63e25.40941642
+
+Port of Havoysund
+https://porthavoysund.roundshot.com/
+70.99277777777777 24.67888888888889
+53ac2ddaa39924.97075337
+
+Port of Honningsvag
+https://porthonningsvag.roundshot.com/
+70.97638888888889 25.963055555555556
+53ac2e2cde5229.45747334
+
+Port of Longyear
+https://portlongyear.roundshot.com/
+78.22833333333334 15.598055555555556
+53ac30d122b126.15751728
+
+Port of Mehamn
+https://portmehamn.roundshot.com/
+71.03972222222222 27.839444444444442
+53ac3422ace561.30283176
+
+Port of Skjervoy
+https://portskjervoy.roundshot.com/
+70.03027777777778 20.976388888888888
+53ac34957396c7.73502489
+
+Port of Vadso
+https://portofvadso.roundshot.com/
+70.07055555555556 29.734722222222224
+53ac351d10f3d4.31867379
+
+Port of Vardo
+https://portvardo.roundshot.com/
+70.37472222222222 31.103611111111114
+53ac359bdda0b0.55481983
+
+Senjahopen
+https://senjahopen.roundshot.com/
+69.49111111111111 17.500555555555554
+53ac3614053139.49019442
+
+Bryne
+https://bryne.roundshot.com/
+58.73388888888889 5.650555555555556
+5322d7b85ca883.79185053
+
+Hammerfest - Hammerfest 360
+https://hammerfest.roundshot.com/
+70.66222222222223 23.691666666666666
+53ac1e0ee03490.30602291
+
+Longyearbyen - Longyearbyen 360
+https://longyearbyen.roundshot.com/
+78.2225 15.6525
+53ac223476f774.62257077
+
+Unn - Pasienthotell
+https://unn.roundshot.com/pasienthotell/
+69.68222222222222 18.980833333333333
+5626a8032ed4b3.57460239
+
+Kvitbjorn
+https://kvitbjorn.roundshot.com/
+69.70777777777778 19.013055555555557
+55d1dfcd4f33f3.12752301
+
+Kvitbjorn - Kvitbjorn 2
+https://kvitbjorn2.roundshot.com/
+69.70833333333334 19.01638888888889
+56a4d93801c6f6.38890275
+
+STATSBYGG
+https://statsbygg.roundshot.com/
+69.68472222222222 18.9775
+5526a1574a7fd0.04212576
+
+Unn - A-Floya
+https://unn.roundshot.com/a-floya/
+69.68361111111112 18.980555555555554
+53ac37e6858d44.06334633
+
+HAFJELL PARK - Hafjelltoppen
+https://hafjell.roundshot.com/hafjelltoppen/
+61.23277777777778 10.51388888888889
+55dacc621dc0b6.03829619
+
+HAFJELL PARK - Kvitfjell Express
+https://kvitfjell.roundshot.com/kvitfjell-express/
+61.46472222222223 10.12138888888889
+55e950eed56fe9.79560714
+
+HAFJELL PARK - Kvitfjell Vestside
+https://kvitfjell.roundshot.com/kvitfjell-vestside/
+61.45194444444445 10.108611111111111
+55e95422477b27.99529140
+
+HAFJELL PARK - Mosetertoppen
+https://hafjell.roundshot.com/mosetertoppen/
+61.24388888888889 10.490555555555554
+55c46e290ed997.42686927
+
+-----
+
+France
+# Webcams: 42
+Grau du Roi - Impérial
+https://grauduroi.roundshot.com/imperial/
+43.535555555555554 4.134166666666667
+57aae61df3c975.13953398
+
+Grau du Roi - Les Bains de Camargue
+https://grauduroi.roundshot.com/plage/
+43.51777777777777 4.125277777777777
+57aae7e71b6a13.79759684
+
+Le Touquet - Base Nord
+https://letouquet.roundshot.com/basenord/
+50.53666666666666 1.5941666666666667
+5437f4134510c2.72135033
+
+Le Touquet - Base Sud
+https://letouquet.roundshot.com/basesud/
+50.516666666666666 1.5786111111111112
+5437f38258d3e0.44280903
+
+Reims - Tour des Argonautes
+https://reims.roundshot.com/
+49.22666666666667 4.035277777777778
+543baf6af0a179.83632193
+
+Bandol - Office de Tourisme - Office de Tourisme
+https://bandol.roundshot.com/office-de-tourisme/
+43.13444444444444 5.753055555555555
+59b6a5447623b9.86399130
+
+Alpe d'Huez - 3060
+https://alpedhuez.roundshot.com/3060/
+45.11361111111111 6.119722222222221
+5437e7ce76f038.93478523
+
+Alpe d'Huez - Auris
+https://alpedhuez.roundshot.com/auris/
+45.0675 6.085
+5437e8ad646fd7.43676587
+
+Alpe d'Huez - Pic Blanc
+https://alpedhuez.roundshot.com/pic-blanc/
+45.125 6.127222222222222
+5437e98c4ab119.07801043
+
+Avoriaz Holidays
+https://avoriaz-holidays.roundshot.com/
+46.19138888888889 6.770833333333333
+54da1f0313edf8.10143286
+
+Courchevel - Dou des Lanches
+https://courchevel.roundshot.com/doudeslanches/
+45.415 6.632777777777778
+5437ee1f77b957.10747331
+
+Courchevel - Saulire
+https://courchevel.roundshot.com/saulire/
+45.38333333333333 6.611111111111111
+5437ecc63daa96.62475175
+
+Courchevel - Signal
+https://courchevel.roundshot.com/signal/
+45.385 6.660277777777778
+5437ed8bed41e2.06613994
+
+Ermitage - Riant
+https://ermitage.roundshot.com/riant/
+47.92722222222222 6.8549999999999995
+5437ef70391190.41683079
+
+Ermitage - Station
+https://ermitage.roundshot.com/station/
+47.92472222222222 6.864444444444444
+5437eecc9bdb05.92061802
+
+Grand Massif Domaine Flaine - Veret
+https://grandmassif.roundshot.com/flaineveret/
+46.00944444444445 6.713333333333334
+5437efc762bfb8.58335184
+
+La Plagne - Montalbert
+https://laplagne.roundshot.com/montalbert/
+45.535 6.637499999999999
+5437f224746e37.38299186
+
+Les Menuires - Roc des 3 Marches
+https://lesmenuires.roundshot.com/
+45.33777777777778 6.570555555555555
+5437f2f7bb3882.53775996
+
+Oz en Oisans - Oz
+https://ozenoisans.roundshot.com/oz/
+45.126111111111115 6.070555555555555
+543bae490d3bd2.42017983
+
+Portes du Soleil - Sommet de Grand-Conche
+https://portesdusoleil.roundshot.com/
+46.18388888888889 6.8149999999999995
+543baef4467068.03622297
+
+Saint-Lary - Merlans
+https://saintlary.roundshot.com/
+42.82777777777778 0.2202777777777778
+543baff5124ad6.87902196
+
+Serre Chevalier - Cucumelle
+https://serrechevalier.roundshot.com/cucumelle/
+44.93138888888889 6.51
+543bb072c989a2.15493528
+
+Serre Chevalier - Ratier
+https://serrechevalier.roundshot.com/ratier/
+44.92388888888889 6.570555555555555
+543bb0f47b6784.33544709
+
+Tignes - 1800
+https://tignes.roundshot.com/1800/
+45.49611111111111 6.926111111111111
+543bd2924fdf25.37737232
+
+Tignes - Brévières
+https://tignes.roundshot.com/brevieres/
+45.5075 6.92
+543bd2287c28d7.17038128
+
+Tignes - Grande Motte
+https://tignes.roundshot.com/grande-motte/
+45.42305555555555 6.8902777777777775
+543bcff0838721.46900857
+
+Tignes - Lac
+https://tignes.roundshot.com/lac/
+45.468611111111116 6.906666666666667
+543bc630698b92.10661132
+
+Tignes - Tovière
+https://tignes.roundshot.com/toviere/
+45.455555555555556 6.919722222222222
+543bd063466ab5.19616446
+
+Tignes - Val Claret
+https://tignes.roundshot.com/val-claret/
+45.45194444444445 6.897777777777777
+543bcf8f4a8106.82703695
+
+Val Thorens - Station
+https://valthorens.roundshot.com/station/
+45.294999999999995 6.580555555555556
+543bec1838e793.29633990
+
+Val d'Isère - Bellevarde
+https://valdisere.roundshot.com/bellevarde/
+45.44305555555555 6.950277777777778
+543beaa2239680.94544000
+
+Val d'Isère - Front de neige
+https://valdisere.roundshot.com/
+45.44638888888888 6.979166666666667
+543be949abd9a9.98790007
+
+Val d'Isère - Snowpark
+https://valdisere.roundshot.com/snowpark/
+45.45166666666667 6.9383333333333335
+543be9db8338e9.39113637
+
+Val d'Isère - Vallée Manchet
+https://valdisere.roundshot.com/manchet/
+45.439722222222215 6.977222222222222
+545c84dc63a904.85096852
+
+Val d'Isère - Village
+https://valdisere.roundshot.com/village/
+45.44888888888889 6.979722222222223
+581c64c16ab941.38509337
+
+Valloire - Valloire - Crey du Quart - Plan de la Séa - 2100m
+https://valloire.roundshot.com/
+45.16111111111111 6.451388888888889
+543bebb87632e7.31748493
+
+Valloire - Valloire - Sétaz - Thimel - 1900m
+https://valloire.roundshot.com/setaz/
+45.150555555555556 6.4350000000000005
+543beaf5b6cb04.66204435
+
+Valmeinier - Les Jeux
+https://valmeinier.roundshot.com/lesjeux/
+45.17805555555555 6.5152777777777775
+545267957dc089.88398518
+
+Valmeinier - Moneul - Crey du Quart
+https://valmeinier.roundshot.com/moneul-creyduquart/
+45.16222222222222 6.470555555555555
+54526824ac78b8.19268277
+
+Bandol - SOGEBA - Bandol Port - Capitainerie
+https://bandol.roundshot.com/port/
+43.134166666666665 5.7572222222222225
+59b11214dd5463.69884363
+
+Grande Motte - Port de Plaisance
+https://grandemotte.roundshot.com/portdeplaisance/
+43.55638888888888 4.081666666666666
+5437f03e9969e2.03752134
+
+Le Touquet - Lycée hôtelier
+https://letouquet.roundshot.com/lycee/
+50.5175 1.5958333333333334
+5437f4749bf104.23507258
+
+-----
+
+Finland
+# Webcams: 3
+Flycam - Tampere
+https://skyviewlive.roundshot.com/tampere/
+61.496944444444445 23.77472222222222
+54d1f0994883b9.68199787
+
+Flycam - Tays
+https://skyviewlive.roundshot.com/tays/
+61.505 23.814722222222223
+54d1f50b65cb50.54256665
+
+Flycam - Hiedanranta
+https://skyviewlive.roundshot.com/hiedanranta/
+61.51638888888889 23.681944444444447
+582431e6e60a55.13915440
+
+-----
+
+Denmark
+# Webcams: 2
+e-webcam.dk - Engholmene - Copenhagen Denmark
+https://engholmene.roundshot.com/
+55.65833333333333 12.560833333333335
+55d6f449706727.57164009
+
+e-webcam.dk - Nordhavn  - Copenhagen Denmark
+https://nordhavn.roundshot.com/
+55.70944444444445 12.600555555555555
+53a986efab9f09.09276153
+
+-----
+
+Luxembourg
+# Webcams: 2
+Kachelmannwetter - Fondation Pescatore
+https://kachelmannwieder.roundshot.com/fondationpescatore/
+49.615833333333335 6.1274999999999995
+54539c7e9a65f9.17685169
+
+Kachelmannwetter - Rodange
+https://kachelmannwieder.roundshot.com/rodange/
+49.54666666666667 5.838611111111111
+55535214642702.83828823
+
+-----
+
+United Kingdom
+# Webcams: 1
+Headland Hotel
+https://headlandhotel.roundshot.com/
+50.42027777777778 -5.097222222222222
+5559948e9cd875.95142256
+
+-----
+
+Spain
+# Webcams: 3
+Baqueira - Blanhiblar
+https://baqueira.roundshot.com/blanhiblar/
+42.71944444444445 0.9430555555555555
+582ed8a8912fb4.22582604
+
+Baqueira - Bosque
+https://baqueira.roundshot.com/bosque/
+42.69916666666666 0.9455555555555556
+5804c306444ec2.66106337
+
+Baqueira - Teso
+https://baqueira.roundshot.com/teso/
+42.676944444444445 0.9805555555555555
+582ed93a9c0ee5.13855517
+
+-----
+
+North America
+# Webcams: 19
+University of Alabama Huntsville - UAH - SWIRLL
+https://uah.roundshot.com/swirll/
+34.725 -86.6463888888889
+56eaa31a64eba1.77323468
+
+IID - IID - Anza-Borrego
+https://iid.roundshot.com/anza-borrego/
+33.165277777777774 -116.15916666666668
+56be59206949b9.00660725
+
+IID - IID - Salton South
+https://iid.roundshot.com/salton-south/
+33.19972222222222 -115.61194444444443
+56be5b66b257d0.24242278
+
+Tin Top Texas
+https://tintop.roundshot.com/
+32.54194444444444 -97.83111111111111
+59829b8b125c67.28661300
+
+Alyeska Resort
+https://alyeskaresort.roundshot.com/glacierbowl/
+60.96222222222222 -149.07166666666666
+586fd168b76df2.35528857
+
+Aspen - Aspen - Power of Four
+https://aspen.roundshot.com/power-of-four/
+39.22555555555556 -106.83611111111111
+53ac198d92e8c8.53152323
+
+Aspen - Aspen - Snowmass Mountain - Elk Camp
+https://aspen.roundshot.com/snowmass/
+39.16888888888889 -106.9263888888889
+53ac188335d9c7.59229609
+
+Aspen - Aspen Buttermilk
+https://aspen.roundshot.com/buttermilk/
+39.18194444444444 -106.87527777777777
+53ac1784e18217.08877702
+
+Aspen - Aspen Buttermilk X Games
+https://aspen.roundshot.com/xgames/
+39.20527777777778 -106.86055555555555
+588556b0eb9b04.62415331
+
+Aspen - Aspen Highlands
+https://aspen.roundshot.com/highlands/
+39.141666666666666 -106.87333333333332
+53ac18faeb68d8.87129920
+
+Aspen - Aspen Mountain - Sundeck
+https://aspen.roundshot.com/aspen/
+39.15138888888889 -106.81944444444444
+53ac1a27a964a9.15321994
+
+Granite Peak Ski Area
+https://skigranitepeak.roundshot.com/
+44.928888888888885 -89.6825
+59c9be60696546.70908387
+
+Jackson Hole - Jackson Hole - Rendezvous Lodge
+https://jacksonhole.roundshot.com/rendezvous-lodge/
+43.60111111111111 -110.85416666666666
+57d49b814370e9.88473849
+
+Killington - Killington - Peak Lodge
+https://killington.roundshot.com/peaklodge/
+43.60472222222222 -72.8175
+55ce48fccd5718.91380428
+
+Ski Lake Louise - Banff Ski Lake Louise - Ptarmigan
+https://skilouise.roundshot.com/ptarmigan/
+51.45416666666667 -116.12472222222222
+582c792aa11367.15978293
+
+Squaw Alpine - Squaw Alpine - Alpine Meadows
+https://squawalpine.roundshot.com/alpine/
+39.15083333333333 -120.24805555555555
+5453738334a667.07759441
+
+Squaw Alpine - Squaw Alpine - Squaw Valley
+https://squawalpine.roundshot.com/squaw/
+39.19555555555555 -120.26666666666667
+54537244393080.83872996
+
+Panogs - Portland - KOIN Tower
+https://panogs.roundshot.com/towr/
+45.51305555555555 -122.67750000000001
+58fb63de4ec215.07731703
+
+Space Needle - Space Needle Seattle
+https://spaceneedle.roundshot.com/
+47.62027777777778 -122.34916666666666
+544a1a9d451563.40343637
+
+-----
+
+Australia
+# Webcams: 1
+Symsol - Hotham
+https://mthotham.roundshot.com/
+-36.97944444444445 147.14138888888888
+54ae54684746d3.82338131
+
+-----
+
+New Zealand
+# Webcams: 1
+Queenstown - Carl Smiley
+https://queenstown.roundshot.com/
+-45.03055555555555 168.6808333333333
+56e993d6b05b75.06245222
+
+-----
+
+Russia
+# Webcams: 1
+Kamerton - Abrau-Dyurso
+https://abrau.roundshot.com/
+44.7575 37.60916666666667
+59c8d00daf9bb0.67538992
+
+-----
+

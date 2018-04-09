@@ -27,10 +27,13 @@ test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=constants.BAT
 valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=constants.BATCH_SIZE, num_workers=num_workers, pin_memory=pin_memory)
 
 
-for i_batch, sample_batched in enumerate(train_loader):
-    print(i_batch) # Batch idx
-    print(sample_batched[0].size()) # Inputs
-    print(sample_batched[1]) # Outputs
+for e in range(constants.EPOCHS):
+    loss = 0
+
+    for i_batch, sample_batched in enumerate(train_loader):
+        print(i_batch) # Batch idx
+        print(sample_batched[0].size()) # Inputs
+        print(sample_batched[1]) # Outputs
 
 
 
@@ -38,13 +41,11 @@ for i_batch, sample_batched in enumerate(train_loader):
 # Pickle or whatever all patches?
 # Does it make sense to save these patches to disk?
 
-# num_workers=1, pin_memory = true for GPU?  (see github link above) https://gist.github.com/kevinzakka/d33bf8d6c7f06a9d8c76d97a7879f5cb
-
 # Could parallelize the load_images() in webcam_dataset
 ## No need for now since it's just strings.
 
 # 3D Convolution
 
-# Each img_stack = 32 * 3 * 128 * 128 = 1.57 MB
+# Each img_stack = 32 * 3 * 128 * 128 bytes = 1.57 MB
 
 # Could use GPU to transform images...?  ToTensor first step - https://discuss.pytorch.org/t/preprocess-images-on-gpu/5096

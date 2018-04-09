@@ -1,0 +1,1225 @@
+Austria
+# Webcams: 112
+Großglockner - Kaiser-Franz-Josefs-Höhe
+http://7.panomax.com
+47.075826 12.750602
+7
+
+Hotel Goldener Berg - Oberlech
+http://9.panomax.com
+47.218512 10.136408
+9
+
+Hexenwasser - Hohe Salve Söll
+http://13.panomax.com
+47.481276 12.196142
+13
+
+Großglockner Hochalpenstraße - Fuschertörl
+http://16.panomax.com
+47.116588 12.824511
+16
+
+Großglockner Hochalpenstraße - Edelweiß-Spitze
+http://17.panomax.com
+47.123603 12.830597
+17
+
+Aberg - Maria Alm
+http://19.panomax.com
+47.356764 12.919756
+19
+
+Dorfgastein im Gasteinertal - Hotel Gasteiner Einkehr
+http://21.panomax.com
+47.244398 13.109965
+21
+
+Bad Hofgastein im Gasteinertal - Hotel Germania
+http://22.panomax.com
+47.16902 13.108792
+22
+
+Bad Gastein im Gasteinertal - Hotel Schillerhof
+http://23.panomax.com
+47.116104 13.138822
+23
+
+Euer Ski-Hotel direkt an der Piste
+http://24.panomax.com
+47.377542 12.599276
+24
+
+Rittisberg - Ramsau am Dachstein
+http://26.panomax.com
+47.419466 13.613405
+26
+
+Hotel Binggl - Mauterndorf
+http://46.panomax.com
+47.13339 13.680311
+42
+
+Das Film-Dorf Ellmau am Wilden Kaiser
+http://47.panomax.com
+47.51107 12.304299
+43
+
+Glattjoch Brandnertal
+http://58.panomax.com
+47.1087 9.7022
+47
+
+Ischgl, 2.864 m
+http://163.panomax.com
+46.950315 10.3093
+101
+
+Die Tauplitz, Ausseerland - Salzkammergut, Lawinenstein
+http://178.panomax.com
+47.598493 13.968869
+111
+
+A1 Turm, Arsenal - Wien
+http://211.panomax.com
+48.181959 16.390816
+131
+
+Ischgl: Ort 1.400 m
+http://228.panomax.com
+47.013877 10.288558
+141
+
+Zillertal Arena, Hochkrimml - Berg
+http://247.panomax.com
+47.224688 12.13415
+160
+
+Zillertal Arena, Gerlospass Talstation
+http://248.panomax.com
+47.241366 12.11453
+161
+
+Zillertal Arena, Gerlos Latschensee
+http://249.panomax.com
+47.24414 12.02883
+162
+
+Zillertal Arena, Rosenalm
+http://256.panomax.com
+47.247948 11.941665
+168
+
+Going am Wilden Kaiser
+http://269.panomax.com
+47.511458 12.323621
+179
+
+LIVE Bild - Schafbergspitze 1783m
+http://270.panomax.com
+47.776733 13.432126
+180
+
+Hauser Kaibling, 1.865 Meter, Steiermark/Austria, www.hauser-kaibling.at
+http://283.panomax.com
+47.377525 13.77061
+191
+
+Schwarze Schneidbahn (3.000 m), Sölden
+http://316.panomax.com
+46.934524 10.924812
+216
+
+Nassfeld - Hermagor
+http://331.panomax.com
+46.566576 13.255091
+224
+
+Ferienregion Mayrhofen-Hippach
+http://460.panomax.com
+47.196002 11.88059
+321
+
+Inns'bruck Unlimited
+http://475.panomax.com
+47.265987 11.401354
+335
+
+Bergbahnen Rosshütte, Härmelekopf (2.045 m) / Olympiaregion Seefeld
+http://499.panomax.com
+47.329049 11.227391
+357
+
+Söll - Schönstes Blumendorf Europas
+http://508.panomax.com
+47.507328 12.198067
+365
+
+Bergbahnen Rosshütte, Bergrestaurant (1.760 m) / Olympiaregion Seefeld
+http://511.panomax.com
+47.341306 11.227728
+368
+
+Seefeld in Tirol - Dorfplatz (1.180 m) / Olympiaregion Seefeld
+http://556.panomax.com
+47.32882 11.18675
+409
+
+Seefeld in Tirol - Panoramakamera Seefeld
+http://580.panomax.com
+47.327845 11.179408
+431
+
+WasserWelten Krimml
+http://626.panomax.com
+47.214152 12.168658
+467
+
+Hotel Bergheimat in Mühlbach am Hochkönig
+http://631.panomax.com
+47.39073 13.11565
+471
+
+Hochsölden 2.077 m
+http://675.panomax.com
+46.975907 10.983221
+501
+
+Der Dachstein 2.700 m
+http://679.panomax.com
+47.467794 13.626356
+505
+
+Telfs in Tirol, 634 m
+http://691.panomax.com
+47.304918 11.070057
+512
+
+Zell am Ziller / Kreuzwiese
+http://717.panomax.com
+47.236107 11.957218
+532
+
+Webcam Großarl
+http://720.panomax.com
+47.242853 13.201781
+534
+
+Hotel Edelweiss &amp; Obergurgl
+http://725.panomax.com
+46.869357 11.026899
+539
+
+Zillertal Arena, Alpengasthof Filzstein
+http://788.panomax.com
+47.232351 12.15722
+596
+
+Die Südsteirische Weinstraße - Leutschach an der Weinstraße, Eorykogel
+http://831.panomax.com
+46.65207 15.511219
+627
+
+Leutasch in Tirol (1.136 m) /  Weidach / Olympiaregion Seefeld
+http://869.panomax.com
+47.370224 11.158455
+654
+
+Frankenburg: Aussichtsturm Göblberg
+http://902.panomax.com
+48.093171 13.526425
+675
+
+LIVE Attergau Salzkammergut Lichtenberg - 885 m
+http://912.panomax.com
+47.932797 13.425645
+683
+
+Ramsau am Dachstein - WM Stadion
+http://995.panomax.com
+47.416236 13.655481
+748
+
+Salober Ski Arena 1.668 m
+http://998.panomax.com
+47.265823 10.128346
+751
+
+Zauchensee – traumhafter Urlaub in den Holiday Pearls-Betrieben
+http://1009.panomax.com
+47.293571 13.457961
+761
+
+Salober-Jet Berg 2.045 m
+http://1041.panomax.com
+47.255174 10.133637
+786
+
+Panoramabahn Burtschasattel Brandnertal
+http://1072.panomax.com
+47.128304 9.742342
+793
+
+Mösern in Tirol (1.206 m) / Olympiaregion Seefeld
+http://1135.panomax.com
+47.311264 11.144133
+816
+
+Thermengemeinden rund um Linsberg Asia - Wiener Alpenbogen mit  Rax, Schneeberg und Hoher Wand  - Wiener Neustadt
+http://1168.panomax.com
+47.7359 16.2616
+841
+
+Standort: Brentenjoch
+http://1178.panomax.com
+47.577759 12.209578
+849
+
+Hochwurzen - Bergstation Gipfelbahn - Hochwurzenhütte
+http://1180.panomax.com
+47.360181 13.639616
+851
+
+Walchsee - Seespitz
+http://1198.panomax.com
+47.648544 12.316914
+864
+
+FestungsBahn Salzburg
+http://1267.panomax.com
+47.795686 13.046239
+913
+
+Gargellner Bergbahnen
+http://1269.panomax.com
+46.961359 9.891442
+915
+
+Silvretta Montafon - Nova Stoba (2.010 m)
+http://1320.panomax.com
+46.980118 9.992064
+961
+
+Silvretta Montafon - Panorama Bahn (2.375 m)
+http://1321.panomax.com
+47.060524 9.976089
+962
+
+Bewegungsberg Golm - Hüttenkopfbahn
+http://1322.panomax.com
+47.064789 9.838508
+963
+
+Hotel Post, Lermoos - Zugspitze ****S
+http://1323.panomax.com
+47.397991 10.887996
+964
+
+Aldiana Salzkammergut &amp; GrimmingTherme Bad Mitterndorf, Ausseerland - Salzkammergut
+http://1324.panomax.com
+47.54522 13.928474
+965
+
+Flughafen Salzburg
+http://1325.panomax.com
+47.793576 12.997367
+966
+
+Ehrwalder Almbahn
+http://1326.panomax.com
+47.384036 10.968708
+967
+
+Nockalmstraße - Eisentalhöhe
+http://1329.panomax.com
+46.929996 13.757426
+970
+
+Turracher Höhe - Panoramabahn
+http://1330.panomax.com
+46.916831 13.864841
+971
+
+Flugplatz Bad Vöslau-Kottingbrunn
+http://1333.panomax.com
+47.964569 16.252168
+974
+
+Lech Zürs am Arlberg, Kriegerhorn 2.070m
+http://1344.panomax.com
+47.215274 10.118829
+982
+
+Hotel Herrschaftstaverne - Haus im Ennstal
+http://1345.panomax.com
+47.410784 13.768266
+983
+
+Werfenweng - Dorfbahn Rosnerköpfel - Steinberg
+http://1430.panomax.com
+47.454201 13.259393
+1055
+
+Altenmarkt - Zauchensee, Schwemmberg
+http://1438.panomax.com
+47.391351 13.429982
+1063
+
+Airport Wien, Hotelneubau - Baustellendokumentation
+http://1459.panomax.com
+48.123318 16.564021
+1084
+
+Strolz Sport &amp; Mode - Lech am Arlberg
+http://1500.panomax.com
+47.208459 10.142066
+1102
+
+Lärchkogel Bergstation 1761 m
+http://1521.panomax.com
+47.371546 13.713298
+1113
+
+Die Tauplitz, Ausseerland - Salzkammergut, Schneiderkogel
+http://1557.panomax.com
+47.599657 13.988807
+1138
+
+Willkommen am Traunsee - Urlaub der bewegt
+http://1648.panomax.com
+47.910475 13.748333
+1214
+
+Scharnitz - das Tor zum Karwendel
+http://1654.panomax.com
+47.380388 11.254804
+1220
+
+Flughafen Innsbruck
+http://1655.panomax.com
+47.25769 11.349632
+1221
+
+Silvretta-Bielerhöhe
+http://1671.panomax.com
+46.917949 10.09316
+1234
+
+SchafbergBahn Bahnhof und Anlegesteg WolfgangseeSchifffahrt
+http://1715.panomax.com
+47.738929 13.440162
+1272
+
+Lünersee Bergstation
+http://1716.panomax.com
+47.059581 9.754319
+1273
+
+Postalm
+http://1721.panomax.com
+47.661953 13.433407
+1278
+
+Seefeld in Tirol - Casino-Arena / Olympiaregion Seefeld
+http://1741.panomax.com
+47.322859 11.175443
+1292
+
+Lärchfilzkogel (1645 m)
+http://1752.panomax.com
+47.444062 12.548604
+1302
+
+Zwölferkogel (1984 m)
+http://1754.panomax.com
+47.360553 12.569174
+1304
+
+Wildenkarkogel (1910 m)
+http://1755.panomax.com
+47.401087 12.68586
+1305
+
+Schattberg Ost (2020 m)
+http://1756.panomax.com
+47.367918 12.638352
+1306
+
+Bewegungsberg Golm - Rätikonbahn Bergstation
+http://1791.panomax.com
+47.060834 9.834562
+1335
+
+Reith bei Seefeld (1.130 m) / Olympiaregion Seefeld
+http://1834.panomax.com
+47.299208 11.203056
+1368
+
+Gletscherexpress (2.757m)
+http://1866.panomax.com
+46.955263 10.940413
+1398
+
+Engelhartszell - Penzenstein
+http://1928.panomax.com
+48.505747 13.742525
+1438
+
+Romantik Hotel der Wiesenhof Achensee
+http://1967.panomax.com
+47.438272 11.700091
+1465
+
+Premium All Inclusive Resort in Saalbach
+http://1968.panomax.com
+47.390195 12.63747
+1466
+
+LOAN - Flugplatz Wr. Neustadt OST
+http://2035.panomax.com
+47.842314 16.257328
+1518
+
+Hotel Schloss Lebenberg
+http://2049.panomax.com
+47.453329 12.38172
+1531
+
+Alpine Resort Fieberbrunn
+http://2050.panomax.com
+47.466289 12.553494
+1532
+
+Strobl am Wolfgangsee
+http://2080.panomax.com
+47.718673 13.481934
+1554
+
+Wintersportarena Liebenau
+http://2101.panomax.com
+48.532416 14.803395
+1569
+
+SkiWelt Westendorf Dorfkamera
+http://2104.panomax.com
+47.441383 12.209323
+1570
+
+Going am Wilden Kaiser - Astberg Bergstation
+http://2106.panomax.com
+47.500853 12.322758
+1571
+
+Zauchensee Rosskopf
+http://2145.panomax.com
+47.294523 13.453264
+1599
+
+Unterberg - Mayrhofner Bergbahnen ( 2200m )
+http://2149.panomax.com
+47.19137 11.790784
+1435
+
+Bad Goisern am Hallstättersee
+http://2214.panomax.com
+47.63967 13.619704
+1644
+
+Faistenau
+http://2231.panomax.com
+47.777996 13.233101
+1657
+
+SkiWelt Westendorf Funpark Boarders Playground
+http://2247.panomax.com
+47.398228 12.260166
+1665
+
+Radstadt, Ski amadé
+http://2250.panomax.com
+47.389864 13.462331
+1668
+
+Leutasch in Tirol (1.136 m) /  Weidach / Wettersteinhalle / Olympiaregion Seefeld
+http://2295.panomax.com
+47.370348 11.152943
+1705
+
+Wildkogel-Arena
+http://2347.panomax.com
+47.288791 12.266524
+1734
+
+Kühtai - Kaiserbahn
+http://2389.panomax.com
+47.226181 11.010953
+1766
+
+Kühtai - Wiesbergbahn
+http://2392.panomax.com
+47.209638 11.029519
+1769
+
+-----
+
+Germany
+# Webcams: 38
+Hotel Kranzbach bei Garmisch Partenkirchen
+http://8.panomax.com
+47.471827 11.21258
+8
+
+Livebild - Lalling im Lallinger Winkel, Bayerischer Wald - Deutschland
+http://101.panomax.com
+48.845376 13.138104
+60
+
+Zugspitze, 2.962m
+http://201.panomax.com
+47.421082 10.985843
+128
+
+Burghotel Falkenstein im Allgäu
+http://231.panomax.com
+47.569424 10.591272
+144
+
+AlpspiX, 2.050m : Alpspitze
+http://237.panomax.com
+47.439202 11.050209
+150
+
+Großer Arber - Das Höchste im Bayerischen Wald
+http://286.panomax.com
+49.113065 13.138793
+193
+
+Panoramaberg Wank, 1.780m
+http://343.panomax.com
+47.507011 11.146857
+149
+
+Reit im Winkl      Bayerische Alpen
+http://366.panomax.com
+47.6793 12.473882
+248
+
+Hotel am Badersee
+http://474.panomax.com
+47.473616 11.015458
+334
+
+360° HD- Kamera - 916m hoher &quot;Großer Inselsberg&quot; Thür. Wald
+http://573.panomax.com
+50.851021 10.467047
+426
+
+Luxury Spa, Retreat &amp; Cultural Hideway
+http://665.panomax.com
+47.461855 11.186269
+496
+
+Livebild vom Brendturm in Furtwangen
+http://701.panomax.com
+48.079179 8.157639
+519
+
+Reit im Winkl - Winklmoosalm - Standort  Hotel Winklmoosalm ***S
+http://763.panomax.com
+47.656358 12.58452
+571
+
+Burgengemeinde Eisenberg im Allgäu
+http://770.panomax.com
+47.612354 10.590032
+578
+
+Insel Langeoog
+http://819.panomax.com
+53.752472 7.481062
+619
+
+Alpenwelt Karwendel - Mittenwald
+http://952.panomax.com
+47.444959 11.256836
+717
+
+Alpenwelt Karwendel - Krün
+http://953.panomax.com
+47.50427 11.281401
+718
+
+Alpenwelt Karwendel - Wallgau
+http://954.panomax.com
+47.528551 11.290064
+719
+
+Hotel Schloss Elmau - Retreat
+http://1226.panomax.com
+47.461997 11.183685
+881
+
+360° HD- Kamera Schneekopf- 978m, höchster Aussichtspunkt im Thüringer Wald - 1.001m üNN
+http://1285.panomax.com
+50.66629 10.763617
+927
+
+Luftkurort Waldeck am Edersee 360° Panorama
+http://1316.panomax.com
+51.204 9.055718
+958
+
+Waging am See - Standort Luger Hof - Krautenberg
+http://1389.panomax.com
+47.948189 12.731782
+1026
+
+Grüntenlifte Rettenberg/Kranzegg im Allgäu - www.gruentenlifte.de
+http://1418.panomax.com
+47.562366 10.331037
+1045
+
+Panoramacam Fernmeldeturm Nürnberg
+http://1465.panomax.com
+49.426041 11.039278
+1090
+
+Alpspitzbahn Nesselwang Mittelstation
+http://1499.panomax.com
+47.606922 10.497154
+1101
+
+Garmisch-Partenkirchen, Kongresshaus
+http://1515.panomax.com
+47.495145 11.091774
+1107
+
+Garmisch-Partenkirchen, Schanze
+http://1517.panomax.com
+47.479068 11.119941
+1109
+
+Garmisch-Partenkirchen, Rathaus
+http://1518.panomax.com
+47.493678 11.103995
+1110
+
+Söllereck/Oberstdorf - Der Familienberg!
+http://1607.panomax.com
+47.381696 10.240771
+1177
+
+Zwiesel im Bayerischen Wald
+http://1647.panomax.com
+49.007287 13.218524
+1213
+
+Ostlerhütte - Die Hütte mit Herz auf 1838 m
+http://1682.panomax.com
+47.548656 10.551502
+1245
+
+Panzer &amp; Braun Tiefbau GmbH in Sonthofen
+http://1832.panomax.com
+47.529494 10.262812
+1366
+
+Söllereck/Oberstdorf - Der Familienberg!
+http://1867.panomax.com
+47.3997 10.245562
+1399
+
+Bergbahn Laber - Oberammergau
+http://2098.panomax.com
+47.5861231 11.103159
+1566
+
+Hörnlebahn, Bad Kohlgrub
+http://2309.panomax.com
+47.644377 11.054922
+1718
+
+Steckenberg (860m)
+http://2310.panomax.com
+47.609838 11.024126
+1719
+
+Kolbensattel (1.270m)
+http://2311.panomax.com
+47.591066 11.027543
+1720
+
+Sportheim Böck
+http://2423.panomax.com
+47.598236 10.504169
+1791
+
+-----
+
+France
+# Webcams: 7
+Chamonix - Aiguille du Midi
+http://199.panomax.com
+45.879451 6.887234
+126
+
+Chamonix - Flégère
+http://949.panomax.com
+45.960394 6.886872
+714
+
+Chamonix - Grands Montets
+http://950.panomax.com
+45.968078 6.943011
+715
+
+Chamonix - Les Houches
+http://955.panomax.com
+45.885801 6.753137
+720
+
+Chamonix - Balme
+http://956.panomax.com
+46.029883 6.962453
+721
+
+Chamonix - Montenvers
+http://957.panomax.com
+45.93292 6.917199
+722
+
+Chamonix - Brévent
+http://1666.panomax.com
+45.933333 6.837424
+1229
+
+-----
+
+Switzerland
+# Webcams: 9
+Lauberhorn 2315 m.ü.M.
+http://293.panomax.com
+46.586481 7.947046
+199
+
+Grindelwald - First 1955 m.ü.M.
+http://294.panomax.com
+46.658379 8.065131
+200
+
+Männlichen auf 2225 m.ü.M. - 1
+http://371.panomax.com
+46.610951 7.942626
+251
+
+Jungfraujoch 3454 m.ü.M.
+http://468.panomax.com
+46.547386 7.980908
+329
+
+Längfluh Berg
+http://958.panomax.com
+46.083168 7.895844
+723
+
+Heidbodme Berg
+http://959.panomax.com
+46.082281 7.975388
+724
+
+Mittelallalin
+http://960.panomax.com
+46.057784 7.904519
+725
+
+Hannig
+http://1029.panomax.com
+46.114919 7.916684
+777
+
+Männlichen auf 2225 m.ü.M. - 2
+http://2285.panomax.com
+46.611097 7.943075
+1699
+
+-----
+
+Greece
+# Webcams: 2
+Thessaloniki, Greece
+http://855.panomax.com
+40.639887 22.960016
+642
+
+Parnassos Ski Centre, Greece
+http://856.panomax.com
+38.548397 22.589315
+643
+
+-----
+
+Italy
+# Webcams: 62
+Mottolino Fun Mountain | Livigno
+http://662.panomax.com
+46.53616 10.127591
+494
+
+Sporthotel Tyrol, Innichen
+http://906.panomax.com
+46.733657 12.280806
+679
+
+Hotel Menardi Cortina d' Ampezzo LiveCam
+http://908.panomax.com
+46.548943 12.131831
+680
+
+La Villa - La Ila
+http://918.panomax.com
+46.583335 11.903762
+689
+
+Cervino Ski Paradise | Plan Maison 2545 m
+http://1203.panomax.com
+45.941912 7.656158
+867
+
+Trezzo sull'Adda dal Castello Visconteo
+http://1263.panomax.com
+45.611917 9.5222
+909
+
+La Thuile - Chaz Dura
+http://1270.panomax.com
+45.691595 6.916226
+916
+
+Cervino Ski Paradise | Plateau Rosa 3480 m
+http://1289.panomax.com
+45.935302 7.707355
+931
+
+Torgnon Plan Prorion | Nordics 1750m
+http://1294.panomax.com
+45.801819 7.552022
+936
+
+Cervino Ski Paradise | Torgnon Chantorne Skiarea 1860 m
+http://1349.panomax.com
+45.809744 7.555657
+987
+
+Skiarea Campiglio Dolomiti di Brenta - Madonna di Campiglio - Pradalago
+http://1386.panomax.com
+46.247419 10.813093
+1023
+
+Sunny Valley - Santa Caterina Valfurva
+http://1398.panomax.com
+46.391323 10.480209
+1029
+
+Seceda (2.518 m), Gröden – Dolomiten
+http://1417.panomax.com
+46.596719 11.724135
+1044
+
+Mont Blanc - The impressive Italian side
+http://1429.panomax.com
+45.748794 6.998747
+1054
+
+Arabba - Bec de Roces
+http://1439.panomax.com
+46.512385 11.864745
+1064
+
+Arabba - Stazione di monte della funivia Porta Vescovo e la terrazza del Rif. Luigi Gorza.
+http://1440.panomax.com
+46.472955 11.868574
+1065
+
+Torgnon
+http://1468.panomax.com
+45.809796 7.579305
+1091
+
+Courmayeur - Arp
+http://1511.panomax.com
+45.770644 6.915634
+1104
+
+Courmayeur - Checrouit
+http://1512.panomax.com
+45.79139 6.947827
+1105
+
+Rifugio Bioch | Bioch Hütte | Bioch Hut - Dolomites - Alta Badia - Italy - Sellaronda
+http://1553.panomax.com
+46.546954 11.90989
+1134
+
+Dantercepies (2.305m) Val Gardena - Dolomiti
+http://1618.panomax.com
+46.553625 11.800085
+1186
+
+Comune di La Magdeleine
+http://1643.panomax.com
+45.813199 7.618602
+1209
+
+Ciampinoi (2.254 m), Val Gardena - Dolomiti
+http://1653.panomax.com
+46.539028 11.753214
+1219
+
+Bacino glaciale della Bessanese (Balme, TO) - Progetto RiST2, la ricerca continua
+http://1658.panomax.com
+45.298139 7.132165
+1222
+
+3 Zinnen Dolomites
+http://1662.panomax.com
+46.715831 12.362233
+1225
+
+Col Raiser (2.106 m), Val Gardena - Dolomiti
+http://1663.panomax.com
+46.584692 11.745181
+1226
+
+Cervino Ski Paradise | Valtournenche Bec Carré 2896 m
+http://1696.panomax.com
+45.905617 7.67429
+1256
+
+Skiarea Campiglio Dolomiti di Brenta - Madonna di Campiglio - Grostè
+http://1708.panomax.com
+46.215901 10.901807
+1267
+
+Passo Pordoi - Pordoi Pass
+http://1742.panomax.com
+46.478355 11.818049
+1293
+
+Cervino Ski Paradise | Chamois Colle Fontana Fredda 2512 m
+http://1774.panomax.com
+45.851953 7.644592
+1319
+
+Canazei - Col dei Rossi
+http://1801.panomax.com
+46.474741 11.801875
+1343
+
+Madesimo visto dagli Andossi
+http://1831.panomax.com
+46.436484 9.349194
+1365
+
+Città dei Sassi (2257 m), Val Gardena - Dolomiti
+http://1852.panomax.com
+46.515863 11.752432
+1382
+
+Catinaccio - Rosengarten da Pra Martin
+http://1853.panomax.com
+46.433369 11.655079
+1383
+
+Seiseralm
+http://1859.panomax.com
+46.542393 11.616932
+1389
+
+Piani di Bobbio . Vista dal Monte Orscellera (1950 m)
+http://1860.panomax.com
+45.955371 9.490954
+1390
+
+Campitello di Fassa - Col Rodella
+http://1863.panomax.com
+46.497065 11.751434
+1395
+
+Livigno feel the Alps
+http://1905.panomax.com
+46.509056 10.149329
+1425
+
+Reinswald - Pichlberg
+http://1909.panomax.com
+46.694141 11.440992
+1426
+
+Grigna Settentrionale (2.410m)  - Vista dal Rifugio Brioschi
+http://1926.panomax.com
+45.953056 9.387528
+1436
+
+Monte Bianco - Mont Blanc - Punta Helbronner (3.462 m)
+http://1944.panomax.com
+45.845775 6.932043
+1437
+
+Moritzino Club - Piz La Ila (2100 m)
+http://1945.panomax.com
+46.565197 11.906595
+1454
+
+Dolomiti - Pozza di Fassa (TN) - Buffaure
+http://1946.panomax.com
+46.431611 11.722901
+1455
+
+Sarnthein - Sarntal
+http://1957.panomax.com
+46.650473 11.35089
+1460
+
+Canonica d'Adda  -  Ponte sul fiume Adda.
+http://2010.panomax.com
+45.577075 9.534964
+1498
+
+Reinswald - Sattele (2.460 m)
+http://2088.panomax.com
+46.700279 11.456262
+1558
+
+Reinswald - Sunnolm
+http://2089.panomax.com
+46.687892 11.433514
+1559
+
+Granpanorama Hotel Sambergerhof
+http://2128.panomax.com
+46.64288 11.521032
+1593
+
+Col dei Baldi (1922 m) - Alleghe - Dolomiti
+http://2176.panomax.com
+46.415552 12.067337
+1620
+
+Ceresole Reale - TO - vista a 360° dal Glaciomuseo del Serrù (2300 m)
+http://2183.panomax.com
+45.463624 7.132484
+1624
+
+Livigno - Feel The Alps
+http://2189.panomax.com
+46.553396 10.158793
+1628
+
+Monte Fertazza (2083 m) - Alleghe - Dolomiti
+http://2190.panomax.com
+46.422626 12.048512
+1629
+
+Cima Paganella (2125 m)
+http://2204.panomax.com
+46.142796 11.036968
+1634
+
+Monte Bondone - Trento - Vason
+http://2226.panomax.com
+46.038604 11.058955
+1653
+
+Skiarea Folgarida Marilleva - Val di Sole - Trentino
+http://2227.panomax.com
+46.275479 10.82742
+1654
+
+Canazei - Ciampac
+http://2256.panomax.com
+46.439158 11.764321
+1674
+
+Pejo 3000 - Val di Sole - Trentino - Italy
+http://2267.panomax.com
+46.383541 10.630864
+1684
+
+Skiarea Campiglio Dolomiti di Brenta - Pinzolo - Doss del Sabion
+http://2278.panomax.com
+46.167657 10.806422
+1694
+
+Kronplatz - Plan de Corones.  San Vigilio di Marebbe
+http://2314.panomax.com
+46.700572 11.928086
+1722
+
+Piz Seteur - Sassolungo
+http://2315.panomax.com
+46.526063 11.763622
+1723
+
+Folgaria - Alpe  Cimbra
+http://2367.panomax.com
+45.886677 11.200632
+1749
+
+Folgaria - Costa d'Agra
+http://2381.panomax.com
+45.877984 11.241578
+1758
+
+-----
+
+Great Britain
+# Webcams: 2
+BBC Glastonbury Webcam
+http://1238.panomax.com
+51.159009 -2.583231
+879
+
+The Forth Bridges
+http://1808.panomax.com
+55.987926 -3.402482
+1346
+
+-----
+
+Israel
+# Webcams: 1
+Inbal luxury Jerusalem hotel
+http://1493.panomax.com
+31.770698 35.221979
+1097
+
+-----
+
+Australia
+# Webcams: 3
+2KW Bar and Restaurant, Adelaide
+http://2156.panomax.com
+-34.921812 138.599661
+1603
+
+St Clair Recreation Centre
+http://2191.panomax.com
+-34.87409 138.540827
+1630
+
+Falls Creek
+http://2377.panomax.com
+-36.871519 147.273483
+1755
+
+-----
+
+Finland
+# Webcams: 1
+Tuikku - Panoramic restaurant on the top of Levi
+http://2224.panomax.com
+67.791082 24.846671
+1651
+
+-----
+

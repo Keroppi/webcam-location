@@ -46,8 +46,10 @@ try:
             print(webcam['name'])
             print(webcam_url)
         
-            driver.get(webcam_url)    
-            loading_bar = WebDriverWait(driver, 99999).until(EC.presence_of_element_located((By.XPATH, "//div[@class='progress-void'][@style='width: 0px;']")))
+            driver.get(webcam_url)
+            loading_bar = WebDriverWait(driver, 60 * 6).until(EC.presence_of_element_located((By.XPATH, "//div[@class='progress-void'][@style='width: 0px;']")))
+
+                
             #driver.implicitly_wait(3) # Implicitly wait 3s for it to load.
 
             use_google = False
@@ -64,13 +66,21 @@ try:
                 lat_long_str = lat_long_str.replace('\"', '')
                 lat_long_str = lat_long_str.replace('\'', '')
                 lat = lat_long_str.split(';')[0]
+                lat_neg = lat.find('-')
                 long = lat_long_str.split(';')[1]
+                long_neg = long.find('-')
                 lat = re.sub("[^0-9]", " ", lat) # remove non-numerics
                 long =  re.sub("[^0-9]", " ", long)
                 lat = [float(x) for x in lat.split()]
                 long = [float(x) for x in long.split()]
                 lat = lat[0] + lat[1] / 60 + lat[2] / 3600
                 long = long[0] + long[1] / 60 + long[2] / 3600
+
+                if lat_neg > -1:
+                    lat *= -1
+                if long_neg > -1:
+                    long *= -1
+                    
                 print("%s %s" % (lat, long))
             else:
                 api_req = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + full_location + '&key=' + GOOGLE_MAPS_API_KEY
@@ -131,7 +141,8 @@ try:
                     else:
                         print('EXCEPTION - Cannot find storage id.')
             else:
-                preview_img = WebDriverWait(driver, 99999).until(EC.presence_of_element_located((By.XPATH, "//img[@data-ng-click='switchToImage(previewedSeries[previewedKey].id)']")))
+                preview_img = WebDriverWait(driver, 60 * 6).until(EC.presence_of_element_located((By.XPATH, "//img[@data-ng-click='switchToImage(previewedSeries[previewedKey].id)']")))                
+                    
                 storage_url = preview_img.get_attribute('src')
             
                 while True:
