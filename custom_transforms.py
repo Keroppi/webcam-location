@@ -35,6 +35,7 @@ class ToTensor():
         #print(transposed.shape)
 
         torch_image = torch.from_numpy(transposed)
+        torch_image = torch_image.float().div(255) # scale to [0, 1], and create float tensor
         #torch_image = torch.from_numpy(reshaped)
 
         #print(sample[5, :, :, 1])

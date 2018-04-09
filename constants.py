@@ -1,5 +1,5 @@
 CLUSTER = False
-DAYS_PER_MONTH = 4 # 'MAX'
+DAYS_PER_MONTH = 5 # 'MAX'
 SIZE = ['small'] # 'large'
 DATA_SOURCES = ['roundshot'] # 'panomax'
 IMAGES_PER_DAY = 32
