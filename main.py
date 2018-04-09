@@ -15,6 +15,14 @@ train_dataset = Train(data, transformations)
 test_dataset = Test(data, transformations)
 valid_dataset = Validation(data, transformations)
 
+'''
+print(len(train_dataset))
+print(len(test_dataset))
+print(len(valid_dataset))
+for i in range(7):
+    print(data.days[i].train_test_valid)
+'''
+
 if torch.cuda.is_available():
     pin_memory = True
     num_workers = 1

@@ -109,6 +109,7 @@ class WebcamData():
                                         # Not enough images!
                                         if len(images) < constants.IMAGES_PER_DAY:
                                             # print("NOT ENOUGH IMAGES!")
+                                            self.types[train_test_valid] -= 1 # This day doesn't count.
                                             continue  # MAY NEED FURTHER ATTENTION # VLI
 
                                         # Sort by time.
@@ -142,7 +143,7 @@ class Train(Dataset):
     def __init__(self, data, transforms=None):
         num_test = data.types['test']
         num_train = data.types['train']
-        self.data = data.days[num_test:num_train]
+        self.data = data.days[num_test:num_test + num_train]
         self.sunrise_label = np.asarray([x.sunrise_idx for x in self.data])
         self.sunset_label = np.asarray([x.sunset_idx for x in self.data])
         self.transforms = transforms
