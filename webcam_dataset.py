@@ -40,8 +40,10 @@ class WebcamData():
             return 'valid'
 
     def load_images(self):
-        if constants.CLUSTER:
+        if constants.CLUSTER and not constants.SMALL_DATASET:
             image_dir = '/scratch_net/biwidl103/vli/data/'
+        elif constants.CLUSTER:
+            image_dir = '/scratch_net/biwidl103/vli/subset_data/'
         else:
             image_dir = '~/data/'
             image_dir = os.path.expanduser(image_dir)
@@ -137,7 +139,11 @@ class WebcamData():
 
     def __init__(self):
         self.types = {'train': 0, 'test': 0, 'valid':0}
+
+        load_t0 = time.time()
         self.days = self.load_images()
+        load_t1 = time.time()
+        print('Load Image Time (s): ' + str(load_t1 - load_t0))
 
 class Train(Dataset):
     def __init__(self, data, transforms=None):

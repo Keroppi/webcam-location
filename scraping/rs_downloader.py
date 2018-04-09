@@ -284,8 +284,8 @@ while lIdx < len(lines):
         month_t0 = time.time()
         month = "{0:0=2d}".format(mtIdx) # 2-digits (8 --> 08)
 
-        print('Month: ' + month)
-        sys.stdout.flush()
+        #print('Month: ' + month)
+        #sys.stdout.flush()
 
         if mtIdx <= 7 and mtIdx % 2 == 1:
             numDays = 31;
@@ -300,7 +300,7 @@ while lIdx < len(lines):
         if mtIdx == 2:
             numDays = 28;
             
-        # Leap Year
+            # Leap Year
             if int(year) % 4 == 0:
                 numDays = 29;
 

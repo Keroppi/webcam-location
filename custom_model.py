@@ -8,8 +8,8 @@ class WebcamLocation(nn.Module):
     def __init__(self):
         super(WebcamLocation, self).__init__()
 
-        self.conv1 = nn.Conv3d(constants.NUM_CHANNELS, 3, 7)
-        self.conv2 = nn.Conv3d(3, 1, 5)
+        self.conv1 = nn.Conv3d(3, 1, 10)
+        #self.conv2 = nn.Conv3d(2, 1, 5)
         # an affine operation: y = Wx + b
         #self.fc1 = nn.Linear(16 * 5 * 5, 100)
         #self.fc2 = nn.Linear(100, 70)
@@ -17,11 +17,12 @@ class WebcamLocation(nn.Module):
 
     def forward(self, x):
         # Max pooling over a (2, 2) window
-        x = F.max_pool2d(F.relu(self.conv1(x)), (2, 2))
+        x = self.conv1(x) # DELETE ME
+        print(self.num_flat_features(x))
+        #x = F.max_pool2d(F.relu(self.conv1(x)), (2, 2))
         # If the size is a square you can only specify a single number
-        x = F.max_pool2d(F.relu(self.conv2(x)), 2)
-        print(num_flat_features(x))
-        x = x.view(-1, self.num_flat_features(x))
+        #x = F.max_pool2d(F.relu(self.conv2(x)), 2)
+        #x = x.view(-1, self.num_flat_features(x))
         #x = F.relu(self.fc1(x))
         #x = F.relu(self.fc2(x))
         #x = self.fc3(x)
