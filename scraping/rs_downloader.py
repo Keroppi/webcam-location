@@ -160,7 +160,7 @@ def download_day(country, name, lat, lng, storage_id, year, month, day):
             urlE = None
             keep_going = True
             if SIZE == 'small':
-                small_img_t0 = time.time()
+                #small_img_t0 = time.time()
                 while keep_going:
                     try:
                         urllib.request.urlretrieve(imgUrlSmall, localPathSmall)
@@ -191,12 +191,12 @@ def download_day(country, name, lat, lng, storage_id, year, month, day):
                         except FileNotFoundError:
                             pass
                         
-                small_img_t1 = time.time()
+                #small_img_t1 = time.time()
 
-                blah = random.randint(0, 100)
-                if blah % 30 == 0:                    
-                    print('Image Time: ' + str(small_img_t1 - small_img_t0))                
-                #sys.stdout.flush()
+                #blah = random.randint(0, 100)
+                #if blah % 30 == 0:
+                #    print('Image Time: ' + str(small_img_t1 - small_img_t0))
+                ##sys.stdout.flush()
         
             else: # large           
                 # To do

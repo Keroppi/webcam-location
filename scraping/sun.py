@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 CLUSTER = True # run on cluster or local machine
 SIZE = 'small' # 'large'
 
-GOOGLE_MAPS_API_KEY = 'AIzaSyCEJkK4hEYYnRv4z6hL6n8A8VqfqJdspnY';
+GOOGLE_MAPS_API_KEY = 'AIzaSyCEJkK4hEYYnRv4z6hL6n8A8VqfqJdspnY'
 
 if CLUSTER:
     SGE_TASK_ID = int(os.environ.get('SGE_TASK_ID')) # Determines the month that gets downloaded. (1 -> January)
@@ -36,7 +36,7 @@ with open(rs_filename) as rs_file:
 
 def get_sun_info(country, name, year, month, day, html_rows):
  try:
-    day_num = day # int
+    day_num = day
     day = "{0:0=2d}".format(day)
 
     #print('Day: ' + day)
@@ -48,8 +48,8 @@ def get_sun_info(country, name, year, month, day, html_rows):
     wrtPthLarge = wrtPth + '/large'
     
     try:
-        os.makedirs(wrtPthSmall);                
-        os.makedirs(wrtPthLarge);
+        os.makedirs(wrtPthSmall)
+        os.makedirs(wrtPthLarge)
     except FileExistsError:
         pass
 
@@ -57,11 +57,31 @@ def get_sun_info(country, name, year, month, day, html_rows):
     # If file already exists and has size > 0, skip this.
     sun_file_str = wrtPth + '/sun.txt'
     if not (os.path.isfile(sun_file_str) and os.path.getsize(sun_file_str) > 0):
-        tds = html_rows[day_num].find_all('td')
-        local_sunrise_str = tds[0].text.split()[0] + ':00'
-        local_sunset_str = tds[1].text.split()[0] + ':00'
-        sun_time = tds[2].text
-        sun_time_seconds = str(int(sun_time.split(':')[0]) * 3600 + int(sun_time.split(':')[1]) * 60 + int(sun_time.split(':')[2]))
+        # Find which row of the table corresponds to this day.
+        for row_idx in range(len(html_rows)):
+            headers = html_rows[row_idx].find_all('th')
+
+            if len(headers) > 0:
+                if headers[0].text.split()[0] == str(day_num):
+                    break
+
+        tds = html_rows[row_idx].find_all('td')
+
+        if tds[0].text == 'Down all day':
+            local_sunrise_str = 'NO SUN'
+            local_sunset_str = 'NO SUN'
+            sun_time = '00:00:00'
+            sun_time_seconds = '0'
+        elif tds[0].text == 'Up all day':
+            local_sunrise_str = 'SUN ALL DAY'
+            local_sunset_str = 'SUN ALL DAY'
+            sun_time = '24:00:00'
+            sun_time_seconds = str(24 * 60 * 60)
+        else:
+            local_sunrise_str = tds[0].text.split()[0] + ':00'
+            local_sunset_str = tds[1].text.split()[0] + ':00'
+            sun_time = tds[2].text
+            sun_time_seconds = str(int(sun_time.split(':')[0]) * 3600 + int(sun_time.split(':')[1]) * 60 + int(sun_time.split(':')[2]))
 
 
         # Save UTC (first 2 rows), day length (HH:MM:SS), 
@@ -158,7 +178,15 @@ while lIdx < len(lines):
         page = urllib.request.urlopen(sun_url).read()
         soup = BeautifulSoup(page, "lxml")
         table = soup.find_all('table')[0]
-        html_rows = table.find_all('tr')[2:]
+        html_rows = table.find_all('tr')
+
+        for start_idx, row in enumerate(html_rows):
+            header_cells = row.find_all('th')
+            if len(header_cells) > 0:
+                if header_cells[0].text.split()[0] == '1':
+                    break
+
+        html_rows = html_rows[start_idx:] # row corresponding to 1st day of that month
 
         with ThreadPoolExecutor(numDays) as executor:               
             future_download = {executor.submit(get_sun_info, country, name, year, month, day, html_rows): day for day in range(1, numDays + 1)}
