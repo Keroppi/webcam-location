@@ -81,8 +81,15 @@ def get_sun_info(country, name, year, month, day, html_rows):
             local_sunrise_str = tds[0].text.split()[0] + ':00'
             local_sunset_str = tds[1].text.split()[0] + ':00'
             sun_time = tds[2].text
-            sun_time_seconds = str(int(sun_time.split(':')[0]) * 3600 + int(sun_time.split(':')[1]) * 60 + int(sun_time.split(':')[2]))
 
+            sun_time_split = sun_time.split(':')
+            sun_time_split.reverse()
+            sun_time_seconds = str(sum([int(x) * 60**power for power, x in enumerate(sun_time_split)]))
+
+            if len(sun_time_split) == 2: # less than 1 hour day length
+                sun_time = '00:' + sun_time
+            elif len(sun_time_split) == 1: # less than 1 minute day length - UNLIKELY
+                sun_time = '00:00:' + sun_time
 
         # Save UTC (first 2 rows), day length (HH:MM:SS), 
         # timezone offset (sec), local time, and day length (sec).
@@ -175,6 +182,7 @@ while lIdx < len(lines):
                 numDays = 29;
 
         sun_url = 'https://www.timeanddate.com/sun/@' + str(lat) + ',' + str(lng) + '?month=' + month + '&year=' + year
+        #print(sun_url)
         page = urllib.request.urlopen(sun_url).read()
         soup = BeautifulSoup(page, "lxml")
         table = soup.find_all('table')[0]
@@ -194,7 +202,7 @@ while lIdx < len(lines):
             for _ in as_completed(future_download):
                 pass
         month_t1 = time.time()
-        print('Month Time (min): ' + str((month_t1 - month_t0) / 60))
+        print('Month Time (sec): ' + str((month_t1 - month_t0)))
         
     lIdx += 2
 
