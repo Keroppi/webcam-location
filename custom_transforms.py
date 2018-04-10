@@ -20,8 +20,8 @@ class RandomPatch():
 
             img_stack[i] = extract_patches_2d(img, self.output_size, max_patches=1, random_state=random_int)[0]
             # cv2.imwrite('/home/vli/patches/test' + str(i) + '.jpg', patch)
-            patch = PIL.Image.fromarray(np.uint8(img_stack[i]))
-            patch.save('/home/vli/patches/sample' + str(i) + '.jpg')
+            #patch = PIL.Image.fromarray(np.uint8(img_stack[i]))
+            #patch.save('/home/vli/patches/sample' + str(i) + '.jpg')
         img_stack = np.stack(img_stack, axis=0)
 
         return img_stack
