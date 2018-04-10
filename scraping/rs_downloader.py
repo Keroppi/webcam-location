@@ -17,7 +17,7 @@ if CLUSTER:
     baseLocation = '/scratch_net/biwidl103/vli/data/roundshot/'
 else:
     LOCAL_MONTH = 1 # January
-    baseLocation = '~/delete-me/'
+    baseLocation = '~/data/roundshot/'
     baseLocation = os.path.expanduser(baseLocation)
 
 year = '2018'
@@ -54,13 +54,13 @@ def download_day(country, name, lat, lng, storage_id, year, month, day):
     except FileExistsError:
         pass
 
-    
+    '''
     # If file already exists and has size > 0, skip this.
     sun_file_str = wrtPth + '/sun.txt'
     if not (os.path.isfile(sun_file_str) and os.path.getsize(sun_file_str) > 0):    
         # Get the time zone offset (for local time).
         d = datetime.datetime.strptime(date, "%Y-%m-%d").date()
-        timestamp = time.mktime(d.timetuple()) + 1
+        timestamp = time.mktime(d.timetuple()) + 12 * 60
         google_url = 'https://maps.googleapis.com/maps/api/timezone/json?location=' + str(lat) + ',' + str(lng) + '&timestamp=' + str(timestamp) + '&key=' + GOOGLE_MAPS_API_KEY
 
         retries = 0
@@ -102,14 +102,16 @@ def download_day(country, name, lat, lng, storage_id, year, month, day):
         utc_sunrise = date + ' ' + sun_data['results']['sunrise']
         utc_sunrise = datetime.datetime.strptime(utc_sunrise, "%Y-%m-%d %I:%M:%S %p")        
         local_sunrise = utc_sunrise + datetime.timedelta(seconds=offset)
-        t = time.mktime(local_sunrise.timetuple())
-        local_sunrise_str = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(t))
+        local_sunrise_str = str(local_sunrise)
+        local_sunrise = datetime.datetime.strptime(local_sunrise_str, "%Y-%m-%d %H:%M:%S")
+        local_sunrise_str = str(local_sunrise)
     
         utc_sunset = date + ' ' + sun_data['results']['sunset']
         utc_sunset = datetime.datetime.strptime(utc_sunset, "%Y-%m-%d %I:%M:%S %p")        
         local_sunset = utc_sunset + datetime.timedelta(seconds=offset)
-        t = time.mktime(local_sunset.timetuple())
-        local_sunset_str = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(t))
+        local_sunset_str = str(local_sunset)
+        local_sunset = datetime.datetime.strptime(local_sunset_str, "%Y-%m-%d %H:%M:%S")
+        local_sunset_str = str(local_sunset)
 
         day_length_split = [int(x) for x in sun_data['results']['day_length'].split(':')];
         day_length_seconds = str(day_length_split[0] * 3600 + day_length_split[1] * 60 + day_length_split[2]);
@@ -124,28 +126,9 @@ def download_day(country, name, lat, lng, storage_id, year, month, day):
             sun_file.write(local_sunrise_str + '\n')
             sun_file.write(local_sunset_str + '\n')
             sun_file.write(day_length_seconds + '\n')
-
-    '''
-    # Only look 2-3 hours before sunrise or after sunset, not 24 hours.
-    with open(sun_file_str, 'r') as sun_f:
-        sun_lines = sun_f.read().splitlines()
-        
-    local_sunrise_str = sun_lines[4]
-    local_sunset_str = sun_lines[5]
-    local_sunrise = datetime.datetime.strptime(local_sunrise_str, "%Y-%m-%d %H:%M:%S")
-    local_sunset = datetime.datetime.strptime(local_sunset_str, "%Y-%m-%d %H:%M:%S")        
-    
-    before_sunrise = local_sunrise - datetime.timedelta(seconds=7200)
-    after_sunset = local_sunset + datetime.timedelta(seconds=7200)
-        
-    before_sunrise_hour = before_sunrise.hour
-    after_sunset_hour = after_sunset.hour    
-    
-    idxHrStart = max(before_sunrise_hour, 0)
-    idxHrEnd = min(after_sunset_hour + 1, 24)
     '''
 
-    # Find where we left off.
+    # Find where we left off.    
     small_files = glob.glob(wrtPthSmall + '/*')
 
     if wrtPthSmall + '/done.txt' in small_files:
@@ -223,7 +206,7 @@ def download_day(country, name, lat, lng, storage_id, year, month, day):
         small_path.write('done')
 
     # TO DO: LARGE FILES    
-            
+
  except Exception as e:
      print('EXCEPTION')
      print(e.__class__.__name__)
@@ -263,7 +246,7 @@ while lIdx < len(lines):
         blank_line = lines[lIdx + 4]
         line = lines[lIdx + 5]
         
-        lIdx += 5        
+        lIdx += 5
 
         # Save latitude and longitude to a file.
         locWrtPth = baseLocation + country + '/' + name + '/'
