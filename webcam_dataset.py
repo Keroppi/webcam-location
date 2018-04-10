@@ -40,10 +40,8 @@ class WebcamData():
             return 'valid'
 
     def load_images(self):
-        if constants.CLUSTER and not constants.SMALL_DATASET:
+        if constants.CLUSTER:
             image_dir = '/scratch_net/biwidl103/vli/data/'
-        elif constants.CLUSTER:
-            image_dir = '/scratch_net/biwidl103/vli/subset_data/'
         else:
             image_dir = '~/data/'
             image_dir = os.path.expanduser(image_dir)
@@ -98,8 +96,8 @@ class WebcamData():
 
                                     with open(day_dir + 'sun.txt') as sun_f:
                                         sun_lines = sun_f.read().splitlines()
-                                        sunrise_str = sun_lines[4]
-                                        sunset_str = sun_lines[5]
+                                        sunrise_str = year + '-' + month + '-' + day + ' ' + sun_lines[4]
+                                        sunset_str = year + '-' + month + '-' + day + ' ' + sun_lines[5]
                                         sunrise = datetime.datetime.strptime(sunrise_str, "%Y-%m-%d %H:%M:%S")
                                         sunset = datetime.datetime.strptime(sunset_str, "%Y-%m-%d %H:%M:%S")
 

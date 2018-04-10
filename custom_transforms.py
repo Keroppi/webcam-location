@@ -1,4 +1,4 @@
-import constants, torch, torchvision, numpy as np, cv2, PIL, sys
+import constants, torch, torchvision, numpy as np, cv2, PIL, sys, random
 from sklearn.feature_extraction.image import extract_patches_2d
 
 class RandomPatch():
@@ -11,13 +11,17 @@ class RandomPatch():
             self.output_size = output_size
 
     def __call__(self, sample):
+        random_int = random.randint(0, 2 ** 32 - 1)  # To consistently look at one patch (instead of random patches).
+
         img_stack = [0] * constants.IMAGES_PER_DAY
         for i in range(constants.IMAGES_PER_DAY):
             img = sample[i, :, :, :]
             # cv2.imwrite('/home/vli/patches/test' + str(int(i / constants.NUM_CHANNELS)) + '.jpg', img)
 
-            img_stack[i] = extract_patches_2d(img, self.output_size, 1)[0]
+            img_stack[i] = extract_patches_2d(img, self.output_size, max_patches=1, random_state=random_int)[0]
             # cv2.imwrite('/home/vli/patches/test' + str(i) + '.jpg', patch)
+            patch = PIL.Image.fromarray(np.uint8(img_stack[i]))
+            patch.save('/home/vli/patches/sample' + str(i) + '.jpg')
         img_stack = np.stack(img_stack, axis=0)
 
         return img_stack

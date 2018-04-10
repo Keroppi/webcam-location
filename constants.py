@@ -1,6 +1,6 @@
-CLUSTER = True
+CLUSTER = False
 SMALL_DATASET = True
-DAYS_PER_MONTH = 5 # 'MAX'
+DAYS_PER_MONTH = 1 # 'MAX'
 SIZE = ['small'] # 'large'
 DATA_SOURCES = ['roundshot'] # 'panomax'
 IMAGES_PER_DAY = 32

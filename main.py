@@ -72,4 +72,8 @@ for e in range(constants.EPOCHS):
 
 # Could use GPU to transform images...?  ToTensor first step - https://discuss.pytorch.org/t/preprocess-images-on-gpu/5096
 
-# Scale images to [0, 1] ?
+
+
+# Could just artificially limit # of days in this line below...
+# self.data = data.days[num_test:num_test + num_train]
+# change __len__ function as well
