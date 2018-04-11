@@ -93,6 +93,7 @@ class WebcamData():
 
                                     day_dir = month_dir + day + '/'
 
+                                    # May need to change if we add LARGE sizes as well. # VLI
                                     train_test_valid = WebcamData.determine_train_test_valid(day_dir)
 
                                     with open(day_dir + 'sun.txt') as sun_f:

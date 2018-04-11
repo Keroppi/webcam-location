@@ -31,18 +31,24 @@ train_loader = torch.utils.data.DataLoader(train_dataset, shuffle=True, batch_si
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=constants.BATCH_SIZE, num_workers=num_workers, pin_memory=pin_memory)
 valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=constants.BATCH_SIZE, num_workers=num_workers, pin_memory=pin_memory)
 
+print("Train / Test/ Validation Sizes: ")
+print(len(train_loader))
+print(len(test_loader))
+print(len(valid_loader))
+
 model = WebcamLocation()
 model.cuda()
 
-loss_fn = torch.nn.MSELoss().cuda()
-optimizer = torch.optim.Adagrad(model.parameters(), lr=1e-4)
+train_loss_fn = torch.nn.MSELoss().cuda()
+test_loss_fn = torch.nn.MSELoss(size_average=False).cuda()
+optimizer = torch.optim.Adagrad(model.parameters(), lr=1e-3)
 
-for e in range(constants.EPOCHS):
+def train_epoch(epoch, model, data_loader, optimizer):
     model.train()
 
-    for batch_idx, (data, target) in enumerate(train_loader):
+    for batch_idx, (data, target) in enumerate(data_loader):
         data = data.cuda()
-        target = target.cuda()
+        target = target.float().cuda()
 
         data, target = Variable(data), Variable(target)
 
@@ -50,15 +56,38 @@ for e in range(constants.EPOCHS):
 
         output = model(data)
 
-        loss = loss_fn(output, target)
+        loss = train_loss_fn(output, target)
         loss.backward()
         optimizer.step()
 
-    #print(i_batch) # Batch idx
-    #print(sample_batched[0].size()) # Inputs
-    #print(sample_batched[1]) # Outputs
+        if batch_idx % constants.LOG_INTERVAL == 0:
+            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                  epoch, batch_idx * len(data), len(data_loader.dataset),
+                  100. * batch_idx / len(data_loader), loss.data[0]))
 
-# FOLLOW THIS FOR NOW https://github.com/pytorch/examples/blob/master/mnist_hogwild/train.py
+def test_epoch(model, data_loader):
+    model.eval()
+    test_loss = 0
+    for data, target in data_loader:
+        data, target = Variable(data, volatile=True), Variable(target)
+        data = data.cuda()
+        target = target.float().cuda()
+
+        output = model(data)
+        test_loss += test_loss_fn(output, target).data[0] # sum up batch loss
+
+    test_loss /= len(data_loader.dataset)
+    print('\nTest set: Average loss: {:.4f}\n'.format(
+          test_loss))
+
+
+for epoch in range(constants.EPOCHS):
+    print('Epoch: ' + str(epoch))
+
+    train_epoch(epoch, model, train_loader, optimizer)
+    test_epoch(model, test_loader)
+
+
 
 # Pickle or whatever all patches?
 # Does it make sense to save these patches to disk?
@@ -66,14 +95,13 @@ for e in range(constants.EPOCHS):
 # Could parallelize the load_images() in webcam_dataset
 ## No need for now since it's just strings.
 
-# 3D Convolution
-
 # Each img_stack = 32 * 3 * 128 * 128 bytes = 1.57 MB
 
 # Could use GPU to transform images...?  ToTensor first step - https://discuss.pytorch.org/t/preprocess-images-on-gpu/5096
 
-
-
 # Could just artificially limit # of days in this line below...
 # self.data = data.days[num_test:num_test + num_train]
 # change __len__ function as well
+
+# Ycbcr
+## https://stackoverflow.com/questions/24610775/pil-image-convert-from-rgb-to-ycbcr-results-in-4-channels-instead-of-3-and-behav
