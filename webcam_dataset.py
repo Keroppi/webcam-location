@@ -94,12 +94,29 @@ class WebcamData():
                                     day_dir = month_dir + day + '/'
 
                                     train_test_valid = WebcamData.determine_train_test_valid(day_dir)
-                                    self.types[train_test_valid] += 1
 
                                     with open(day_dir + 'sun.txt') as sun_f:
                                         sun_lines = sun_f.read().splitlines()
-                                        sunrise_str = year + '-' + month + '-' + day + ' ' + sun_lines[4]
-                                        sunset_str = year + '-' + month + '-' + day + ' ' + sun_lines[5]
+
+                                        # No sunrise or no sunset this day, so skip it.
+                                        if sun_lines[4].find('SUN') > 0 or sun_lines[5].find('SUN') > 0:
+                                            continue  # MAY NEED FURTHER ATTENTION # VLI
+
+                                        date_str = year + '-' + month + '-' + day
+                                        date = datetime.datetime.strptime(date_str, "%Y-%m-%d")
+
+                                        # Heuristic for 2 if statements below - not necessarily 100% accurate.
+                                        # If sunrise is from 10 PM to 11:59 PM, it happens the day before.
+                                        if int(sun_lines[4].split(':')[0]) >= 20:
+                                            date += datetime.timedelta(days=-1)
+                                            date_str = str(date.date())
+                                        # If sunset is from midnight to 1:59 AM, it happens the next day.
+                                        if int(sun_lines[5].split(':')[0]) < 2:
+                                            date += datetime.timedelta(days=1)
+                                            date_str = str(date.date())
+
+                                        sunrise_str = date_str + ' ' + sun_lines[4]
+                                        sunset_str = date_str + ' ' + sun_lines[5]
                                         sunrise = datetime.datetime.strptime(sunrise_str, "%Y-%m-%d %H:%M:%S")
                                         sunset = datetime.datetime.strptime(sunset_str, "%Y-%m-%d %H:%M:%S")
 
@@ -108,10 +125,8 @@ class WebcamData():
                                         image_dir = day_dir + size + '/'
                                         images = glob.glob(image_dir + '*.jpg')
 
-                                        # Not enough images!
+                                        # Not enough images, so skip it.
                                         if len(images) < constants.IMAGES_PER_DAY:
-                                            # print("NOT ENOUGH IMAGES!")
-                                            self.types[train_test_valid] -= 1 # This day doesn't count.
                                             continue  # MAY NEED FURTHER ATTENTION # VLI
 
                                         # Sort by time.
@@ -133,6 +148,7 @@ class WebcamData():
                                         day_obj = Day(subset_times, subset_images, sunrise, sunset,
                                                       train_test_valid)  # One training / test example.
                                         data.append(day_obj)
+                                        self.types[train_test_valid] += 1
 
         data.sort(key=functools.cmp_to_key(WebcamData.compare_data_types)) # Sorted in order of test, train, valid
         return data
@@ -176,7 +192,10 @@ class Train(Dataset):
         if self.transforms is not None:
             img_stack = self.transforms(img_stack)
 
-        return (img_stack, self.sunrise_label[index]) # SKIP SUNSET FOR NOW # VLI
+        if constants.LEARNING_SUNRISE:
+            return (img_stack, self.sunrise_label[index])
+        else:
+            return (img_stack, self.sunset_label[index])
 
     def __len__(self):
         return len(self.data)
@@ -202,7 +221,10 @@ class Test(Dataset):
         if self.transforms is not None:
             img_stack = self.transforms(img_stack)
 
-        return (img_stack, self.sunrise_label[index]) # SKIP SUNSET FOR NOW # VLI
+        if constants.LEARNING_SUNRISE:
+            return (img_stack, self.sunrise_label[index])
+        else:
+            return (img_stack, self.sunset_label[index])
 
     def __len__(self):
         return len(self.data)
@@ -229,7 +251,10 @@ class Validation(Dataset):
         if self.transforms is not None:
             img_stack = self.transforms(img_stack)
 
-        return (img_stack, self.sunrise_label[index]) # SKIP SUNSET FOR NOW # VLI
+        if constants.LEARNING_SUNRISE:
+            return (img_stack, self.sunrise_label[index])
+        else:
+            return (img_stack, self.sunset_label[index])
 
     def __len__(self):
         return len(self.data)
