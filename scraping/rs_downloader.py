@@ -7,6 +7,10 @@ from urllib.request import URLError
 from urllib.request import HTTPError
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
 
+# Cluster usage:
+# qsub -l h_vmem=10G -q long.q@* -t 1:3 rs_downloader.py
+# 1:3 indicates January to March, inclusive
+
 CLUSTER = True # run on cluster or local machine
 SIZE = 'small' # 'large'
 
@@ -14,13 +18,13 @@ GOOGLE_MAPS_API_KEY = 'AIzaSyCEJkK4hEYYnRv4z6hL6n8A8VqfqJdspnY';
 
 if CLUSTER:
     SGE_TASK_ID = int(os.environ.get('SGE_TASK_ID')) # Determines the month that gets downloaded. (1 -> January)
-    baseLocation = '/scratch_net/biwidl103/vli/data/roundshot/'
+    baseLocation = '/srv/glusterfs/vli/data/roundshot/'
 else:
     LOCAL_MONTH = 1 # January
     baseLocation = '~/data/roundshot/'
     baseLocation = os.path.expanduser(baseLocation)
 
-year = '2018'
+year = '2017'
 
 rs_filename = '~/roundshot.txt'
 rs_filename = os.path.expanduser(rs_filename)

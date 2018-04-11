@@ -6,6 +6,10 @@ class Day():
         sunrise_idx = 0
         sunset_idx = 0
 
+        # Time between first and last images.
+        #Uused for scaling if the sunrise / sunset fall outside the range of images.
+        time_diff = times[-1] - times[0]
+
         max_sunrise_idx = None
         max_sunset_idx = None
         for time in times:
@@ -22,18 +26,26 @@ class Day():
 
             sunset_idx +=1
 
-        if max_sunrise_idx is None:
-            sunrise_idx = constants.IMAGES_PER_DAY # Past the last image.
-        elif max_sunrise_idx == 0:
-            sunrise_idx = -1
+        if max_sunrise_idx is None: # Past the last image.
+            sunrise_idx = constants.IMAGES_PER_DAY - 1
+            extra = (sunrise - times[-1]) / time_diff
+            sunrise_idx += extra
+        elif max_sunrise_idx == 0: # Before the first image.
+            sunrise_idx = 0
+            extra = (sunrise - times[0]) / time_diff
+            sunrise_idx += extra
         else:
             remainder = (sunrise - times[max_sunrise_idx - 1]) / (times[max_sunrise_idx] - times[max_sunrise_idx - 1])
             sunrise_idx = remainder + max_sunrise_idx - 1
 
         if max_sunset_idx is None:
-            sunset_idx = constants.IMAGES_PER_DAY
+            sunset_idx = constants.IMAGES_PER_DAY - 1
+            extra = (sunset - times[-1]) / time_diff
+            sunset_idx += extra
         elif max_sunset_idx == 0:
-            sunset_idx = -1
+            sunset_idx = 0
+            extra = (sunset- times[0]) / time_diff
+            sunset_idx += extra
         else:
             remainder = (sunset - times[max_sunset_idx - 1]) / (times[max_sunset_idx] - times[max_sunset_idx - 1])
             sunset_idx = remainder + max_sunset_idx - 1

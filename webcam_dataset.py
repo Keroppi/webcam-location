@@ -29,6 +29,8 @@ class WebcamData():
         return times
 
     def determine_train_test_valid(path):
+        # Hash the directory string to determine if it falls in train/test/validation.
+
         path = path[path.find(path.split('/')[-7]):]  # -7 should be roundshot or panomax (data source)
         value = int(hashlib.sha256(path.encode('utf-8')).hexdigest(), 16) % constants.SPLIT_TOTAL
 
@@ -41,7 +43,7 @@ class WebcamData():
 
     def load_images(self):
         if constants.CLUSTER:
-            image_dir = '/scratch_net/biwidl103/vli/data/'
+            image_dir = '/srv/glusterfs/vli/data/'
         else:
             image_dir = '~/data/'
             image_dir = os.path.expanduser(image_dir)
