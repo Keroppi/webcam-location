@@ -1,6 +1,23 @@
 import constants, torch, torchvision, numpy as np, cv2, PIL, sys, random
 from sklearn.feature_extraction.image import extract_patches_2d
 
+class RandomResize():
+    def __init__(self, output_size):  # int for square, else (height, width)
+        assert isinstance(output_size, (int, tuple))
+        if isinstance(output_size, int):
+            self.output_size = (output_size, output_size)
+        else:
+            assert len(output_size) == 2
+            self.output_size = output_size
+
+    def __call__(self, sample):
+        #print(sample.shape) # IMAGES_PER_DAY, height, width, RGB
+
+
+
+
+        return None
+
 class RandomPatch():
     def __init__(self, output_size): # int for square, else (height, width)
         assert isinstance(output_size, (int, tuple))

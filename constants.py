@@ -1,7 +1,6 @@
 LEARNING_SUNRISE = True # False for sunset
 CLUSTER = False
-SMALL_DATASET = (30, 2, 2) # Train, test, validation
-DAYS_PER_MONTH = 5 # 'MAX'
+DAYS_PER_MONTH = 3 # 'MAX'
 SIZE = ['small'] # 'large'
 DATA_SOURCES = ['roundshot'] # 'panomax'
 IMAGES_PER_DAY = 32
@@ -13,9 +12,9 @@ EPOCHS = 2
 FIRST_FC_LAYER_SIZE = 32 * 26 * 26 # Output dimensionality of final convolution layer.
 LOG_INTERVAL = 1
 SPLIT_TOTAL = 100
-SPLIT_TRAIN = 79 # 80% train
-SPLIT_TEST = 89 # 10% test
-SPLIT_VALID = 99 # 10% validation
+SPLIT_TRAIN = 89 # 90% train
+SPLIT_TEST = 94 # 5% test
+SPLIT_VALID = 99 # 5% validation
 
 
 
