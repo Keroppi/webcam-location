@@ -1,4 +1,4 @@
-import constants, torch, torchvision, numpy as np, cv2, PIL, sys, random
+import constants, torch, torchvision, numpy as np, PIL, sys, random, skimage.transform
 from sklearn.feature_extraction.image import extract_patches_2d
 
 class RandomResize():
@@ -12,11 +12,25 @@ class RandomResize():
 
     def __call__(self, sample):
         #print(sample.shape) # IMAGES_PER_DAY, height, width, RGB
+        images, height, width, channels = sample.shape
+
+        new_height = random.randint(constants.PATCH_SIZE[0], int(1.5 * height))
+        #new_width = random.randint(constants.PATCH_SIZE[1], int(1.5 * width))
+
+        new_height_ratio = max(new_height, constants.PATCH_SIZE[0] + 1) / height # + 1 to make sure it's not smaller than patch size
 
 
+        img_stack = [0] * constants.IMAGES_PER_DAY
+        for i in range(constants.IMAGES_PER_DAY):
+            #img_stack[i] = skimage.transform.resize(sample[i, :, :, :], (new_height, new_width, channels), preserve_range=True)
+            img_stack[i] = skimage.transform.rescale(sample[i, :, :, :], new_height_ratio, preserve_range=True)
 
+            #patch = PIL.Image.fromarray(np.uint8(img_stack[i]))
+            #patch.save('/home/vli/patches/sample' + str(i) + '.jpg')
 
-        return None
+        img_stack = np.stack(img_stack, axis=0)
+
+        return img_stack
 
 class RandomPatch():
     def __init__(self, output_size): # int for square, else (height, width)

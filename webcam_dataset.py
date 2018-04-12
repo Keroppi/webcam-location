@@ -1,4 +1,4 @@
-import os, sys, cv2, calendar, glob, datetime, time, functools, numpy as np, constants, PIL, hashlib, torch
+import os, sys, calendar, glob, datetime, time, functools, numpy as np, constants, PIL, hashlib, torch
 from day import Day
 from torch.utils.data.dataset import Dataset
 
@@ -160,7 +160,7 @@ class WebcamData():
         load_t0 = time.time()
         self.days = self.load_images()
         load_t1 = time.time()
-        print('Load Image Time (s): ' + str(load_t1 - load_t0))
+        print('Load File Paths Time (s): ' + str(load_t1 - load_t0))
 
 class Train(Dataset):
     def __init__(self, data, transforms=None):
