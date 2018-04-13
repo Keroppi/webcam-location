@@ -15,7 +15,7 @@ class WebcamLocation(nn.Module):
         output_channels = [16, 32, 48, 16] # each element corresponds to a layer
         padding = [(2, 2), (1, 1), (1, 1), (0, 0)] # each element corresponds to a layer
 
-        linear_sizes = [1000, 100]
+        linear_sizes = [2000, 200]
 
 
         self.conv1 = nn.Conv3d(constants.NUM_CHANNELS, output_channels[0],
@@ -44,21 +44,21 @@ class WebcamLocation(nn.Module):
         # Max pooling over a (2, 2) window
         x = F.max_pool3d(F.relu(self.conv1(x)), (1, 2, 2))
 
-        print('Conv 1')
-        print(x.size())
-        print(self.num_flat_features(x))
+        #print('Conv 1')
+        #print(x.size())
+        #print(self.num_flat_features(x))
 
         x = F.max_pool3d(F.relu(self.conv2(x)), (1, 2, 2))
 
-        print('Conv 2')
-        print(x.size())
-        print(self.num_flat_features(x))
+        #print('Conv 2')
+        #print(x.size())
+        #print(self.num_flat_features(x))
 
         x = F.relu(self.conv3(x))
 
-        print('Conv 3')
-        print(x.size())
-        print(self.num_flat_features(x))
+        #print('Conv 3')
+        #print(x.size())
+        #print(self.num_flat_features(x))
 
         x = F.max_pool3d(F.relu(self.conv4(x)), (1, 2, 2))
 
