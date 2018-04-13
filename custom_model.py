@@ -8,7 +8,7 @@ class WebcamLocation(nn.Module):
     def __init__(self):
         super(WebcamLocation, self).__init__()
 
-        kernel_sizes = [(4, 4), (3, 3), (2, 2), (2, 2)] # each element corresponds to a layer, tuple is (height, width)
+        kernel_sizes = [(5, 5), (3, 3), (2, 2), (2, 2)] # each element corresponds to a layer, tuple is (height, width)
         output_channels = [16, 32, 48, 32] # each element corresponds to a layer
         padding = [(2, 2), (1, 1), (1, 1), (0, 0)] # each element corresponds to a layer
 
@@ -41,7 +41,7 @@ class WebcamLocation(nn.Module):
         print(x.size())
         print(self.num_flat_features(x))
 
-        x = self.conv2(x)
+        x = F.max_pool3d(F.relu(self.conv2(x)), (1, 2, 2))
 
         print('Conv 2')
         print(x.size())

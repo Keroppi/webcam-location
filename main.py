@@ -13,6 +13,9 @@ from custom_transforms import RandomResize, RandomPatch, ToTensor
 from custom_model import WebcamLocation
 from torch.autograd import Variable
 
+vmem = subprocess.run(['echo', '$SGE_GPU'], stdout=subprocess.PIPE)
+print('SGE_GPU: \n' + str(vmem.stdout).replace('\\n', '\n'))
+
 print('Current Device(s): ' + str(torch.cuda.current_device()))
 print('Device Count: ' + str(torch.cuda.device_count()))
 
