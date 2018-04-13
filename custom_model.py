@@ -16,13 +16,17 @@ class WebcamLocation(nn.Module):
 
 
         self.conv1 = nn.Conv3d(constants.NUM_CHANNELS, output_channels[0],
-                               kernel_size=(1, kernel_sizes[0][0], kernel_sizes[0][1]), stride=(1, 2, 2), padding=(1, padding[0], padding[0]))
+                               kernel_size=(1, kernel_sizes[0][0], kernel_sizes[0][1]), stride=(1, 2, 2),
+                               padding=(0, padding[0][0], padding[0][1]))
         self.conv2 = nn.Conv3d(output_channels[0], output_channels[1],
-                               kernel_size=(1, kernel_sizes[1][0], kernel_sizes[1][1]), stride=1, padding=(1, padding[0], padding[0]))
+                               kernel_size=(1, kernel_sizes[1][0], kernel_sizes[1][1]), stride=1,
+                               padding=(0, padding[1][0], padding[1][1]))
         self.conv3 = nn.Conv3d(output_channels[1], output_channels[2],
-                               kernel_size=(1, kernel_sizes[2][0], kernel_sizes[2][1]), stride=1, padding=(1, padding[0], padding[0]))
+                               kernel_size=(1, kernel_sizes[2][0], kernel_sizes[2][1]), stride=1,
+                               padding=(0, padding[2][0], padding[2][1]))
         self.conv4 = nn.Conv3d(output_channels[2], output_channels[3],
-                               kernel_size=(1, kernel_sizes[3][0], kernel_sizes[3][1]), stride=1, padding=(1, padding[0], padding[0]))
+                               kernel_size=(1, kernel_sizes[3][0], kernel_sizes[3][1]), stride=1,
+                               padding=(0, padding[3][0], padding[3][1]))
 
         # an affine operation: y = Wx + b
         self.fc1 = nn.Linear(constants.FIRST_FC_LAYER_SIZE, linear_sizes[0])
