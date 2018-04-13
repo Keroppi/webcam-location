@@ -8,24 +8,31 @@ class WebcamLocation(nn.Module):
     def __init__(self):
         super(WebcamLocation, self).__init__()
 
-        kernel_sizes = [(5, 5), (3, 3), (2, 2), (2, 2)] # each element corresponds to a layer, tuple is (height, width)
-        output_channels = [16, 32, 48, 32] # each element corresponds to a layer
+        kernel_sizes = [(1, 5, 5),
+                        (4, 2, 2), # Look at 4 frames at once.
+                        (1, 2, 2),
+                        (1, 2, 2)] # each element corresponds to a layer, tuple is (height, width)
+        output_channels = [16, 32, 48, 16] # each element corresponds to a layer
         padding = [(2, 2), (1, 1), (1, 1), (0, 0)] # each element corresponds to a layer
 
         linear_sizes = [1000, 100]
 
 
         self.conv1 = nn.Conv3d(constants.NUM_CHANNELS, output_channels[0],
-                               kernel_size=(1, kernel_sizes[0][0], kernel_sizes[0][1]), stride=(1, 2, 2),
+                               kernel_size=kernel_sizes[0],
+                               stride=(1, 2, 2),
                                padding=(0, padding[0][0], padding[0][1]))
         self.conv2 = nn.Conv3d(output_channels[0], output_channels[1],
-                               kernel_size=(1, kernel_sizes[1][0], kernel_sizes[1][1]), stride=1,
+                               kernel_size=kernel_sizes[1],
+                               stride=(2, 1, 1), # Skip every other frame.
                                padding=(0, padding[1][0], padding[1][1]))
         self.conv3 = nn.Conv3d(output_channels[1], output_channels[2],
-                               kernel_size=(1, kernel_sizes[2][0], kernel_sizes[2][1]), stride=1,
+                               kernel_size=kernel_sizes[2],
+                               stride=1,
                                padding=(0, padding[2][0], padding[2][1]))
         self.conv4 = nn.Conv3d(output_channels[2], output_channels[3],
-                               kernel_size=(1, kernel_sizes[3][0], kernel_sizes[3][1]), stride=1,
+                               kernel_size=kernel_sizes[3],
+                               stride=1,
                                padding=(0, padding[3][0], padding[3][1]))
 
         # an affine operation: y = Wx + b
@@ -47,7 +54,7 @@ class WebcamLocation(nn.Module):
         print(x.size())
         print(self.num_flat_features(x))
 
-        x = self.conv3(x)
+        x = F.relu(self.conv3(x))
 
         print('Conv 3')
         print(x.size())
