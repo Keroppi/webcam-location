@@ -1,4 +1,5 @@
-import constants, numpy as np, cv2, sys, PIL
+import constants
+import numpy as np, sys, PIL
 from sklearn.feature_extraction.image import extract_patches_2d
 
 class Day():
