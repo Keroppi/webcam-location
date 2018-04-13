@@ -1,5 +1,5 @@
 import constants
-import torch, torchvision, os, time, shutil, os, argparse
+import torch, torchvision, os, time, shutil, os, argparse, subprocess
 from webcam_dataset import WebcamData
 from webcam_dataset import Train
 from webcam_dataset import Test
@@ -8,6 +8,9 @@ from custom_transforms import RandomResize, RandomPatch, ToTensor
 from custom_model import WebcamLocation
 from torch.autograd import Variable
 import torch.nn.functional as F
+
+vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
+print('V-Memory Before: \n' + str(vmem.stdout).replace('\\n', '\n'))
 
 parser = argparse.ArgumentParser(description='Webcam Locator')
 parser.add_argument('--resume', default='', type=str, metavar='PATH',
@@ -36,6 +39,9 @@ else:
 train_loader = torch.utils.data.DataLoader(train_dataset, shuffle=True, batch_size=constants.BATCH_SIZE, num_workers=num_workers, pin_memory=pin_memory)
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=constants.BATCH_SIZE, num_workers=num_workers, pin_memory=pin_memory)
 valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=constants.BATCH_SIZE, num_workers=num_workers, pin_memory=pin_memory)
+
+vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
+print('V-Memory After Loaders: \n' + str(vmem.stdout).replace('\\n', '\n'))
 
 #'''
 print("Train / Test/ Validation Sizes: ")
@@ -89,6 +95,10 @@ def train_epoch(epoch, model, data_loader, optimizer):
                   epoch, batch_idx * len(data), len(data_loader.dataset),
                   100. * batch_idx / len(data_loader), loss.data[0]))
 
+        vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
+        print('V-Memory After Epoch: ' + str(epoch) + '\n' + str(vmem.stdout).replace('\\n', '\n'))
+
+
 def test_epoch(model, data_loader):
     model.eval()
     test_loss = 0
@@ -140,6 +150,7 @@ for epoch in range(start_epoch, constants.EPOCHS):
 ## No need for now since it's just strings.
 
 # Each img_stack = 32 * 3 * 128 * 128 * 4 bytes = 6.29 MB
+# Batched 12 GB / 6.29 MB ~ 1900 stacks per batch
 
 # Could use GPU to transform images...?  ToTensor first step - https://discuss.pytorch.org/t/preprocess-images-on-gpu/5096
 
