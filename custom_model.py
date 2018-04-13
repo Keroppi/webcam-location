@@ -1,4 +1,4 @@
-import torch
+import torch, sys
 import torch.nn as nn
 from torch.autograd import Variable
 import torch.nn.functional as F
@@ -40,6 +40,7 @@ class WebcamLocation(nn.Module):
 
         print(x.shape)
         print(self.num_flat_features(x))
+        sys.exit()
 
         x = x.view(-1, self.num_flat_features(x))
         x = F.relu(self.fc1(x))

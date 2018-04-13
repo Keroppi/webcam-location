@@ -1,3 +1,5 @@
+#!/scratch_net/biwidl106/vli/.pyenv/shims/python
+
 import constants
 import torch, torchvision, os, time, shutil, os, argparse, subprocess
 from webcam_dataset import WebcamData
