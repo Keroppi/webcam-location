@@ -32,7 +32,7 @@ class WebcamLocation(nn.Module):
     def forward(self, x):
         # Max pooling over a (2, 2) window
         x = F.max_pool3d(F.relu(self.conv1(x)), (1, 2, 2))
-        
+
         print(x.size())
         print(self.num_flat_features(x))
 
