@@ -61,7 +61,10 @@ print(len(valid_loader))
 #'''
 
 model = WebcamLocation()
-model.cuda()
+
+if torch.cuda.is_available():
+    model.cuda()
+
 
 train_loss_fn = torch.nn.MSELoss().cuda()
 test_loss_fn = torch.nn.MSELoss(size_average=False).cuda()
@@ -87,8 +90,11 @@ def train_epoch(epoch, model, data_loader, optimizer):
     model.train()
 
     for batch_idx, (data, target) in enumerate(data_loader):
-        data = data.cuda()
-        target = target.float().cuda()
+        if torch.cuda.is_available():
+            data = data.cuda()
+            target = target.float().cuda()
+        else:
+            target = target.float()
 
         data, target = Variable(data), Variable(target)
 
@@ -116,8 +122,12 @@ def test_epoch(model, data_loader):
     test_loss = 0
     for data, target in data_loader:
         data, target = Variable(data, volatile=True), Variable(target)
-        data = data.cuda()
-        target = target.float().cuda()
+
+        if torch.cuda.is_available():
+            data = data.cuda()
+            target = target.float().cuda()
+        else:
+            target = target.float()
 
         output = model(data)
         test_loss += test_loss_fn(output, target).data[0] # sum up batch loss

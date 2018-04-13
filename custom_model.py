@@ -17,7 +17,6 @@ class WebcamLocation(nn.Module):
 
         linear_sizes = [2000, 200]
 
-
         self.conv1 = nn.Conv3d(constants.NUM_CHANNELS, output_channels[0],
                                kernel_size=kernel_sizes[0],
                                stride=(1, 2, 2),
