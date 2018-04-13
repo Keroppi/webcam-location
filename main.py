@@ -2,7 +2,7 @@
 
 import torch, torchvision, os, time, shutil, os, argparse, subprocess, sys
 
-sys.path.append('/home/vli/webcam-dataset') # For importing .py files in the same directory.
+sys.path.append('/home/vli/webcam-location') # For importing .py files in the same directory.
 import constants
 
 from webcam_dataset import WebcamData
