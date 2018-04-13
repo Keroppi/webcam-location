@@ -1,1 +1,5 @@
-qsub -l gpu -l h_vmem=8G -q gpu.long.q@* -j y -o /srv/glusterfs/vli/job_logs -cwd main.py
+Inside gpu.sh:
+CUDA_VISIBLE_DEVICES=$SGE_GPU ~/webcam-location/main.py
+
+qsub command:
+qsub -l gpu -l h_vmem=8G -q gpu.long.q@* -j y -o /srv/glusterfs/vli/job_logs ~/gpu.sh

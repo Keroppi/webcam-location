@@ -12,7 +12,9 @@ from webcam_dataset import Validation
 from custom_transforms import RandomResize, RandomPatch, ToTensor
 from custom_model import WebcamLocation
 from torch.autograd import Variable
-import torch.nn.functional as F
+
+print('Current Device(s): ' + str(torch.cuda.current_device()))
+print('Device Count: ' + str(torch.cuda.device_count()))
 
 vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
 print('V-Memory Before: \n' + str(vmem.stdout).replace('\\n', '\n'))
@@ -102,6 +104,8 @@ def train_epoch(epoch, model, data_loader, optimizer):
 
         vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
         print('V-Memory After Epoch: ' + str(epoch) + '\n' + str(vmem.stdout).replace('\\n', '\n'))
+
+        #sys.exit()
 
 
 def test_epoch(model, data_loader):

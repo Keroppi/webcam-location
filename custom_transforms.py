@@ -22,8 +22,8 @@ class RandomResize():
 
         img_stack = [0] * constants.IMAGES_PER_DAY
         for i in range(constants.IMAGES_PER_DAY):
-            #img_stack[i] = skimage.transform.resize(sample[i, :, :, :], (new_height, new_width, channels), preserve_range=True)
-            img_stack[i] = skimage.transform.rescale(sample[i, :, :, :], new_height_ratio, preserve_range=True)
+            #img_stack[i] = skimage.transform.resize(sample[i, :, :, :], (new_height, new_width, channels), preserve_range=True, mode='reflect')
+            img_stack[i] = skimage.transform.rescale(sample[i, :, :, :], new_height_ratio, preserve_range=True, mode='reflect')
 
             #patch = PIL.Image.fromarray(np.uint8(img_stack[i]))
             #patch.save('/home/vli/patches/sample' + str(i) + '.jpg')
