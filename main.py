@@ -105,7 +105,7 @@ def train_epoch(epoch, model, data_loader, optimizer):
         vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
         print('V-Memory After Epoch: ' + str(epoch) + '\n' + str(vmem.stdout).replace('\\n', '\n'))
 
-        #sys.exit()
+        sys.exit() # VLI
 
 
 def test_epoch(model, data_loader):

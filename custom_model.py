@@ -8,21 +8,21 @@ class WebcamLocation(nn.Module):
     def __init__(self):
         super(WebcamLocation, self).__init__()
 
-        kernel_sizes = [(7, 7), (5, 5), (3, 3), (2, 2)] # each element corresponds to a layer, tuple is (height, width)
-        output_channels = [32, 64, 96, 64] # each element corresponds to a layer
-        padding = [2, 1, 1, 0] # each element corresponds to a layer
+        kernel_sizes = [(5, 5), (4, 4), (3, 3), (2, 2)] # each element corresponds to a layer, tuple is (height, width)
+        output_channels = [16, 32, 48, 32] # each element corresponds to a layer
+        padding = [(2, 2), (1, 1), (1, 1), (0, 0)] # each element corresponds to a layer
 
         linear_sizes = [1000, 100]
 
 
         self.conv1 = nn.Conv3d(constants.NUM_CHANNELS, output_channels[0],
-                               kernel_size=(1, kernel_sizes[0][0], kernel_sizes[0][1]), stride=(1, 3, 3), padding=padding[0])
+                               kernel_size=(1, kernel_sizes[0][0], kernel_sizes[0][1]), stride=(1, 2, 2), padding=(1, padding[0], padding[0]))
         self.conv2 = nn.Conv3d(output_channels[0], output_channels[1],
-                               kernel_size=(1, kernel_sizes[1][0], kernel_sizes[1][1]), stride=1, padding=padding[1])
+                               kernel_size=(1, kernel_sizes[1][0], kernel_sizes[1][1]), stride=1, padding=(1, padding[0], padding[0]))
         self.conv3 = nn.Conv3d(output_channels[1], output_channels[2],
-                               kernel_size=(1, kernel_sizes[2][0], kernel_sizes[2][1]), stride=1, padding=padding[2])
+                               kernel_size=(1, kernel_sizes[2][0], kernel_sizes[2][1]), stride=1, padding=(1, padding[0], padding[0]))
         self.conv4 = nn.Conv3d(output_channels[2], output_channels[3],
-                               kernel_size=(1, kernel_sizes[3][0], kernel_sizes[3][1]), stride=1, padding=padding[3])
+                               kernel_size=(1, kernel_sizes[3][0], kernel_sizes[3][1]), stride=1, padding=(1, padding[0], padding[0]))
 
         # an affine operation: y = Wx + b
         self.fc1 = nn.Linear(constants.FIRST_FC_LAYER_SIZE, linear_sizes[0])
