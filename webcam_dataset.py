@@ -56,7 +56,7 @@ class WebcamData():
 
             # Remove hidden folders.
             countries = [x for x in countries if not x.startswith('.')]
-            countries = 'United Kingdom' # VLI
+            #countries = 'United Kingdom' # VLI
 
             for country in countries:
                 country_dir = curr_image_dir + country + '/'
@@ -75,7 +75,7 @@ class WebcamData():
                         lng = float(location_split[1])
 
                         years = next(os.walk(place_dir))[1]
-                        years = '2018' ## VLI
+                        #years = '2018' ## VLI
 
                         for year in years:
                             year_dir = place_dir + year + '/'

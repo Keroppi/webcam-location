@@ -1,0 +1,1 @@
+qsub -l gpu -l h_vmem=8G -q gpu.long.q@* -j y -o /srv/glusterfs/vli/job_logs -cwd main.py

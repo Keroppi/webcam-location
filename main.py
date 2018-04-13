@@ -162,3 +162,6 @@ for epoch in range(start_epoch, constants.EPOCHS):
 
 # Ycbcr
 ## https://stackoverflow.com/questions/24610775/pil-image-convert-from-rgb-to-ycbcr-results-in-4-channels-instead-of-3-and-behav
+
+# Multiple GPUs
+# http://pytorch.org/tutorials/beginner/former_torchies/parallelism_tutorial.html
