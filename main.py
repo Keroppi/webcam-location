@@ -1,7 +1,10 @@
 #!/scratch_net/biwidl106/vli/.pyenv/shims/python
 
+import torch, torchvision, os, time, shutil, os, argparse, subprocess, sys
+
+sys.path.append('/home/vli/webcam-dataset') # For importing .py files in the same directory.
 import constants
-import torch, torchvision, os, time, shutil, os, argparse, subprocess
+
 from webcam_dataset import WebcamData
 from webcam_dataset import Train
 from webcam_dataset import Test
