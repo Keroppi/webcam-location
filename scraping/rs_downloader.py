@@ -236,7 +236,8 @@ while lIdx < len(lines):
     
     line = lines[lIdx];
     while line != '-----':
-        name = line;
+        name = line
+        name = name.replace('/', '-') # Otherwise the / will create a sub-directory
 
         print(name)
         sys.stdout.flush()

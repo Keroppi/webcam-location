@@ -21,6 +21,7 @@ print('Device Count: ' + str(torch.cuda.device_count()))
 
 vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
 print('V-Memory Before: \n' + str(vmem.stdout).replace('\\n', '\n'))
+sys.stdout.flush()
 
 parser = argparse.ArgumentParser(description='Webcam Locator')
 parser.add_argument('--resume', default='', type=str, metavar='PATH',
@@ -68,6 +69,9 @@ if torch.cuda.is_available():
     model = model.cuda()
     train_loss_fn = train_loss_fn.cuda()
     test_loss_fn = test_loss_fn.cuda()
+
+    if torch.cuda.device_count() > 1:
+        model = torch.nn.DataParallel(model)
 
 optimizer = torch.optim.Adagrad(model.parameters(), lr=1e-3)
 start_epoch = 0
