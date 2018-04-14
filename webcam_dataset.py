@@ -56,7 +56,7 @@ class WebcamData():
 
             # Remove hidden folders.
             countries = [x for x in countries if not x.startswith('.')]
-            countries = ['Russia'] # VLI
+            #countries = ['Russia'] # VLI
 
             for country in countries:
                 country_dir = curr_image_dir + country + '/'
@@ -75,7 +75,7 @@ class WebcamData():
                         lng = float(location_split[1])
 
                         years = next(os.walk(place_dir))[1]
-                        years = ['2018'] ## VLI
+                        #years = ['2018'] ## VLI
 
                         for year in years:
                             year_dir = place_dir + year + '/'
@@ -127,6 +127,12 @@ class WebcamData():
                                         #img_stack = np.array([])  # Stack all images along the color channel depth.
                                         image_dir = day_dir + size + '/'
                                         images = glob.glob(image_dir + '*.jpg')
+
+                                        done = glob.glob(image_dir + '*.txt')
+                                        if len(done) < 1: # no done.txt file, so skip it
+                                            if year == '2018': # VLI
+                                                print('2018 is unfinished! ' + image_dir) # VLI
+                                            continue
 
                                         # Not enough images, so skip it.
                                         if len(images) < constants.IMAGES_PER_DAY:

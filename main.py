@@ -128,7 +128,7 @@ def test_epoch(model, data_loader):
         if torch.cuda.is_available():
             data = data.cuda()
             target = target.float().cuda()
-            
+
         output = model(data)
         test_loss += test_loss_fn(output, target).data[0] # sum up batch loss
 
