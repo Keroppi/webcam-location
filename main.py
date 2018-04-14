@@ -13,8 +13,8 @@ from custom_transforms import RandomResize, RandomPatch, ToTensor
 from custom_model import WebcamLocation
 from torch.autograd import Variable
 
-vmem = subprocess.run(['echo', '$SGE_GPU'], stdout=subprocess.PIPE)
-print('SGE_GPU: \n' + str(vmem.stdout).replace('\\n', '\n'))
+d = dict(os.environ)
+print('SGE_GPU: ' + d['SGE_GPU'])
 
 print('Current Device(s): ' + str(torch.cuda.current_device()))
 print('Device Count: ' + str(torch.cuda.device_count()))
@@ -155,8 +155,15 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
 for epoch in range(start_epoch, constants.EPOCHS):
     print('Epoch: ' + str(epoch))
 
+    train_t0 = time.time()
     train_epoch(epoch, model, train_loader, optimizer)
+    train_t1 = time.time()
+    print('Epoch Train Time (min): ' + str((train_t1 - train_t0) / 60))
+
+    test_t0 = time.time()
     test_error = test_epoch(model, test_loader)
+    test_t1 = time.time()
+    print('Epoch Test Time (min): ' + str((test_t1 - test_t0) / 60))
 
     is_best = test_error < best_error
     best_error = min(test_error, best_error)
