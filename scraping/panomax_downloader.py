@@ -8,7 +8,7 @@ from urllib.request import URLError
 from urllib.request import HTTPError
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
 
-CLUSTER = False  # run on cluster or local machine
+CLUSTER = True  # run on cluster or local machine
 SIZE = 'small'  # 'large'
 
 GOOGLE_MAPS_API_KEY = 'AIzaSyCEJkK4hEYYnRv4z6hL6n8A8VqfqJdspnY'
@@ -18,11 +18,13 @@ if CLUSTER:
     baseLocation = '/srv/glusterfs/vli/panomax/'
 else:
     LOCAL_MONTH = 1  # January
-    baseLocation = '~/panomax/'
+    baseLocation = '~/data/panomax/'
     baseLocation = os.path.expanduser(baseLocation)
 
 year = '2018'
-'https://panodata4.panomax.com/cams/1766/2018/04/15/09-50-00_small.jpg'
+
+# Example URL
+# https://panodata4.panomax.com/cams/1766/2018/04/15/09-50-00_small.jpg
 
 pano_filename = '~/panomax.txt'
 pano_filename = os.path.expanduser(pano_filename)
@@ -153,17 +155,17 @@ def download_day(country, name, lat, lng, storage_id, year, month, day):
                 minute = "{0:0=2d}".format(idxMnt)
                 img_time = hour + '-' + minute + '-00'
 
-                imgUrlSmall = urlEnd + year + '/' + month + '/' + day + '/' + img_time + '/' + date + '-' + img_time + '_small.jpg'
-                imgUrlLarge = urlEnd + year + '/' + month + '/' + day + '/' + img_time + '/' + date + '-' + img_time + '_default.jpg'
+                imgUrlSmall = urlEnd + year + '/' + month + '/' + day + '/' + img_time + '_small.jpg'
+                imgUrlLarge = urlEnd + year + '/' + month + '/' + day + '/' + img_time + '_default.jpg'
                 localPathSmall = wrtPthSmall + '/' + date + '-' + img_time + '_thumbnail.jpg'
                 localPathLarge = wrtPthLarge + '/' + date + '-' + img_time + '_full.jpg'
 
-                urlE = None
-                keep_going = True
                 image_found = False
 
                 if SIZE == 'small':
                     for server in range(1, 6): # Look through servers 1-5 on panomax.
+                        keep_going = True
+
                         while keep_going: # Retry this server.
                             try:
                                 urllib.request.urlretrieve(baseUrl[0] + str(server) + imgUrlSmall, localPathSmall)
@@ -269,21 +271,21 @@ while lIdx < len(lines):
         # sys.stdout.flush()
 
         if mtIdx <= 7 and mtIdx % 2 == 1:
-            numDays = 31;
+            numDays = 31
         elif mtIdx <= 7:
-            numDays = 30;
+            numDays = 30
         elif mtIdx % 2 == 1:
-            numDays = 30;
+            numDays = 30
         else:
-            numDays = 31;
+            numDays = 31
 
         # February is a special case.
         if mtIdx == 2:
-            numDays = 28;
+            numDays = 28
 
             # Leap Year
             if int(year) % 4 == 0:
-                numDays = 29;
+                numDays = 29
 
         with ThreadPoolExecutor(numDays) as executor:
             future_download = {executor.submit(download_day, country, name, lat, lng, storage_id, year, month, day): day

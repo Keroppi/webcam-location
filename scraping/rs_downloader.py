@@ -161,7 +161,6 @@ def download_day(country, name, lat, lng, storage_id, year, month, day):
             localPathSmall = wrtPthSmall + '/' + date + '-' + img_time + '_thumbnail.jpg'
             localPathLarge = wrtPthLarge + '/' + date + '-' + img_time + '_full.jpg'
 
-            urlE = None
             keep_going = True
             if SIZE == 'small':
                 #small_img_t0 = time.time()
