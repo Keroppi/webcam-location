@@ -78,33 +78,6 @@ class Day():
         self.sunset = sunset
         self.sunrise_idx, self.sunset_idx = self.get_sun_idx(times, sunrise, sunset)
 
-        # Extract only the subset of images.
-        '''
-        subset_img_idx = []
-        for idx in subset_time_idx:
-            for channel in range(constants.NUM_CHANNELS):
-                subset_img_idx += [constants.NUM_CHANNELS * idx + channel]
-
-        self.subset_img_stack = np.take(img_stack, subset_img_idx, axis=2)
-
-        #print(subset_time_idx)
-        #print(subset_img_idx)
-        '''
-
-        # Cut out patches from the images.
-        '''
-        self.patch_stack = np.array([]) # Stack patches along the color channel depth.
-        for i in range(0, constants.IMAGES_PER_DAY * constants.NUM_CHANNELS, constants.NUM_CHANNELS):
-            img = self.subset_img_stack[:, :, i:i+constants.NUM_CHANNELS]
-            #cv2.imwrite('/home/vli/patches/test' + str(int(i / constants.NUM_CHANNELS)) + '.jpg', img)
-
-            patch = extract_patches_2d(img, (constants.PATCH_H, constants.PATCH_W), 1)[0]
-            #cv2.imwrite('/home/vli/patches/test' + str(i) + '.jpg', patch)
-
-            self.patch_stack = np.dstack((self.patch_stack, patch)) if self.patch_stack.size else patch
-        '''
-
-
 
 
 
