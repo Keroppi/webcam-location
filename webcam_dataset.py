@@ -69,95 +69,101 @@ class WebcamData():
                 for place in places:
                     place_dir = country_dir + place + '/'
 
-                    with open(place_dir + 'location.txt') as location_f:
-                        location_split = location_f.read().split()
-                        lat = float(location_split[0])
-                        lng = float(location_split[1])
+                    try:
+                        with open(place_dir + 'location.txt') as location_f:
+                            location_split = location_f.read().split()
+                            lat = float(location_split[0])
+                            lng = float(location_split[1])
+                    except FileNotFoundError:
+                        #print('WARNING - No location.txt! ' + place_dir)
+                        continue
 
-                        years = next(os.walk(place_dir))[1]
-                        #years = ['2018'] ## VLI
+                    years = next(os.walk(place_dir))[1]
 
-                        for year in years:
-                            year_dir = place_dir + year + '/'
+                    for year in years:
+                        year_dir = place_dir + year + '/'
 
-                            months = next(os.walk(year_dir))[1]
+                        months = next(os.walk(year_dir))[1]
 
-                            for month in months:
-                                month_dir = year_dir + month + '/'
+                        for month in months:
+                            month_dir = year_dir + month + '/'
 
-                                if constants.DAYS_PER_MONTH == 'MAX':
-                                    numDays = calendar.monthrange(int(year), int(month))[1]
-                                else:
-                                    numDays = constants.DAYS_PER_MONTH
+                            if constants.DAYS_PER_MONTH == 'MAX':
+                                numDays = calendar.monthrange(int(year), int(month))[1]
+                            else:
+                                numDays = constants.DAYS_PER_MONTH
 
-                                for day in range(1, numDays + 1):
-                                    day = "{0:0=2d}".format(day)
+                            for day in range(1, numDays + 1):
+                                day = "{0:0=2d}".format(day)
 
-                                    day_dir = month_dir + day + '/'
+                                day_dir = month_dir + day + '/'
 
-                                    # May need to change if we add LARGE sizes as well. # VLI
-                                    train_test_valid = WebcamData.determine_train_test_valid(day_dir)
+                                # May need to change if we add LARGE sizes as well. # VLI
+                                train_test_valid = WebcamData.determine_train_test_valid(day_dir)
 
+                                try:
                                     with open(day_dir + 'sun.txt') as sun_f:
                                         sun_lines = sun_f.read().splitlines()
+                                except FileNotFoundError:
+                                    print('WARNING - No sun.txt! ' + day_dir)
+                                    continue
 
-                                        # No sunrise or no sunset this day, so skip it.
-                                        if sun_lines[4].find('SUN') > 0 or sun_lines[5].find('SUN') > 0:
-                                            continue  # MAY NEED FURTHER ATTENTION # VLI
+                                # No sunrise or no sunset this day, so skip it.
+                                if sun_lines[4].find('SUN') > 0 or sun_lines[5].find('SUN') > 0:
+                                    continue  # MAY NEED FURTHER ATTENTION # VLI
 
-                                        date_str = year + '-' + month + '-' + day
-                                        date = datetime.datetime.strptime(date_str, "%Y-%m-%d")
+                                date_str = year + '-' + month + '-' + day
+                                date = datetime.datetime.strptime(date_str, "%Y-%m-%d")
 
-                                        # Heuristic for 2 if statements below - not necessarily 100% accurate.
-                                        # If sunrise is from 10 PM to 11:59 PM, it happens the day before.
-                                        if int(sun_lines[4].split(':')[0]) >= 20:
-                                            date += datetime.timedelta(days=-1)
-                                            date_str = str(date.date())
-                                        # If sunset is from midnight to 1:59 AM, it happens the next day.
-                                        if int(sun_lines[5].split(':')[0]) < 2:
-                                            date += datetime.timedelta(days=1)
-                                            date_str = str(date.date())
+                                # Heuristic for 2 if statements below - not necessarily 100% accurate.
+                                # If sunrise is from 10 PM to 11:59 PM, it happens the day before.
+                                if int(sun_lines[4].split(':')[0]) >= 20:
+                                    date += datetime.timedelta(days=-1)
+                                    date_str = str(date.date())
+                                # If sunset is from midnight to 1:59 AM, it happens the next day.
+                                if int(sun_lines[5].split(':')[0]) < 2:
+                                    date += datetime.timedelta(days=1)
+                                    date_str = str(date.date())
 
-                                        sunrise_str = date_str + ' ' + sun_lines[4]
-                                        sunset_str = date_str + ' ' + sun_lines[5]
-                                        sunrise = datetime.datetime.strptime(sunrise_str, "%Y-%m-%d %H:%M:%S")
-                                        sunset = datetime.datetime.strptime(sunset_str, "%Y-%m-%d %H:%M:%S")
+                                sunrise_str = date_str + ' ' + sun_lines[4]
+                                sunset_str = date_str + ' ' + sun_lines[5]
+                                sunrise = datetime.datetime.strptime(sunrise_str, "%Y-%m-%d %H:%M:%S")
+                                sunset = datetime.datetime.strptime(sunset_str, "%Y-%m-%d %H:%M:%S")
 
-                                    for size in constants.SIZE:
-                                        #img_stack = np.array([])  # Stack all images along the color channel depth.
-                                        image_dir = day_dir + size + '/'
-                                        images = glob.glob(image_dir + '*.jpg')
+                                for size in constants.SIZE:
+                                    image_dir = day_dir + size + '/'
+                                    images = glob.glob(image_dir + '*.jpg')
 
-                                        done = glob.glob(image_dir + '*.txt')
-                                        if len(done) < 1: # no done.txt file, so skip it
-                                            if year == '2018': # VLI
-                                                print('2018 is unfinished! ' + image_dir) # VLI
-                                            continue
+                                    done = glob.glob(image_dir + '*.txt')
+                                    if len(done) < 1: # no done.txt file, so skip it
+                                        if year == '2018': # VLI
+                                            print('WARNING - 2018 is unfinished! ' + image_dir) # VLI
+                                        continue
 
-                                        # Not enough images, so skip it.
-                                        if len(images) < constants.IMAGES_PER_DAY:
-                                            continue  # MAY NEED FURTHER ATTENTION # VLI
+                                    # Not enough images, so skip it.
+                                    if len(images) < constants.IMAGES_PER_DAY:
+                                        continue  # MAY NEED FURTHER ATTENTION # VLI
 
-                                        # Sort by time.
-                                        images.sort(key=functools.cmp_to_key(WebcamData.compare_images))
+                                    # Sort by time.
+                                    images.sort(key=functools.cmp_to_key(WebcamData.compare_images))
 
-                                        # Get the list of times associated with the images.
-                                        times = WebcamData.extract_times(images)
+                                    # Get the list of times associated with the images.
+                                    times = WebcamData.extract_times(images)
 
-                                        # Randomly select IMAGES_PER_DAY images from times / images.
-                                        subset_idx = np.random.choice(len(times), constants.IMAGES_PER_DAY,
+                                    # Randomly select IMAGES_PER_DAY images from times / images.
+                                    subset_idx = np.random.choice(len(times), constants.IMAGES_PER_DAY,
                                                                       replace=False)
-                                        subset_idx.sort()
-                                        subset_times = [times[x] for x in subset_idx]
-                                        subset_images = [images[x] for x in subset_idx]
+                                    subset_idx.sort()
+                                    subset_times = [times[x] for x in subset_idx]
+                                    subset_images = [images[x] for x in subset_idx]
 
-                                        #test = PIL.Image.open(subset_images[5]) # VLI DELETE THIS
-                                        #test.save('/home/vli/patches/original' + place + '.jpg' ) # DELETE
+                                    #test = PIL.Image.open(subset_images[5]) # VLI DELETE THIS
+                                    #test.save('/home/vli/patches/original' + place + '.jpg' ) # DELETE
 
-                                        day_obj = Day(subset_times, subset_images, sunrise, sunset,
-                                                      train_test_valid)  # One training / test example.
-                                        data.append(day_obj)
-                                        self.types[train_test_valid] += 1
+                                    day_obj = Day(subset_times, subset_images, sunrise, sunset,
+                                                  train_test_valid)  # One training / test example.
+                                    data.append(day_obj)
+                                    self.types[train_test_valid] += 1
 
         data.sort(key=functools.cmp_to_key(WebcamData.compare_data_types)) # Sorted in order of test, train, valid
         return data
