@@ -1,5 +1,8 @@
+qsub command for downloading from roundshot (3:12 means march to december, inclusive):
+qsub -l h_vmem=10G -q long.q@* -j y -o /srv/glusterfs/vli/job_logs -t 3:12 -R y -pe multicore 10 ~/rs_downloader.py
+
 Inside gpu.sh:
 CUDA_VISIBLE_DEVICES=$SGE_GPU ~/webcam-location/main.py
 
-qsub command:
+qsub command for deep learning:
 qsub -l gpu -l h_vmem=12G -q gpu.long.q@* -j y -o /srv/glusterfs/vli/job_logs ~/gpu.sh
