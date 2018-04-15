@@ -109,7 +109,7 @@ class WebcamData():
                                     continue
 
                                 # No sunrise or no sunset this day, so skip it.
-                                if sun_lines[4].find('SUN') > 0 or sun_lines[5].find('SUN') > 0:
+                                if sun_lines[4].find('SUN') >= 0 or sun_lines[5].find('SUN') >= 0:
                                     continue  # MAY NEED FURTHER ATTENTION # VLI
 
                                 date_str = year + '-' + month + '-' + day

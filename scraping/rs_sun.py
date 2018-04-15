@@ -8,10 +8,6 @@ from urllib.request import HTTPError
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
 from bs4 import BeautifulSoup
 
-# Cluster usage:
-# qsub -l h_vmem=5G -q short.q@* -t 1:3 sun.py
-# 1:3 indicates January to March, inclusive
-
 CLUSTER = True # run on cluster or local machine
 SIZE = 'small' # 'large'
 
