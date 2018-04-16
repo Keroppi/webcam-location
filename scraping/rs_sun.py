@@ -77,7 +77,7 @@ def get_sun_info(country, name, year, month, day, html_rows):
             local_sunset_str = 'SUN ALL DAY'
             sun_time = '24:00:00'
             sun_time_seconds = str(24 * 60 * 60)
-        elif tds[0].text == '': # No sunrise because the sun was up all day yesterday.
+        elif tds[0].text == '' or tds[0].text == '-': # No sunrise because the sun was up all day yesterday.
             local_sunrise_str = 'SUN DID NOT RISE'
 
             if tds[1].text.find(':') >= 0:
@@ -87,7 +87,7 @@ def get_sun_info(country, name, year, month, day, html_rows):
 
             sun_time = 'N/A'
             sun_time_seconds = '-1'
-        elif tds[1].text == '':
+        elif tds[1].text == '' or tds[1].text == '-': # No sunset because the sun is up all day from now into tomorrow.
             local_sunset_str = 'SUN DID NOT SET'
 
             if tds[0].text.find(':') >= 0:
@@ -163,7 +163,7 @@ while lIdx < len(lines):
         line = lines[lIdx + 5]
         
         lIdx += 5
-        
+
         # Save latitude and longitude to a file.
         locWrtPth = baseLocation + country + '/' + name + '/'
         try:
