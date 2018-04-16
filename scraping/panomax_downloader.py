@@ -1,4 +1,4 @@
-#!/scratch_net/biwidl106/vli/.pyenv/shims/python
+#!/srv/glusterfs/vli/.pyenv/shims/python
 
 import string, sys, os, requests, urllib.request, json, multiprocessing as mp, datetime, time, traceback, socket, \
        random, glob

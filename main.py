@@ -1,4 +1,4 @@
-#!/scratch_net/biwidl106/vli/.pyenv/shims/python
+#!/srv/glusterfs/vli/.pyenv/shims/python
 
 import torch, torchvision, os, time, shutil, os, argparse, subprocess, sys
 

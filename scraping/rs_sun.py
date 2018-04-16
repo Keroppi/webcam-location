@@ -1,4 +1,4 @@
-#!/scratch_net/biwidl106/vli/.pyenv/shims/python
+#!/srv/glusterfs/vli/.pyenv/shims/python
 
 import string, sys, os, requests, urllib.request, json, multiprocessing as mp, datetime, time, traceback, socket, random, glob
 from urllib.error import ContentTooShortError
@@ -170,7 +170,7 @@ while lIdx < len(lines):
         line = lines[lIdx + 5]
         
         lIdx += 5
-        
+
         # Save latitude and longitude to a file.
         locWrtPth = baseLocation + country + '/' + name + '/'
         try:
