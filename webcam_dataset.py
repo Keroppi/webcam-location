@@ -194,8 +194,8 @@ class Train(Dataset):
 
     def __getitem__(self, index):
         # Return image and the label
-        width = self.data[index].width
-        height = self.data[index].height
+        #width = self.data[index].width
+        #height = self.data[index].height
         img_paths = self.data[index].img_paths
 
         #img_stack = np.asarray([])

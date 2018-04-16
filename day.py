@@ -71,8 +71,8 @@ class Day():
 
         # Determine height / width
         # Perhaps unnecessary?
-        example_img = PIL.Image.open(img_paths[0]) # lazily loads - the entire image is not read into memory
-        self.width, self.height = example_img.size
+        #example_img = PIL.Image.open(img_paths[0]) # lazily loads - the entire image is not read into memory
+        #self.width, self.height = example_img.size
 
         self.sunrise = sunrise
         self.sunset = sunset
