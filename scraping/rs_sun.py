@@ -77,6 +77,22 @@ def get_sun_info(country, name, year, month, day, html_rows):
             local_sunset_str = 'SUN ALL DAY'
             sun_time = '24:00:00'
             sun_time_seconds = str(24 * 60 * 60)
+        elif tds[0].text == '': # No sunrise because the sun was up all day yesterday.
+            local_sunrise_str = 'SUN DID NOT RISE'
+
+            if tds[1].text.find(':') >= 0:
+                local_sunset_str = tds[1].text.split()[0] + ':00'
+
+            sun_time = 'N/A'
+            sun_time_seconds = '-1'
+        elif tds[1].text == '':
+            local_sunset_str = 'SUN DID NOT SET'
+
+            if tds[0].text.find(':') >= 0:
+                local_sunrise_str = tds[1].text.split()[0] + ':00'
+
+            sun_time = 'N/A'
+            sun_time_seconds = '-1'
         else:
             local_sunrise_str = tds[0].text.split()[0] + ':00'
             local_sunset_str = tds[1].text.split()[0] + ':00'
