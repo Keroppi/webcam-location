@@ -8,7 +8,7 @@ from urllib.request import HTTPError
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
 from bs4 import BeautifulSoup
 
-CLUSTER = True # run on cluster or local machine
+CLUSTER = False # run on cluster or local machine
 SIZE = 'small' # 'large'
 
 GOOGLE_MAPS_API_KEY = 'AIzaSyCEJkK4hEYYnRv4z6hL6n8A8VqfqJdspnY'
@@ -17,7 +17,7 @@ if CLUSTER:
     SGE_TASK_ID = int(os.environ.get('SGE_TASK_ID')) # Determines the month that gets downloaded. (1 -> January)
     baseLocation = '/srv/glusterfs/vli/data/roundshot/'
 else:
-    LOCAL_MONTH = 8 # August
+    LOCAL_MONTH = 5 # May
     baseLocation = '~/data/roundshot/'
     baseLocation = os.path.expanduser(baseLocation)
 
@@ -98,18 +98,25 @@ def get_sun_info(country, name, year, month, day, html_rows):
             sun_time = 'N/A'
             sun_time_seconds = '-1'
         else:
-            local_sunrise_str = tds[0].text.split()[0] + ':00'
-            local_sunset_str = tds[1].text.split()[0] + ':00'
+            stripped_sunrise = tds[0].text.replace('-', '')
+            stripped_sunset = tds[1].text.replace('-', '')
+
+            local_sunrise_str = stripped_sunrise.split()[0] + ':00'
+            local_sunset_str = stripped_sunset.split()[0] + ':00'
             sun_time = tds[2].text
 
-            sun_time_split = sun_time.split(':')
-            sun_time_split.reverse()
-            sun_time_seconds = str(sum([int(x) * 60**power for power, x in enumerate(sun_time_split)]))
+            if sun_time == '' or sun_time == '-':
+                sun_time = 'N/A'
+                sun_time_seconds = '-1'
+            else:
+                sun_time_split = sun_time.split(':')
+                sun_time_split.reverse()
+                sun_time_seconds = str(sum([int(x) * 60**power for power, x in enumerate(sun_time_split)]))
 
-            if len(sun_time_split) == 2: # less than 1 hour day length
-                sun_time = '00:' + sun_time
-            elif len(sun_time_split) == 1: # less than 1 minute day length - UNLIKELY
-                sun_time = '00:00:' + sun_time
+                if len(sun_time_split) == 2: # less than 1 hour day length
+                    sun_time = '00:' + sun_time
+                elif len(sun_time_split) == 1: # less than 1 minute day length - UNLIKELY
+                    sun_time = '00:00:' + sun_time
 
         # Save UTC (first 2 rows), day length (HH:MM:SS), 
         # timezone offset (sec), local time, and day length (sec).
@@ -163,6 +170,9 @@ while lIdx < len(lines):
         line = lines[lIdx + 5]
         
         lIdx += 5
+
+        if name.find('ARCTIC') < 0:
+            continue
 
         # Save latitude and longitude to a file.
         locWrtPth = baseLocation + country + '/' + name + '/'
