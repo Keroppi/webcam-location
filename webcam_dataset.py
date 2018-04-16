@@ -181,7 +181,7 @@ class WebcamData():
         load_t0 = time.time()
         self.days = self.load_images()
         load_t1 = time.time()
-        print('Load File Paths Time (s): ' + str(load_t1 - load_t0))
+        print('Load File Paths Time (min): ' + str((load_t1 - load_t0) / 60))
 
 class Train(Dataset):
     def __init__(self, data, transforms=None):
