@@ -19,7 +19,7 @@ class RandomResize():
         #new_width = random.randint(constants.PATCH_SIZE[1], int(1.5 * width))
 
         new_ratio = new_height / height
-        new_width = max(math.round(width * new_ratio), constants.PATCH_SIZE[1])
+        new_width = max(round(width * new_ratio), constants.PATCH_SIZE[1])
 
         img_stack = [0] * constants.IMAGES_PER_DAY
         for i in range(constants.IMAGES_PER_DAY):
