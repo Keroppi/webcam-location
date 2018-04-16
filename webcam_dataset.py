@@ -1,4 +1,4 @@
-import os, sys, calendar, glob, datetime, time, functools, numpy as np, constants, PIL, hashlib, torch
+import os, sys, calendar, glob, datetime, time, functools, numpy as np, constants, PIL, hashlib, torch, subprocess
 from day import Day
 from torch.utils.data.dataset import Dataset
 
@@ -112,7 +112,7 @@ class WebcamData():
 
                                 # No sunrise or no sunset this day, so skip it.
                                 if sun_lines[4].find('SUN') >= 0 or sun_lines[5].find('SUN') >= 0:
-                                    continue  # MAY NEED FURTHER ATTENTION # VLI
+                                    continue
 
                                 date_str = year + '-' + month + '-' + day
                                 date = datetime.datetime.strptime(date_str, "%Y-%m-%d")
@@ -144,7 +144,7 @@ class WebcamData():
 
                                     # Not enough images, so skip it.
                                     if len(images) < constants.IMAGES_PER_DAY:
-                                        continue  # MAY NEED FURTHER ATTENTION # VLI
+                                        continue
 
                                     # Sort by time.
                                     images.sort(key=functools.cmp_to_key(WebcamData.compare_images))
@@ -159,18 +159,18 @@ class WebcamData():
                                     subset_times = [times[x] for x in subset_idx]
                                     subset_images = [images[x] for x in subset_idx]
 
-                                    #test = PIL.Image.open(subset_images[5]) # VLI DELETE THIS
-                                    #test.save('/home/vli/patches/original' + place + '.jpg' ) # DELETE
+                                    #test = PIL.Image.open(subset_images[5])
+                                    #test.save('/home/vli/patches/original' + place + '.jpg' )
 
                                     day_obj = Day(subset_times, subset_images, sunrise, sunset,
                                                   train_test_valid)  # One training / test example.
                                     data.append(day_obj)
                                     self.types[train_test_valid] += 1
 
-        sort_t0 = time.time()
+        #sort_t0 = time.time()
         data.sort(key=functools.cmp_to_key(WebcamData.compare_data_types)) # Sorted in order of test, train, valid
-        sort_t1 = time.time()
-        print('Sorting filenames time (s): ' + str(sort_t1 - sort_t0))
+        #sort_t1 = time.time()
+        #print('Sorting filenames time (s): ' + str(sort_t1 - sort_t0))
         sys.stdout.flush()
 
         return data
@@ -211,8 +211,14 @@ class Train(Dataset):
         #frogs = img_stack.reshape(height, width, 32 * 3)
         #print(np.shares_memory(img_stack, frogs))
 
+        vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
+        print('V-Memory Before Transform: \n' + str(vmem.stdout).replace('\\n', '\n'))
+
         if self.transforms is not None:
             img_stack = self.transforms(img_stack)
+
+        vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
+        print('V-Memory After Transform: \n' + str(vmem.stdout).replace('\\n', '\n'))
 
         if constants.LEARNING_SUNRISE:
             return (img_stack, self.sunrise_label[index])

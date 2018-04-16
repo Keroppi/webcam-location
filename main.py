@@ -48,9 +48,6 @@ train_loader = torch.utils.data.DataLoader(train_dataset, shuffle=True, batch_si
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=constants.BATCH_SIZE, num_workers=num_workers, pin_memory=pin_memory)
 valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=constants.BATCH_SIZE, num_workers=num_workers, pin_memory=pin_memory)
 
-vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
-print('V-Memory After Loaders: \n' + str(vmem.stdout).replace('\\n', '\n'))
-
 #'''
 print("Train / Test/ Validation Sizes: ")
 print(len(train_loader))
@@ -105,7 +102,15 @@ def train_epoch(epoch, model, data_loader, optimizer):
         output = model(data)
 
         loss = train_loss_fn(output, target)
+
+        vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
+        print('V-Memory Before Backward: \n' + str(vmem.stdout).replace('\\n', '\n'))
+
         loss.backward()
+
+        vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
+        print('V-Memory After Backward: \n' + str(vmem.stdout).replace('\\n', '\n'))
+
         optimizer.step()
 
         if batch_idx % constants.LOG_INTERVAL == 0:
