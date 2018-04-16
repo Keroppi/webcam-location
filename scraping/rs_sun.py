@@ -82,6 +82,8 @@ def get_sun_info(country, name, year, month, day, html_rows):
 
             if tds[1].text.find(':') >= 0:
                 local_sunset_str = tds[1].text.split()[0] + ':00'
+            else:
+                local_sunset_str = 'SUN DID NOT SET'
 
             sun_time = 'N/A'
             sun_time_seconds = '-1'
@@ -90,6 +92,8 @@ def get_sun_info(country, name, year, month, day, html_rows):
 
             if tds[0].text.find(':') >= 0:
                 local_sunrise_str = tds[1].text.split()[0] + ':00'
+            else:
+                local_sunrise_str = 'SUN DID NOT RISE'
 
             sun_time = 'N/A'
             sun_time_seconds = '-1'
