@@ -15,7 +15,7 @@ GOOGLE_MAPS_API_KEY = 'AIzaSyCEJkK4hEYYnRv4z6hL6n8A8VqfqJdspnY'
 
 if CLUSTER:
     SGE_TASK_ID = int(os.environ.get('SGE_TASK_ID'))  # Determines the month that gets downloaded. (1 -> January)
-    baseLocation = '/srv/glusterfs/vli/panomax/'
+    baseLocation = '/srv/glusterfs/vli/data/panomax/'
 else:
     LOCAL_MONTH = 1  # January
     baseLocation = '~/data/panomax/'

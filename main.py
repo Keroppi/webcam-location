@@ -13,15 +13,12 @@ from custom_transforms import RandomResize, RandomPatch, ToTensor
 from custom_model import WebcamLocation
 from torch.autograd import Variable
 
-d = dict(os.environ)
-print('SGE_GPU: ' + d['SGE_GPU'])
+if constants.CLUSTER:
+    d = dict(os.environ)
+    print('SGE_GPU: ' + d['SGE_GPU'])
 
 print('Current Device(s): ' + str(torch.cuda.current_device()))
 print('Device Count: ' + str(torch.cuda.device_count()))
-
-vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
-print('V-Memory Before: \n' + str(vmem.stdout).replace('\\n', '\n'))
-sys.stdout.flush()
 
 parser = argparse.ArgumentParser(description='Webcam Locator')
 parser.add_argument('--resume', default='', type=str, metavar='PATH',

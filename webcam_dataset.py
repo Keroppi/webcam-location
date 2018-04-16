@@ -56,7 +56,6 @@ class WebcamData():
 
             # Remove hidden folders.
             countries = [x for x in countries if not x.startswith('.')]
-            #countries = ['Russia'] # VLI
 
             for country in countries:
                 country_dir = curr_image_dir + country + '/'
@@ -86,6 +85,9 @@ class WebcamData():
                         months = next(os.walk(year_dir))[1]
 
                         for month in months:
+                            if int(month) < 4 and year == '2017': # VLI # skip anything before April 2017 for now...
+                                continue
+
                             month_dir = year_dir + month + '/'
 
                             if constants.DAYS_PER_MONTH == 'MAX':
@@ -198,7 +200,7 @@ class Train(Dataset):
             #cv2.imwrite('/home/vli/test.jpg', img)
             img_stack[i] = img
             #img_stack = np.stack(img_stack, img), axis=2) if img_stack.size else img # should this be 3D stack or 4D?
-        img_stack = np.stack(img_stack, axis=0)
+        #img_stack = np.stack(img_stack, axis=0)
 
         #print(img_stack.shape)
         #frogs = img_stack.reshape(height, width, 32 * 3)

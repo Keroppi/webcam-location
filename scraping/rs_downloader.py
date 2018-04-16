@@ -24,7 +24,7 @@ else:
     baseLocation = '~/data/roundshot/'
     baseLocation = os.path.expanduser(baseLocation)
 
-year = '2018'
+year = '2017'
 
 rs_filename = '~/roundshot.txt'
 rs_filename = os.path.expanduser(rs_filename)
