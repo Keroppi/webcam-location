@@ -167,7 +167,12 @@ class WebcamData():
                                     data.append(day_obj)
                                     self.types[train_test_valid] += 1
 
+        sort_t0 = time.time()
         data.sort(key=functools.cmp_to_key(WebcamData.compare_data_types)) # Sorted in order of test, train, valid
+        sort_t1 = time.time()
+        print('Sorting filenames time (s): ' + str(sort_t1 - sort_t0))
+        sys.stdout.flush()
+
         return data
 
     def __init__(self):
