@@ -75,7 +75,7 @@ class WebcamData():
                             lat = float(location_split[0])
                             lng = float(location_split[1])
                     except FileNotFoundError:
-                        #print('WARNING - No location.txt! ' + place_dir)
+                        print('WARNING - No location.txt! ' + place_dir)
                         continue
 
                     years = next(os.walk(place_dir))[1]

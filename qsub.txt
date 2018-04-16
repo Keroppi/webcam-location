@@ -2,7 +2,7 @@ qsub command for downloading from roundshot (3:12 means march to december, inclu
 qsub -l h_vmem=10G -q long.q@* -j y -o /srv/glusterfs/vli/job_logs -t 3:12 -R y -pe multicore 12 ~/rs_downloader.py
 
 qsub command for getting sunrise/sunset:
-qsub -l h_vmem=10G -q middle.q@* -j y -o /srv/glusterfs/vli/job_logs -t 3:12 ~/rs_sun.py
+qsub -l h_vmem=8G -q middle.q@* -j y -o /srv/glusterfs/vli/job_logs -t 3:12 ~/rs_sun.py
 
 Inside gpu.sh:
 CUDA_VISIBLE_DEVICES=$SGE_GPU ~/webcam-location/main.py

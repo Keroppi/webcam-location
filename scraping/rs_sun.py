@@ -17,7 +17,7 @@ if CLUSTER:
     SGE_TASK_ID = int(os.environ.get('SGE_TASK_ID')) # Determines the month that gets downloaded. (1 -> January)
     baseLocation = '/srv/glusterfs/vli/data/roundshot/'
 else:
-    LOCAL_MONTH = 1 # January
+    LOCAL_MONTH = 8 # August
     baseLocation = '~/data/roundshot/'
     baseLocation = os.path.expanduser(baseLocation)
 
@@ -163,7 +163,7 @@ while lIdx < len(lines):
         line = lines[lIdx + 5]
         
         lIdx += 5
-
+        
         # Save latitude and longitude to a file.
         locWrtPth = baseLocation + country + '/' + name + '/'
         try:
