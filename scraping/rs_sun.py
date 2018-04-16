@@ -8,7 +8,7 @@ from urllib.request import HTTPError
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
 from bs4 import BeautifulSoup
 
-CLUSTER = False # run on cluster or local machine
+CLUSTER = True # run on cluster or local machine
 SIZE = 'small' # 'large'
 
 GOOGLE_MAPS_API_KEY = 'AIzaSyCEJkK4hEYYnRv4z6hL6n8A8VqfqJdspnY'
@@ -170,10 +170,7 @@ while lIdx < len(lines):
         line = lines[lIdx + 5]
         
         lIdx += 5
-
-        if name.find('ARCTIC') < 0:
-            continue
-
+        
         # Save latitude and longitude to a file.
         locWrtPth = baseLocation + country + '/' + name + '/'
         try:
