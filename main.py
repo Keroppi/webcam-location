@@ -132,13 +132,7 @@ def train_epoch(epoch, model, data_loader, optimizer):
 def test_epoch(model, data_loader):
     model.eval()
     test_loss = 0
-    for data, target in data_loader:
-        for dim in data.size():
-            if dim == 0:
-                print('Data has no dimensions!')
-                print(data.size())
-                break
-
+    for batch_idx, (data, target) in enumerate(data_loader):
         data, target = Variable(data, volatile=True), Variable(target)
         target = target.float()
 
