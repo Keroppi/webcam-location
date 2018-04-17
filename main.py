@@ -50,7 +50,7 @@ test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=constants.BAT
 valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=constants.BATCH_SIZE, num_workers=num_workers, pin_memory=pin_memory)
 
 #'''
-print("Train / Test/ Validation Sizes: ")
+print("Train/Test/Validation Sizes: ")
 print(len(train_loader))
 print(len(test_loader))
 print(len(valid_loader))
@@ -90,6 +90,12 @@ def train_epoch(epoch, model, data_loader, optimizer):
     model.train()
 
     for batch_idx, (data, target) in enumerate(data_loader):
+        for dim in data.size():
+            if dim == 0:
+                print('Data has no dimensions!')
+                print(data.size())
+                break
+
         data, target = Variable(data), Variable(target)
 
         target = target.float()
@@ -119,16 +125,20 @@ def train_epoch(epoch, model, data_loader, optimizer):
                   epoch, batch_idx * len(data), len(data_loader.dataset),
                   100. * batch_idx / len(data_loader), loss.data[0]))
 
-        vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
-        print('V-Memory After Epoch: ' + str(epoch) + '\n' + str(vmem.stdout).replace('\\n', '\n'))
-
-        #sys.exit() # VLI
+    vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
+    print('V-Memory After Train Epoch: ' + str(epoch) + '\n' + str(vmem.stdout).replace('\\n', '\n'))
 
 
 def test_epoch(model, data_loader):
     model.eval()
     test_loss = 0
     for data, target in data_loader:
+        for dim in data.size():
+            if dim == 0:
+                print('Data has no dimensions!')
+                print(data.size())
+                break
+
         data, target = Variable(data, volatile=True), Variable(target)
         target = target.float()
 
@@ -141,6 +151,9 @@ def test_epoch(model, data_loader):
 
     test_loss /= len(data_loader.dataset)
     print('\nTest set: Average loss: {:.4f}\n'.format(test_loss))
+
+    vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
+    print('V-Memory After Test Epoch: \n' + str(vmem.stdout).replace('\\n', '\n'))
 
     return test_loss
 

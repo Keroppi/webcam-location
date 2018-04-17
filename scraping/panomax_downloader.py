@@ -213,7 +213,7 @@ def download_day(country, name, lat, lng, storage_id, year, month, day):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         traceback.print_tb(exc_tb)
         sys.stdout.flush()
-
+        print('Day: ' + day)
 
 lIdx = 0
 while lIdx < len(lines):

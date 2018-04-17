@@ -3,20 +3,17 @@ from sklearn.feature_extraction.image import extract_patches_2d
 
 class Resize(): # Make sure all images are the same size as the first image.
     def __call__(self, sample):
-        #print(sample.shape) # IMAGES_PER_DAY, height, width, RGB
         height, width, channels = sample[0].shape
 
-        img_stack = [0] * constants.IMAGES_PER_DAY
-        img_stack[0] = sample[0]
+        #img_stack = [0] * constants.IMAGES_PER_DAY
+        #img_stack[0] = sample[0]
         for i in range(1, constants.IMAGES_PER_DAY):
             curr_height, curr_width, _ = sample[i].shape
 
             if curr_height != height or curr_width != width:
-                img_stack[i] = skimage.transform.resize(sample[i], (height, width, channels), preserve_range=True, mode='reflect')
-            else:
-                img_stack[i] = sample[i]
+                sample[i] = skimage.transform.resize(sample[i], (height, width, channels), preserve_range=True, mode='reflect')
 
-        return img_stack
+        return sample
 
 
 class RandomResize():
@@ -65,10 +62,9 @@ class RandomPatch():
 
         img_stack = [0] * constants.IMAGES_PER_DAY
         for i in range(constants.IMAGES_PER_DAY):
-            img = sample[i]
-            # cv2.imwrite('/home/vli/patches/test' + str(int(i / constants.NUM_CHANNELS)) + '.jpg', img)
+            # cv2.imwrite('/home/vli/patches/test' + str(int(i / constants.NUM_CHANNELS)) + '.jpg', sample[i])
 
-            img_stack[i] = extract_patches_2d(img, self.output_size, max_patches=1, random_state=random_int)[0]
+            img_stack[i] = extract_patches_2d(sample[i], self.output_size, max_patches=1, random_state=random_int)[0]
             # cv2.imwrite('/home/vli/patches/test' + str(i) + '.jpg', patch)
             #patch = PIL.Image.fromarray(np.uint8(img_stack[i]))
             #patch.save('/home/vli/patches/sample' + str(i) + '.jpg')

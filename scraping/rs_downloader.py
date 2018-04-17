@@ -20,7 +20,7 @@ if CLUSTER:
     SGE_TASK_ID = int(os.environ.get('SGE_TASK_ID')) # Determines the month that gets downloaded. (1 -> January)
     baseLocation = '/srv/glusterfs/vli/data/roundshot/'
 else:
-    LOCAL_MONTH = 1 # January
+    LOCAL_MONTH = 12 # December
     baseLocation = '~/data/roundshot/'
     baseLocation = os.path.expanduser(baseLocation)
 
@@ -217,6 +217,8 @@ def download_day(country, name, lat, lng, storage_id, year, month, day):
      exc_type, exc_obj, exc_tb = sys.exc_info()
      traceback.print_tb(exc_tb)
      sys.stdout.flush()
+     print('Day: ' + day)
+
             
 lIdx = 0
 while lIdx < len(lines):
@@ -251,6 +253,9 @@ while lIdx < len(lines):
         line = lines[lIdx + 5]
         
         lIdx += 5
+
+        #if name != 'Les Menuires - Roc des 3 Marches':
+        #    continue
 
         # Save latitude and longitude to a file.
         locWrtPth = baseLocation + country + '/' + name + '/'
