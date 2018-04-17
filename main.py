@@ -90,12 +90,6 @@ def train_epoch(epoch, model, data_loader, optimizer):
     model.train()
 
     for batch_idx, (data, target) in enumerate(data_loader):
-        for dim in data.size():
-            if dim == 0:
-                print('Data has no dimensions!')
-                print(data.size())
-                break
-
         data, target = Variable(data), Variable(target)
 
         target = target.float()
@@ -138,7 +132,7 @@ def test_epoch(model, data_loader):
 
         if torch.cuda.is_available():
             data = data.cuda()
-            target = target.float().cuda()
+            target = target.cuda()
 
         output = model(data)
         test_loss += test_loss_fn(output, target).data[0] # sum up batch loss
