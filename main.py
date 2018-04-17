@@ -9,7 +9,7 @@ from webcam_dataset import WebcamData
 from webcam_dataset import Train
 from webcam_dataset import Test
 from webcam_dataset import Validation
-from custom_transforms import RandomResize, RandomPatch, ToTensor
+from custom_transforms import Resize, RandomResize, RandomPatch, ToTensor
 from custom_model import WebcamLocation
 from torch.autograd import Variable
 
@@ -31,10 +31,11 @@ if not constants.CLUSTER:
 data = WebcamData()
 
 transformations = torchvision.transforms.Compose([RandomResize(constants.PATCH_SIZE), RandomPatch(constants.PATCH_SIZE), ToTensor()])
+test_transformations = torchvision.transforms.Compose([Resize(), RandomPatch(constants.PATCH_SIZE), ToTensor()])
 
 train_dataset = Train(data, transformations)
-test_dataset = Test(data, transformations)
-valid_dataset = Validation(data, transformations)
+test_dataset = Test(data, test_transformations)
+valid_dataset = Validation(data, test_transformations)
 
 if torch.cuda.is_available():
     pin_memory = True

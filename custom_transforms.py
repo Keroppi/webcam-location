@@ -1,6 +1,24 @@
 import constants, torch, torchvision, numpy as np, PIL, sys, random, skimage.transform, math
 from sklearn.feature_extraction.image import extract_patches_2d
 
+class Resize(): # Make sure all images are the same size as the first image.
+    def __call__(self, sample):
+        #print(sample.shape) # IMAGES_PER_DAY, height, width, RGB
+        height, width, channels = sample[0].shape
+
+        img_stack = [0] * constants.IMAGES_PER_DAY
+        img_stack[0] = sample[0]
+        for i in range(1, constants.IMAGES_PER_DAY):
+            curr_height, curr_width, _ = sample[i].shape
+
+            if curr_height != height or curr_width != width:
+                img_stack[i] = skimage.transform.resize(sample[i], (height, width, channels), preserve_range=True, mode='reflect')
+            else:
+                img_stack[i] = sample[i]
+
+        return img_stack
+
+
 class RandomResize():
     def __init__(self, output_size):  # int for square, else (height, width)
         assert isinstance(output_size, (int, tuple))

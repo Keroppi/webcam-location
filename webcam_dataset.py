@@ -211,14 +211,8 @@ class Train(Dataset):
         #frogs = img_stack.reshape(height, width, 32 * 3)
         #print(np.shares_memory(img_stack, frogs))
 
-        vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
-        print('V-Memory Before Transform: \n' + str(vmem.stdout).replace('\\n', '\n'))
-
         if self.transforms is not None:
             img_stack = self.transforms(img_stack)
-
-        vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
-        print('V-Memory After Transform: \n' + str(vmem.stdout).replace('\\n', '\n'))
 
         if constants.LEARNING_SUNRISE:
             return (img_stack, self.sunrise_label[index])
@@ -244,7 +238,7 @@ class Test(Dataset):
         for i, image in enumerate(img_paths):
             img = np.asarray(PIL.Image.open(image)) #cv2.imread(image)
             img_stack[i] = img
-        img_stack = np.stack(img_stack, axis=0)
+        #img_stack = np.stack(img_stack, axis=0)
 
         if self.transforms is not None:
             img_stack = self.transforms(img_stack)
@@ -274,7 +268,7 @@ class Validation(Dataset):
         for i, image in enumerate(img_paths):
             img = np.asarray(PIL.Image.open(image)) #cv2.imread(image)
             img_stack[i] = img
-        img_stack = np.stack(img_stack, axis=0)
+        #img_stack = np.stack(img_stack, axis=0)
 
         if self.transforms is not None:
             img_stack = self.transforms(img_stack)
