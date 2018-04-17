@@ -104,9 +104,6 @@ def train_epoch(epoch, model, data_loader, optimizer):
 
         loss = train_loss_fn(output, target)
 
-        vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
-        print('V-Memory Before Backward: \n' + str(vmem.stdout).replace('\\n', '\n'))
-
         loss.backward()
 
         vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
