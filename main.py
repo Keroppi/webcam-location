@@ -54,6 +54,9 @@ print("Train/Test/Validation Sizes: ")
 print(len(train_loader))
 print(len(test_loader))
 print(len(valid_loader))
+print(len(train_loader.dataset))
+print(len(test_loader.dataset))
+print(len(valid_loader.dataset))
 #'''
 
 model = WebcamLocation()
@@ -99,15 +102,9 @@ def train_epoch(epoch, model, data_loader, optimizer):
             target = target.cuda()
 
         optimizer.zero_grad()
-
         output = model(data)
-
         loss = train_loss_fn(output, target)
-
         loss.backward()
-
-        vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
-        print('V-Memory After Backward: \n' + str(vmem.stdout).replace('\\n', '\n'))
 
         optimizer.step()
 
