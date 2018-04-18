@@ -89,6 +89,7 @@ if args.resume:
               .format(args.resume, checkpoint['epoch']))
     else:
         print("=> no checkpoint found at '{}'".format(args.resume))
+sys.stdout.flush()
 
 
 def train_epoch(epoch, model, data_loader, optimizer):
@@ -118,8 +119,6 @@ def train_epoch(epoch, model, data_loader, optimizer):
 
     vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
     print('V-Memory After Train Epoch: ' + str(epoch) + '\n' + str(vmem.stdout).replace('\\n', '\n'))
-
-
 
 def test_epoch(model, data_loader):
     model.eval()
@@ -157,7 +156,7 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
 for epoch in range(start_epoch, constants.EPOCHS):
     print('Epoch: ' + str(epoch))
     sys.stdout.flush()
-    
+
     train_t0 = time.time()
     train_epoch(epoch, model, train_loader, optimizer)
     train_t1 = time.time()
