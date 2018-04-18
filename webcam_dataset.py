@@ -171,7 +171,7 @@ class WebcamData():
         data.sort(key=functools.cmp_to_key(WebcamData.compare_data_types)) # Sorted in order of test, train, valid
         #sort_t1 = time.time()
         #print('Sorting filenames time (s): ' + str(sort_t1 - sort_t0))
-        sys.stdout.flush()
+        #sys.stdout.flush()
 
         return data
 
@@ -182,6 +182,7 @@ class WebcamData():
         self.days = self.load_images()
         load_t1 = time.time()
         print('Load File Paths Time (min): ' + str((load_t1 - load_t0) / 60))
+        sys.stdout.flush()
 
 class Train(Dataset):
     def __init__(self, data, transforms=None):

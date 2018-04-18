@@ -19,6 +19,7 @@ if constants.CLUSTER:
 
 print('Current Device(s): ' + str(torch.cuda.current_device()))
 print('Device Count: ' + str(torch.cuda.device_count()))
+sys.stdout.flush()
 
 parser = argparse.ArgumentParser(description='Webcam Locator')
 parser.add_argument('--resume', default='', type=str, metavar='PATH',
@@ -57,6 +58,7 @@ print(len(valid_loader))
 print(len(train_loader.dataset))
 print(len(test_loader.dataset))
 print(len(valid_loader.dataset))
+sys.stdout.flush()
 #'''
 
 model = WebcamLocation()
@@ -112,9 +114,11 @@ def train_epoch(epoch, model, data_loader, optimizer):
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                   epoch, batch_idx * len(data), len(data_loader.dataset),
                   100. * batch_idx / len(data_loader), loss.data[0]))
+            sys.stdout.flush()
 
     vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
     print('V-Memory After Train Epoch: ' + str(epoch) + '\n' + str(vmem.stdout).replace('\\n', '\n'))
+
 
 
 def test_epoch(model, data_loader):
@@ -152,16 +156,19 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
 
 for epoch in range(start_epoch, constants.EPOCHS):
     print('Epoch: ' + str(epoch))
-
+    sys.stdout.flush()
+    
     train_t0 = time.time()
     train_epoch(epoch, model, train_loader, optimizer)
     train_t1 = time.time()
     print('Epoch Train Time (min): ' + str((train_t1 - train_t0) / 60))
+    sys.stdout.flush()
 
     test_t0 = time.time()
     test_error = test_epoch(model, test_loader)
     test_t1 = time.time()
     print('Epoch Test Time (min): ' + str((test_t1 - test_t0) / 60))
+    sys.stdout.flush()
 
     is_best = test_error < best_error
     best_error = min(test_error, best_error)
@@ -188,9 +195,6 @@ for epoch in range(start_epoch, constants.EPOCHS):
 # Could just artificially limit # of days in this line below...
 # self.data = data.days[num_test:num_test + num_train]
 # change __len__ function as well
-
-# Ycbcr
-## https://stackoverflow.com/questions/24610775/pil-image-convert-from-rgb-to-ycbcr-results-in-4-channels-instead-of-3-and-behav
 
 # Multiple GPUs
 # http://pytorch.org/tutorials/beginner/former_torchies/parallelism_tutorial.html
