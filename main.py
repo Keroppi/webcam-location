@@ -184,7 +184,6 @@ for epoch in range(start_epoch, constants.EPOCHS):
 # Does it make sense to save these patches to disk?
 
 # Could parallelize the load_images() in webcam_dataset
-## No need for now since it's just strings.
 
 # Each img_stack = 32 * 3 * 128 * 128 * 4 bytes = 6.29 MB
 # Batched 12 GB / 6.29 MB ~ 1900 stacks per batch
