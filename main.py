@@ -138,7 +138,7 @@ def test_epoch(model, data_loader):
     print('\nTest set: Average loss: {:.4f}\n'.format(test_loss))
 
     vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
-    print('V-Memory After Test Epoch: \n' + str(vmem.stdout).replace('\\n', '\n'))
+    print('V-Memory After Test: \n' + str(vmem.stdout).replace('\\n', '\n'))
 
     return test_loss
 
