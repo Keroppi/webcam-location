@@ -8,7 +8,7 @@ class WebcamLocation(nn.Module):
     def __init__(self,
                  num_conv_layers, output_channels, kernel_sizes, paddings, strides, max_poolings, conv_relus, # Conv inputs.
                  num_hidden_fc_layers, fc_sizes, fc_relus, # FC inputs.
-                 input_shape=(3, 128, 128)):
+                 input_shape=(3, 32, 128, 128)):
         super(WebcamLocation, self).__init__()
 
         self.num_conv_layers = num_conv_layers
@@ -68,9 +68,9 @@ class WebcamLocation(nn.Module):
         '''
 
         self.num_hidden_fc_layers = num_hidden_fc_layers
-        self.fc_layers = [0] * self.num_hidden_fc_layers # Initialize
+        self.fc_layers = [0] * (self.num_hidden_fc_layers + 1) # Initialize
         self.fc_sizes = fc_sizes
-        self.fc_relus = fc_relus
+        self.fc_relus = fc_relus + [False] # Output layer doesn't need ReLu
 
         # Example (2 hidden layers):
         # self.linear_sizes = [2000, 200]
@@ -79,10 +79,10 @@ class WebcamLocation(nn.Module):
         self.first_fc_layer_size = self.get_conv_output(input_shape)
 
         # an affine operation: y = Wx + b
-        for i in range(self.num_conv_layers + 1):
+        for i in range(self.num_hidden_fc_layers + 1):
             if i == 0:
                 self.fc_layers[i] = nn.Linear(self.first_fc_layer_size, self.fc_sizes[0])
-            elif i < self.num_conv_layers + 1:
+            elif i < self.num_hidden_fc_layers:
                 self.fc_layers[i] = nn.Linear(self.fc_sizes[i - 1], self.fc_sizes[i])
             else:
                 self.fc_layers[i] = nn.Linear(self.fc_sizes[i - 1], 1)
@@ -94,12 +94,14 @@ class WebcamLocation(nn.Module):
         self.fc3 = nn.Linear(linear_sizes[1], 1)
         '''
 
+        self.network = nn.Sequential(*(self.conv_layers + self.fc_layers))
+
     # Used to get output size of convolutions.
     def get_conv_output(self, shape):
         batch_size = 1 # Not important.
         input = Variable(torch.rand(batch_size, *shape))
         output_feat = self.forward_features(input)
-        flattened_size = output_feat.data.view(batch_size, -1).size(1)
+        flattened_size = self.num_flat_features(output_feat)
 
         return flattened_size
 
@@ -148,30 +150,35 @@ class WebcamLocation(nn.Module):
 
         return x
 
-    '''
+
     def num_flat_features(self, x):
         size = x.size()[1:]  # all dimensions except the batch dimension
         num_features = 1
         for s in size:
             num_features *= s
         return num_features
-    '''
+
 
 def RandomizeArgs():
     conv_num_layers = random.randint(3, 6)
-    kernel_sizes = [(random.randint(1, 6), random.randint(2, 8), random.randint(2, 8)) for x in range(conv_num_layers)]
+    kernel_sizes = [(random.randint(1, 4), random.randint(2, 8), random.randint(2, 8)) for x in range(conv_num_layers)]
     output_channels = [random.randint(8, 64) for x in range(conv_num_layers)]
     paddings = [(random.randint(0, 2), random.randint(0, 2), random.randint(0, 2)) for x in range(conv_num_layers)]
-    strides = [(random.randint(1, 4), random.randint(1, 4), random.randint(1, 4)) for x in range(conv_num_layers)]
-    max_poolings = [(random.randint(1, 3), random.randint(2, 4), random.randint(2, 4))
+    strides = [(random.randint(1, 4), random.randint(1, 2), random.randint(1, 2)) for x in range(conv_num_layers)]
+    max_poolings = [(random.randint(1, 2), random.randint(2, 4), random.randint(2, 4))
                     if random.randint(1, conv_num_layers) >= 2 else None # On average one layer has no max pooling.
                     for x in range(conv_num_layers)]
     conv_relus = [True if random.randint(0, 1) == 1 else False for x in range(conv_num_layers)]
 
-    num_hidden_fc_layers = random.randint(2, 8)
-    fc_sizes = [random.randint(30, 3000) for x in range(num_hidden_fc_layers)]
+    num_hidden_fc_layers = random.randint(2, 6)
+    fc_sizes = [random.randint(1000, 5000)] * num_hidden_fc_layers #[random.randint(30, 3000) for x in range(num_hidden_fc_layers)]
+    for i in range(1, num_hidden_fc_layers): # Decreasing width of layers.
+        fc_sizes[i] = int(fc_sizes[i - 1] / 2)
+
     fc_relus = [True if random.randint(0, 1) == 1 else False for x in range(num_hidden_fc_layers)]
 
     return (conv_num_layers, output_channels, kernel_sizes, paddings, strides, max_poolings, conv_relus,
             num_hidden_fc_layers, fc_sizes, fc_relus,
-            (constants.NUM_CHANNELS, constants.PATCH_SIZE[0], constants.PATCH_SIZE[1]))
+            (constants.NUM_CHANNELS, constants.IMAGES_PER_DAY, constants.PATCH_SIZE[0], constants.PATCH_SIZE[1]))
+
+

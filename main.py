@@ -62,8 +62,24 @@ print(len(test_loader.dataset))
 sys.stdout.flush()
 #'''
 
-model_args = RandomizeArgs()
-model = WebcamLocation(*model_args)
+model_t0 = time.time()
+while True: # Try random models until we get one where the convolutions produce a valid size.
+    try:
+        model_args = RandomizeArgs()
+        model = WebcamLocation(*model_args)
+        break
+    except RuntimeError as e: # Very hacky.
+        if str(e).find('Output size is too small') >= 0: # Invalid configuration.
+            pass
+        elif str(e).find('not enough memory: you tried to allocate') >= 0: # Configuration uses too much memory.
+            print('TOO MUCH MEMORY')
+            pass
+        else:
+            raise e
+model_t1 = time.time()
+print('Time to find a valid model (s): ' + str(model_t1 - model_t0))
+sys.stdout.flush()
+
 train_loss_fn = torch.nn.MSELoss().cuda()
 test_loss_fn = torch.nn.MSELoss(size_average=False).cuda()
 

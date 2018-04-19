@@ -80,7 +80,7 @@ class ToTensor():
         sample = np.stack(img_stack, axis=0)
 
         #num_images, height, width, num_channels = sample.shape
-        transposed = sample.transpose(3, 0, 1, 2) # NUM_IMAGES_PER_DAY x C x H x W
+        transposed = sample.transpose(3, 0, 1, 2) # C x NUM_IMAGES_PER_DAY x H x W
         #reshaped = transposed.reshape(constants.IMAGES_PER_DAY * 3, height, width) # C x H x W
 
         #original = PIL.Image.fromarray(np.uint8(sample[5]))
