@@ -1,6 +1,7 @@
 #!/srv/glusterfs/vli/.pyenv/shims/python
 
 import torch, torchvision, os, time, shutil, os, argparse, subprocess, sys
+from skorch.net import NeuralNetRegressor
 
 sys.path.append('/home/vli/webcam-location') # For importing .py files in the same directory on the cluster.
 import constants
