@@ -34,9 +34,9 @@ class WebcamData():
         path = path[path.find(path.split('/')[-7]):]  # -7 should be roundshot or panomax (data source)
         value = int(hashlib.sha256(path.encode('utf-8')).hexdigest(), 16) % constants.SPLIT_TOTAL
 
-        if value <= constants.SPLIT_TRAIN:
+        if value < constants.SPLIT_TRAIN:
             return 'train'
-        elif value <= constants.SPLIT_TEST:
+        elif value < constants.SPLIT_TEST:
             return 'test'
         else:
             return 'valid'

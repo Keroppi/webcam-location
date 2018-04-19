@@ -9,12 +9,11 @@ NUM_CHANNELS = 3 # RGB
 BATCH_SIZE = 80
 NUM_LOADER_WORKERS = 8
 EPOCHS = 5
-FIRST_FC_LAYER_SIZE = 16 * 15 * 8 * 8 # Output dimensionality of final convolution layer.
 LOG_INTERVAL = 20
 SPLIT_TOTAL = 100
-SPLIT_TRAIN = 89 # 90% train
-SPLIT_TEST = 94 # 5% test
-SPLIT_VALID = 99 # 5% validation
+SPLIT_TRAIN = 75 # 75% train
+SPLIT_TEST = 100 # 25% test
+SPLIT_VALID = 100 # 0% validation
 
 
 

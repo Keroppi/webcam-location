@@ -37,7 +37,7 @@ test_transformations = torchvision.transforms.Compose([Resize(), RandomPatch(con
 
 train_dataset = Train(data, transformations)
 test_dataset = Test(data, test_transformations)
-valid_dataset = Validation(data, test_transformations)
+#valid_dataset = Validation(data, test_transformations)
 
 if torch.cuda.is_available():
     pin_memory = True
@@ -49,16 +49,16 @@ else:
 
 train_loader = torch.utils.data.DataLoader(train_dataset, shuffle=True, batch_size=constants.BATCH_SIZE, num_workers=num_workers, pin_memory=pin_memory)
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=constants.BATCH_SIZE, num_workers=num_workers, pin_memory=pin_memory)
-valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=constants.BATCH_SIZE, num_workers=num_workers, pin_memory=pin_memory)
+#valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=constants.BATCH_SIZE, num_workers=num_workers, pin_memory=pin_memory)
 
 #'''
-print("Train/Test/Validation Sizes: ")
+print("Train/Test Sizes: ")
 print(len(train_loader))
 print(len(test_loader))
-print(len(valid_loader))
+#print(len(valid_loader))
 print(len(train_loader.dataset))
 print(len(test_loader.dataset))
-print(len(valid_loader.dataset))
+#print(len(valid_loader.dataset))
 sys.stdout.flush()
 #'''
 
