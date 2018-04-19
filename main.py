@@ -208,9 +208,5 @@ for epoch in range(start_epoch, constants.EPOCHS):
 
 # Could use GPU to transform images...?  ToTensor first step - https://discuss.pytorch.org/t/preprocess-images-on-gpu/5096
 
-# Could just artificially limit # of days in this line below...
-# self.data = data.days[num_test:num_test + num_train]
-# change __len__ function as well
-
 # Multiple GPUs
 # http://pytorch.org/tutorials/beginner/former_torchies/parallelism_tutorial.html
