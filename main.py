@@ -11,7 +11,7 @@ from webcam_dataset import Train
 from webcam_dataset import Test
 from webcam_dataset import Validation
 from custom_transforms import Resize, RandomResize, RandomPatch, ToTensor
-from custom_model import WebcamLocation
+from custom_model import WebcamLocation, RandomizeArgs
 from torch.autograd import Variable
 
 if constants.CLUSTER:
@@ -62,7 +62,8 @@ print(len(test_loader.dataset))
 sys.stdout.flush()
 #'''
 
-model = WebcamLocation()
+model_args = RandomizeArgs()
+model = WebcamLocation(*model_args)
 train_loss_fn = torch.nn.MSELoss().cuda()
 test_loss_fn = torch.nn.MSELoss(size_average=False).cuda()
 

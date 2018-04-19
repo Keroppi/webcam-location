@@ -1,4 +1,4 @@
-import torch, sys
+import torch, sys, random
 import torch.nn as nn
 from torch.autograd import Variable
 import torch.nn.functional as F
@@ -30,7 +30,7 @@ class WebcamLocation(nn.Module):
         self.paddings = [(0, 2, 2), (0, 1, 1), (0, 1, 1), (0, 0, 0)] 
         self.strides = [(1, 2, 2), (2, 1, 1), (1, 1, 1), (1, 1, 1)]
         self.poolings = [(1, 2, 2), (1, 2, 2), None, (1, 2, 2)]
-        self.relus = [True, True, False, True]
+        self.conv_relus = [True, True, False, True]
         '''
 
         for i in range(self.num_conv_layers):
@@ -156,3 +156,22 @@ class WebcamLocation(nn.Module):
             num_features *= s
         return num_features
     '''
+
+def RandomizeArgs():
+    conv_num_layers = random.randint(3, 6)
+    kernel_sizes = [(random.randint(1, 6), random.randint(2, 8), random.randint(2, 8)) for x in range(conv_num_layers)]
+    output_channels = [random.randint(8, 64) for x in range(conv_num_layers)]
+    paddings = [(random.randint(0, 2), random.randint(0, 2), random.randint(0, 2)) for x in range(conv_num_layers)]
+    strides = [(random.randint(1, 4), random.randint(1, 4), random.randint(1, 4)) for x in range(conv_num_layers)]
+    max_poolings = [(random.randint(1, 3), random.randint(2, 4), random.randint(2, 4))
+                    if random.randint(1, conv_num_layers) >= 2 else None # On average one layer has no max pooling.
+                    for x in range(conv_num_layers)]
+    conv_relus = [True if random.randint(0, 1) == 1 else False for x in range(conv_num_layers)]
+
+    num_hidden_fc_layers = random.randint(2, 8)
+    fc_sizes = [random.randint(30, 3000) for x in range(num_hidden_fc_layers)]
+    fc_relus = [True if random.randint(0, 1) == 1 else False for x in range(num_hidden_fc_layers)]
+
+    return (conv_num_layers, output_channels, kernel_sizes, paddings, strides, max_poolings, conv_relus,
+            num_hidden_fc_layers, fc_sizes, fc_relus,
+            (constants.NUM_CHANNELS, constants.PATCH_SIZE[0], constants.PATCH_SIZE[1]))
