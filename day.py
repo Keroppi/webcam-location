@@ -1,8 +1,25 @@
 import constants
-import numpy as np, sys, PIL
+import numpy as np, sys, PIL, math, time, datetime
 from sklearn.feature_extraction.image import extract_patches_2d
 
 class Day():
+    def get_local_time(self, idx):
+        if idx <= constants.IMAGES_PER_DAY - 1 and idx >= 0:
+            floor_idx = math.floor(idx)
+            ceil_idx = math.ceil(idx)
+
+            if floor_idx == ceil_idx:
+                return self.times[floor_idx]
+
+            diff = self.times[ceil_idx] - self.times[floor_idx]
+            return self.times[floor_idx] + (idx - floor_idx) * diff
+        elif idx < 0:
+            diff = self.times[-1] - self.times[0]
+            return self.times[0] + idx * diff
+        else:
+            diff = self.times[-1] - self.times[0]
+            return self.times[constants.IMAGES_PER_DAY - 1] + (idx - (constants.IMAGES_PER_DAY - 1)) * diff
+
     def get_sun_idx(self, times, sunrise, sunset):
         sunrise_idx = 0
         sunset_idx = 0
@@ -64,13 +81,15 @@ class Day():
 
         return (sunrise_idx, sunset_idx)
 
-    def __init__(self, times, img_paths, sunrise, sunset, train_test_valid, lat, lng, mali_solar_noon):
+    def __init__(self, times, img_paths, sunrise, sunset, train_test_valid, lat, lng, time_offset, mali_solar_noon):
+        self.times = times
         self.train_test_valid = train_test_valid
         self.date = times[0].date()
         self.lat = lat
         self.lng = lng
         self.mali_solar_noon = mali_solar_noon
         self.img_paths = img_paths
+        self.time_offset = time_offset # Time zone offset in seconds.
 
 
         # Determine height / width

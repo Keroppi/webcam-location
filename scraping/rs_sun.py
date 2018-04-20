@@ -8,7 +8,7 @@ from urllib.request import HTTPError
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
 from bs4 import BeautifulSoup
 
-CLUSTER = False # run on cluster or local machine
+CLUSTER = True # run on cluster or local machine
 SIZE = 'small' # 'large'
 
 GOOGLE_MAPS_API_KEY = 'AIzaSyCEJkK4hEYYnRv4z6hL6n8A8VqfqJdspnY'
@@ -17,7 +17,7 @@ if CLUSTER:
     SGE_TASK_ID = int(os.environ.get('SGE_TASK_ID')) # Determines the month that gets downloaded. (1 -> January)
     baseLocation = '/srv/glusterfs/vli/data/roundshot/'
 else:
-    LOCAL_MONTH = 3
+    LOCAL_MONTH = 1
     baseLocation = '~/data/roundshot/'
     baseLocation = os.path.expanduser(baseLocation)
 
@@ -56,8 +56,8 @@ def get_sun_info(country, name, year, month, day, html_rows, lat, lng):
     
     # If file already exists and has size > 0, skip this.
     sun_file_str = wrtPth + '/sun.txt'
-    #if not (os.path.isfile(sun_file_str) and os.path.getsize(sun_file_str) > 0):
-    if True:
+    if not (os.path.isfile(sun_file_str) and os.path.getsize(sun_file_str) > 0):
+    #if True:
         # Find which row of the table corresponds to this day.
         for row_idx in range(len(html_rows)):
             headers = html_rows[row_idx].find_all('th')
@@ -265,6 +265,9 @@ while lIdx < len(lines):
         line = lines[lIdx + 5]
         
         lIdx += 5
+
+        #if name.find('Vevey') < 0 and name.find('Aiglon') < 0:
+        #    continue
 
         # Save latitude and longitude to a file.
         locWrtPth = baseLocation + country + '/' + name + '/'

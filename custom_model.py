@@ -160,9 +160,18 @@ class WebcamLocation(nn.Module):
 
 
 def RandomizeArgs():
-    conv_num_layers = random.randint(3, 6)
+    if constants.CLUSTER:
+        conv_num_layers = random.randint(3, 6)
+    else:
+        conv_num_layers = random.randint(1, 1)
+
     kernel_sizes = [(random.randint(1, 4), random.randint(2, 6), random.randint(2, 6)) for x in range(conv_num_layers)]
-    output_channels = [random.randint(8, 64) for x in range(conv_num_layers)]
+
+    if constants.CLUSTER:
+        output_channels = [random.randint(5, 50) for x in range(conv_num_layers)]
+    else:
+        output_channels = [random.randint(1, 1) for x in range(conv_num_layers)]
+
     paddings = [(0, random.randint(0, 2), random.randint(0, 2)) for x in range(conv_num_layers)]
     strides = [(random.randint(1, 4), random.randint(1, 3), random.randint(1, 3)) for x in range(conv_num_layers)]
     max_poolings = [(random.randint(1, 2), random.randint(2, 4), random.randint(2, 4))
@@ -170,8 +179,13 @@ def RandomizeArgs():
                     for x in range(conv_num_layers)]
     conv_relus = [True if random.randint(0, 1) == 1 else False for x in range(conv_num_layers)]
 
-    num_hidden_fc_layers = random.randint(2, 6)
+    if constants.CLUSTER:
+        num_hidden_fc_layers = random.randint(2, 6)
+    else:
+        num_hidden_fc_layers = random.randint(1, 1)
+
     fc_sizes = [random.randint(1000, 5000)] * num_hidden_fc_layers #[random.randint(30, 3000) for x in range(num_hidden_fc_layers)]
+
     for i in range(1, num_hidden_fc_layers): # Decreasing width of layers.
         fc_sizes[i] = int(fc_sizes[i - 1] / 2)
 

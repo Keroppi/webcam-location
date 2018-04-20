@@ -1,7 +1,6 @@
 #!/srv/glusterfs/vli/.pyenv/shims/python
 
 import torch, torchvision, os, time, shutil, os, argparse, subprocess, sys
-from skorch.net import NeuralNetRegressor
 
 sys.path.append('/home/vli/webcam-location') # For importing .py files in the same directory on the cluster.
 import constants
@@ -106,6 +105,7 @@ if args.resume:
     if os.path.isfile(args.resume):
         print("=> loading checkpoint '{}'".format(args.resume))
         checkpoint = torch.load(args.resume)
+        model = checkpoint['model']
         start_epoch = checkpoint['epoch']
         best_error = checkpoint['best_prec1']
         model.load_state_dict(checkpoint['state_dict'])
@@ -131,6 +131,7 @@ def train_epoch(epoch, model, data_loader, optimizer):
 
         optimizer.zero_grad()
         output = model(data)
+
         loss = train_loss_fn(output, target)
         loss.backward()
 
@@ -174,10 +175,15 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
         directory = '~/models/'
         directory = os.path.expanduser(directory)
 
-    torch.save(state, directory + filename)
+    if constants.LEARNING_SUNRISE:
+        prefix = 'sunrise_'
+    else:
+        prefix = 'sunset_'
+
+    torch.save(state, directory + prefix + filename)
     if is_best:
-        shutil.copyfile(directory + filename, directory + 'model_best.pth.tar')
-        with open(directory + 'best_params.txt', 'w') as best_params:
+        shutil.copyfile(directory + filename, directory + prefix + 'model_best.pth.tar')
+        with open(directory + prefix + 'best_params.txt', 'w') as best_params:
             best_params.write(str(model.network) + '\n')
             best_params.write('Max Pooling: ' + str(model_args[5]) + '\n')
             best_params.write('Conv Relus: ' + str(model_args[6]) + '\n')
@@ -205,6 +211,7 @@ for epoch in range(start_epoch, constants.EPOCHS):
     is_best = test_error < best_error
     best_error = min(test_error, best_error)
     save_checkpoint({
+        'model': model,
         'epoch': epoch + 1,
         'state_dict': model.state_dict(),
         'best_prec1': best_error,
