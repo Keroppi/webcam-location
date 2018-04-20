@@ -166,7 +166,7 @@ class WebcamData():
                                     #test = PIL.Image.open(subset_images[5])
                                     #test.save('/home/vli/patches/original' + place + '.jpg' )
 
-                                    day_obj = Day(subset_times, subset_images, sunrise, sunset,
+                                    day_obj = Day(place, subset_times, subset_images, sunrise, sunset,
                                                   train_test_valid, lat, lng, time_offset, mali_solar_noon)  # One training / test example.
                                     data.append(day_obj)
                                     self.types[train_test_valid] += 1

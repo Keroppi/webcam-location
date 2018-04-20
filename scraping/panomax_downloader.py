@@ -1,7 +1,7 @@
 #!/srv/glusterfs/vli/.pyenv/shims/python
 
 import string, sys, os, requests, urllib.request, json, multiprocessing as mp, datetime, time, traceback, socket, \
-       random, glob
+       random, glob, imghdr
 from urllib.error import ContentTooShortError
 from http.client import RemoteDisconnected
 from urllib.request import URLError
@@ -169,8 +169,13 @@ def download_day(country, name, lat, lng, storage_id, year, month, day):
                         while keep_going: # Retry this server.
                             try:
                                 urllib.request.urlretrieve(baseUrl[0] + str(server) + imgUrlSmall, localPathSmall)
+
+                                if imghdr.what(localPathSmall) is None: # Check it's a valid jpg.
+                                    os.remove(localPathSmall)
+                                else:
+                                    image_found = True
+
                                 keep_going = False
-                                image_found = True
                             except HTTPError as e:  # 404 (sometimes 503)
                                 # print(imgUrlSmall + ' failed with code: ' + str(e.code))
                                 #if e.code == 404:

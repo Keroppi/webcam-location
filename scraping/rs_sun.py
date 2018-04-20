@@ -34,7 +34,7 @@ with open(rs_filename) as rs_file:
     lines = rs_file.read().splitlines()
 
 
-def get_sun_info(country, name, year, month, day, html_rows, lat, lng):
+def get_sun_info(country, name, year, month, day, html_rows, mali_html_rows, lat, lng):
  try:
     day_num = day
     day = "{0:0=2d}".format(day)
@@ -119,6 +119,21 @@ def get_sun_info(country, name, year, month, day, html_rows, lat, lng):
                 elif len(sun_time_split) == 1: # less than 1 minute day length - UNLIKELY
                     sun_time = '00:00:' + sun_time
 
+        if local_sunrise_str.find('SUN') >= 0 or local_sunset_str.find('SUN') >= 0:
+            # Save UTC (first 2 rows), day length (HH:MM:SS),
+            # timezone offset (sec), local time, and day length (sec).
+            with open(wrtPth + '/sun.txt', 'w') as sun_file:
+                sun_file.write('UTC SUNRISE UNKNOWN' + '\n')
+                sun_file.write('UTC SUNSET UNKNOWN' + '\n')
+                sun_file.write(sun_time + '\n')
+                sun_file.write('TIME ZONE OFFSET UNKNOWN' + '\n')
+                sun_file.write(local_sunrise_str + '\n')
+                sun_file.write(local_sunset_str + '\n')
+                sun_file.write(sun_time_seconds + '\n')
+                sun_file.write('MALI SOLAR NOON UNKNOWN')
+
+            return
+
         # Get the time zone offset (for local time).
         sunrise_date = datetime.datetime.strptime(date, "%Y-%m-%d")
         sunset_date = datetime.datetime.strptime(date, "%Y-%m-%d")
@@ -187,25 +202,11 @@ def get_sun_info(country, name, year, month, day, html_rows, lat, lng):
         utc_sunrise = d - datetime.timedelta(seconds=offset)
         utc_sunset = d1 - datetime.timedelta(seconds=offset)
 
-        # Find UTC solar noon.
-        # Mali is at 0 longitude and never observes DST, so it is ALWAYS UTC time there.
-        mali_url = 'https://www.timeanddate.com/sun/@17.5707,0?month=' + str(utc_d.month) + '&year=' + str(utc_d.year)
-        mali_page = urllib.request.urlopen(mali_url).read()
-        mali_soup = BeautifulSoup(mali_page, "lxml")
-        mali_table = mali_soup.find_all('table')[0]
-        mali_html_rows = mali_table.find_all('tr')
-        for start_idx, row in enumerate(mali_html_rows):
-            header_cells = row.find_all('th')
-            if len(header_cells) > 0:
-                if header_cells[0].text.split()[0] == '1':
-                    break
-        mali_html_rows = mali_html_rows[start_idx:]  # row corresponding to 1st day of that month
-
         for row_idx in range(len(mali_html_rows)):
             headers = mali_html_rows[row_idx].find_all('th')
 
             if len(headers) > 0:
-                if headers[0].text.split()[0] == str(utc_d.day):
+                if headers[0].text.split()[0] == str(day_num):
                     break
 
         mali_tds = mali_html_rows[row_idx].find_all('td')
@@ -319,8 +320,23 @@ while lIdx < len(lines):
                     break
         html_rows = html_rows[start_idx:] # row corresponding to 1st day of that month
 
+        # Find UTC solar noon.
+        # Mali is at 0 longitude and never observes DST, so it is ALWAYS UTC time there.
+        mali_url = 'https://www.timeanddate.com/sun/@17.5707,0?month=' + month + '&year=' + year
+        mali_page = urllib.request.urlopen(mali_url).read()
+        mali_soup = BeautifulSoup(mali_page, "lxml")
+        mali_table = mali_soup.find_all('table')[0]
+        mali_html_rows = mali_table.find_all('tr')
+        for start_idx, row in enumerate(mali_html_rows):
+            header_cells = row.find_all('th')
+            if len(header_cells) > 0:
+                if header_cells[0].text.split()[0] == '1':
+                    break
+        mali_html_rows = mali_html_rows[start_idx:]  # row corresponding to 1st day of that month
+
+
         with ThreadPoolExecutor(numDays) as executor:               
-            future_download = {executor.submit(get_sun_info, country, name, year, month, day, html_rows, lat, lng): day for day in range(1, numDays + 1)}
+            future_download = {executor.submit(get_sun_info, country, name, year, month, day, html_rows, mali_html_rows, lat, lng): day for day in range(1, numDays + 1)}
                 
             for _ in as_completed(future_download):
                 pass

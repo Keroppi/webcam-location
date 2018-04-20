@@ -81,9 +81,10 @@ class Day():
 
         return (sunrise_idx, sunset_idx)
 
-    def __init__(self, times, img_paths, sunrise, sunset, train_test_valid, lat, lng, time_offset, mali_solar_noon):
+    def __init__(self, place, times, img_paths, sunrise, sunset, train_test_valid, lat, lng, time_offset, mali_solar_noon):
         self.times = times
         self.train_test_valid = train_test_valid
+        self.place = place
         self.date = times[0].date()
         self.lat = lat
         self.lng = lng
