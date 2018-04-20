@@ -8,7 +8,7 @@ from urllib.request import HTTPError
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
 from bs4 import BeautifulSoup
 
-CLUSTER = True # run on cluster or local machine
+CLUSTER = False # run on cluster or local machine
 SIZE = 'small' # 'large'
 
 GOOGLE_MAPS_API_KEY = 'AIzaSyCEJkK4hEYYnRv4z6hL6n8A8VqfqJdspnY'
@@ -17,11 +17,11 @@ if CLUSTER:
     SGE_TASK_ID = int(os.environ.get('SGE_TASK_ID')) # Determines the month that gets downloaded. (1 -> January)
     baseLocation = '/srv/glusterfs/vli/data/roundshot/'
 else:
-    LOCAL_MONTH = 5 # May
+    LOCAL_MONTH = 3
     baseLocation = '~/data/roundshot/'
     baseLocation = os.path.expanduser(baseLocation)
 
-year = '2017'
+year = '2018'
 
 rs_filename = '~/roundshot.txt'
 rs_filename = os.path.expanduser(rs_filename)
@@ -34,7 +34,7 @@ with open(rs_filename) as rs_file:
     lines = rs_file.read().splitlines()
 
 
-def get_sun_info(country, name, year, month, day, html_rows):
+def get_sun_info(country, name, year, month, day, html_rows, lat, lng):
  try:
     day_num = day
     day = "{0:0=2d}".format(day)
@@ -56,7 +56,8 @@ def get_sun_info(country, name, year, month, day, html_rows):
     
     # If file already exists and has size > 0, skip this.
     sun_file_str = wrtPth + '/sun.txt'
-    if not (os.path.isfile(sun_file_str) and os.path.getsize(sun_file_str) > 0):
+    #if not (os.path.isfile(sun_file_str) and os.path.getsize(sun_file_str) > 0):
+    if True:
         # Find which row of the table corresponds to this day.
         for row_idx in range(len(html_rows)):
             headers = html_rows[row_idx].find_all('th')
@@ -118,16 +119,110 @@ def get_sun_info(country, name, year, month, day, html_rows):
                 elif len(sun_time_split) == 1: # less than 1 minute day length - UNLIKELY
                     sun_time = '00:00:' + sun_time
 
+        # Get the time zone offset (for local time).
+        sunrise_date = datetime.datetime.strptime(date, "%Y-%m-%d")
+        sunset_date = datetime.datetime.strptime(date, "%Y-%m-%d")
+
+        # Heuristic for 2 if statements below - not necessarily 100% accurate.
+        # If sunrise is from 10 PM to 11:59 PM, it happens the day before.
+        if int(local_sunrise_str.split(':')[0]) >= 20:
+            sunrise_date += datetime.timedelta(days=-1)
+        # If sunset is from midnight to 1:59 AM, it happens the next day.
+        if int(local_sunset_str.split(':')[0]) < 2:
+            sunset_date += datetime.timedelta(days=1)
+
+        d = datetime.datetime.strptime(str(sunrise_date.date()) + ' ' + local_sunrise_str, "%Y-%m-%d %H:%M:%S")
+        d1 = datetime.datetime.strptime(str(sunset_date.date()) + ' ' + local_sunset_str, "%Y-%m-%d %H:%M:%S")
+        timestamp = time.mktime(d.timetuple())
+        google_url = 'https://maps.googleapis.com/maps/api/timezone/json?location=' + str(lat) + ',' + \
+                     str(lng) + '&timestamp=' + str(timestamp) + '&key=' + GOOGLE_MAPS_API_KEY
+
+        retries = 0
+        while True:
+            with urllib.request.urlopen(google_url) as goog_url_obj:
+                time_data = json.loads(goog_url_obj.read().decode())
+
+                if time_data['status'] == 'OK':
+                    break
+                else:
+                    if retries < 600:
+                        time.sleep(2)  # Possibly rate limited.
+                        retries += 1
+                    else:
+                        print('Exceed Google API quota - sleeping.')  # Exceed quota for the day.
+                        sys.stdout.flush()
+                        time.sleep(3600)  # 1 hour
+                        retries = 0
+
+        offset = time_data['dstOffset'] + time_data['rawOffset']  # seconds
+        utc_d = d - datetime.timedelta(seconds=offset)
+
+        # Requery time zone using estimate of UTC time.
+        timestamp = time.mktime(utc_d.timetuple())
+        google_url = 'https://maps.googleapis.com/maps/api/timezone/json?location=' + str(lat) + ',' + \
+                     str(lng) + '&timestamp=' + str(timestamp) + '&key=' + GOOGLE_MAPS_API_KEY
+        retries = 0
+        while True:
+            with urllib.request.urlopen(google_url) as goog_url_obj:
+                time_data = json.loads(goog_url_obj.read().decode())
+
+                if time_data['status'] == 'OK':
+                    break
+                else:
+                    if retries < 600:
+                        time.sleep(2)  # Possibly rate limited.
+                        retries += 1
+                    else:
+                        print('Exceed Google API quota - sleeping.')  # Exceed quota for the day.
+                        sys.stdout.flush()
+                        time.sleep(3600)  # 1 hour
+                        retries = 0
+
+        offset = time_data['dstOffset'] + time_data['rawOffset'];  # seconds
+
+        # NOTE: Ultimately converting local time to UTC is IMPOSSIBLE because of ambiguity.
+        # e.g. If clocks roll back from 2 AM to 1 AM, then we see 1 AM twice - ambiguous!
+        # But if sunrise and sunset are not close to DST changes, then it should be ok.
+
+        utc_sunrise = d - datetime.timedelta(seconds=offset)
+        utc_sunset = d1 - datetime.timedelta(seconds=offset)
+
+        # Find UTC solar noon.
+        # Mali is at 0 longitude and never observes DST, so it is ALWAYS UTC time there.
+        mali_url = 'https://www.timeanddate.com/sun/@17.5707,0?month=' + str(utc_d.month) + '&year=' + str(utc_d.year)
+        mali_page = urllib.request.urlopen(mali_url).read()
+        mali_soup = BeautifulSoup(mali_page, "lxml")
+        mali_table = mali_soup.find_all('table')[0]
+        mali_html_rows = mali_table.find_all('tr')
+        for start_idx, row in enumerate(mali_html_rows):
+            header_cells = row.find_all('th')
+            if len(header_cells) > 0:
+                if header_cells[0].text.split()[0] == '1':
+                    break
+        mali_html_rows = mali_html_rows[start_idx:]  # row corresponding to 1st day of that month
+
+        for row_idx in range(len(mali_html_rows)):
+            headers = mali_html_rows[row_idx].find_all('th')
+
+            if len(headers) > 0:
+                if headers[0].text.split()[0] == str(utc_d.day):
+                    break
+
+        mali_tds = mali_html_rows[row_idx].find_all('td')
+        mali_split = mali_tds[10].text.split()
+        mali_solar_noon = mali_split[0]
+
         # Save UTC (first 2 rows), day length (HH:MM:SS), 
         # timezone offset (sec), local time, and day length (sec).
         with open(wrtPth + '/sun.txt', 'w') as sun_file:
-            sun_file.write('UTC SUNRISE UNKNOWN' + '\n')
-            sun_file.write('UTC SUNSET UNKNOWN' + '\n')
+            sun_file.write(str(utc_sunrise) + '\n')
+            sun_file.write(str(utc_sunset) + '\n')
             sun_file.write(sun_time + '\n')
-            sun_file.write('TIME ZONE / DST OFFSET UNKNOWN' + '\n')
-            sun_file.write(local_sunrise_str + '\n')
-            sun_file.write(local_sunset_str + '\n')
+            sun_file.write(str(offset) + '\n')
+            sun_file.write(str(sunrise_date.date()) + ' ' + local_sunrise_str + '\n')
+            sun_file.write(str(sunset_date.date()) + ' ' + local_sunset_str + '\n')
             sun_file.write(sun_time_seconds + '\n')
+            sun_file.write(str(utc_d.date()) + ' ' + mali_solar_noon)
 
  except Exception as e:
      print('EXCEPTION')
@@ -210,22 +305,19 @@ while lIdx < len(lines):
                 numDays = 29;
 
         sun_url = 'https://www.timeanddate.com/sun/@' + str(lat) + ',' + str(lng) + '?month=' + month + '&year=' + year
-        #print(sun_url)
         page = urllib.request.urlopen(sun_url).read()
         soup = BeautifulSoup(page, "lxml")
         table = soup.find_all('table')[0]
         html_rows = table.find_all('tr')
-
         for start_idx, row in enumerate(html_rows):
             header_cells = row.find_all('th')
             if len(header_cells) > 0:
                 if header_cells[0].text.split()[0] == '1':
                     break
-
         html_rows = html_rows[start_idx:] # row corresponding to 1st day of that month
 
         with ThreadPoolExecutor(numDays) as executor:               
-            future_download = {executor.submit(get_sun_info, country, name, year, month, day, html_rows): day for day in range(1, numDays + 1)}
+            future_download = {executor.submit(get_sun_info, country, name, year, month, day, html_rows, lat, lng): day for day in range(1, numDays + 1)}
                 
             for _ in as_completed(future_download):
                 pass

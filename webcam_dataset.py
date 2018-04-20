@@ -114,6 +114,7 @@ class WebcamData():
                                 if sun_lines[4].find('SUN') >= 0 or sun_lines[5].find('SUN') >= 0:
                                     continue
 
+                                '''
                                 date_str = year + '-' + month + '-' + day
                                 date = datetime.datetime.strptime(date_str, "%Y-%m-%d")
 
@@ -126,11 +127,13 @@ class WebcamData():
                                 if int(sun_lines[5].split(':')[0]) < 2:
                                     date += datetime.timedelta(days=1)
                                     date_str = str(date.date())
-
-                                sunrise_str = date_str + ' ' + sun_lines[4]
-                                sunset_str = date_str + ' ' + sun_lines[5]
+                                '''
+                                sunrise_str = sun_lines[4] #date_str + ' ' + sun_lines[4]
+                                sunset_str = sun_lines[5] #date_str + ' ' + sun_lines[5]
+                                mali_solar_noon = sun_lines[7]
                                 sunrise = datetime.datetime.strptime(sunrise_str, "%Y-%m-%d %H:%M:%S")
                                 sunset = datetime.datetime.strptime(sunset_str, "%Y-%m-%d %H:%M:%S")
+                                mali_solar_noon = datetime.datetime.strptime(mali_solar_noon, "%Y-%m-%d %H:%M:%S")
 
                                 for size in constants.SIZE:
                                     image_dir = day_dir + size + '/'
@@ -163,7 +166,7 @@ class WebcamData():
                                     #test.save('/home/vli/patches/original' + place + '.jpg' )
 
                                     day_obj = Day(subset_times, subset_images, sunrise, sunset,
-                                                  train_test_valid)  # One training / test example.
+                                                  train_test_valid, lat, lng, mali_solar_noon)  # One training / test example.
                                     data.append(day_obj)
                                     self.types[train_test_valid] += 1
 

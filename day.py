@@ -64,10 +64,14 @@ class Day():
 
         return (sunrise_idx, sunset_idx)
 
-    def __init__(self, times, img_paths, sunrise, sunset, train_test_valid):
+    def __init__(self, times, img_paths, sunrise, sunset, train_test_valid, lat, lng, mali_solar_noon):
         self.train_test_valid = train_test_valid
         self.date = times[0].date()
+        self.lat = lat
+        self.lng = lng
+        self.mali_solar_noon = mali_solar_noon
         self.img_paths = img_paths
+
 
         # Determine height / width
         # Perhaps unnecessary?

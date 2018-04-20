@@ -182,6 +182,7 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
             best_params.write('Max Pooling: ' + str(model_args[5]) + '\n')
             best_params.write('Conv Relus: ' + str(model_args[6]) + '\n')
             best_params.write('FC Relus: ' + str(model_args[9]) + '\n')
+            best_params.write('Using ' + str(constants.DAYS_PER_MONTH) + ' days per month.')
             best_params.write(str(state['best_prec1']))
 
 
