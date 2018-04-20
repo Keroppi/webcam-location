@@ -1,6 +1,6 @@
-CLUSTER = True #False
+CLUSTER = True
 LEARNING_SUNRISE = True # False for sunset
-DAYS_PER_MONTH = 2 # 'MAX'
+DAYS_PER_MONTH = 5 # 'MAX'
 SIZE = ['small'] # 'large'
 DATA_SOURCES = ['roundshot'] # 'panomax'
 IMAGES_PER_DAY = 32

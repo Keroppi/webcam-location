@@ -9,3 +9,5 @@ CUDA_VISIBLE_DEVICES=$SGE_GPU ~/webcam-location/main.py
 
 qsub command for deep learning:
 qsub -l gpu -l h_vmem=12G -q gpu.middle.q@* -j y -o /srv/glusterfs/vli/job_logs ~/gpu.sh
+
+Note: Try not to use biwirender02 - only 5 GB GPUs

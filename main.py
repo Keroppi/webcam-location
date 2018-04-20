@@ -62,17 +62,24 @@ print(len(test_loader.dataset))
 sys.stdout.flush()
 #'''
 
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
 model_t0 = time.time()
 while True: # Try random models until we get one where the convolutions produce a valid size.
     try:
         model_args = RandomizeArgs()
         model = WebcamLocation(*model_args)
-        break
+        model_memory_mb = count_parameters(model) * 4 / 1000 / 1000
+
+        if model_memory_mb < 5000: # Only proceed if the model's memory is less than 5 GB
+            print('Model memory (MB): ' + str(model_memory_mb))
+            sys.stdout.flush()
+            break
     except RuntimeError as e: # Very hacky.
         if str(e).find('Output size is too small') >= 0: # Invalid configuration.
             pass
         elif str(e).find('not enough memory: you tried to allocate') >= 0: # Configuration uses too much memory.
-            print('TOO MUCH MEMORY')
             pass
         else:
             raise e
@@ -170,6 +177,13 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
     torch.save(state, directory + filename)
     if is_best:
         shutil.copyfile(directory + filename, directory + 'model_best.pth.tar')
+        with open(directory + 'best_params.txt', 'w') as best_params:
+            best_params.write(str(model.network) + '\n')
+            best_params.write('Max Pooling: ' + str(model_args[5]) + '\n')
+            best_params.write('Conv Relus: ' + str(model_args[6]) + '\n')
+            best_params.write('FC Relus: ' + str(model_args[9]) + '\n')
+            best_params.write(str(state['best_prec1']))
+
 
 for epoch in range(start_epoch, constants.EPOCHS):
     print('Epoch: ' + str(epoch))
