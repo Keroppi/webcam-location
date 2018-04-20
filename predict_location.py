@@ -101,7 +101,7 @@ for d_idx, day_length in enumerate(day_lengths):
     ts = pd.Series(pd.to_datetime([str(data[d_idx].date.date())]))
     day_of_year = int(ts.dt.dayofyear)
 
-    declination = math.radians(23.45 * math.sin(360 * (283 + day_of_year) / 365)) # Brock model, day_of_year from 1 to 365, inclusive
+    declination = math.radians(23.45) * math.sin(math.radians(360 * (283 + day_of_year) / 365)) # Brock model, day_of_year from 1 to 365, inclusive
     lat = math.degrees(math.atan(-math.cos(math.radians(15 * day_length_hours / 2)) / math.tan(declination)))
 
     latitudes.append(lat) # Only one day to predict latitude - could average across many days.
