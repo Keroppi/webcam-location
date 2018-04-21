@@ -105,9 +105,30 @@ for d_idx, day_length in enumerate(day_lengths):
 
     latitudes.append(lat) # Only one day to predict latitude - could average across many days.
 
-# Go through day objects - create a map where we can average all lat/longs of same places.
+# Average all lat/longs of same places.
+places = {}
 
-# Haversine formula for computing distance.
-# https://www.movable-type.co.uk/scripts/latlong.html
+for i in range(data.types['test']):
+    if places.get(data[i].place) is None:
+        places[data[i].place] = [0, 0, 0] # lat, lng, number of data points to average, average
+
+    places[data[i].place][0] += latitudes[i]
+    places[data[i].place][1] += longitudes[i]
+    places[data[i].place][2] += 1
+
+places_lat_lng = {}
+for key in places:
+    places_lat_lng[key] = (places[key][0] / places[key][2], places[key][1] / places[key][2])
+
+for i in range(data.types['test']):
+    place = data[i].place
+    actual_lat = data[i].lat
+    actual_lng = data[i].lng
+
+    pred_lat = places_lat_lng[place][0]
+    pred_lng = places_lat_lng[place][1]
+
+    # Haversine formula for computing distance.
+    # https://www.movable-type.co.uk/scripts/latlong.html
 
 # Make sure get_local_time works.

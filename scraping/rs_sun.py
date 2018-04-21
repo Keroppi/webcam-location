@@ -17,11 +17,11 @@ if CLUSTER:
     SGE_TASK_ID = int(os.environ.get('SGE_TASK_ID')) # Determines the month that gets downloaded. (1 -> January)
     baseLocation = '/srv/glusterfs/vli/data/roundshot/'
 else:
-    LOCAL_MONTH = 1
+    LOCAL_MONTH = 9
     baseLocation = '~/data/roundshot/'
     baseLocation = os.path.expanduser(baseLocation)
 
-year = '2018'
+year = '2017'
 
 rs_filename = '~/roundshot.txt'
 rs_filename = os.path.expanduser(rs_filename)
@@ -152,6 +152,8 @@ def get_sun_info(country, name, year, month, day, html_rows, mali_html_rows, lat
         google_url = 'https://maps.googleapis.com/maps/api/timezone/json?location=' + str(lat) + ',' + \
                      str(lng) + '&timestamp=' + str(timestamp) + '&key=' + GOOGLE_MAPS_API_KEY
 
+
+
         retries = 0
         while True:
             with urllib.request.urlopen(google_url) as goog_url_obj:
@@ -185,8 +187,8 @@ def get_sun_info(country, name, year, month, day, html_rows, mali_html_rows, lat
                 if time_data['status'] == 'OK':
                     break
                 else:
-                    if retries < 600:
-                        time.sleep(2)  # Possibly rate limited.
+                    if retries < 500:
+                        time.sleep(5)  # Possibly rate limited.
                         retries += 1
                     else:
                         print(time_data['status'])
@@ -269,7 +271,7 @@ while lIdx < len(lines):
         
         lIdx += 5
 
-        #if name.find('Vevey') < 0 and name.find('Aiglon') < 0:
+        #if name.find('Queenstown') < 0:
         #    continue
 
         # Save latitude and longitude to a file.
@@ -311,6 +313,7 @@ while lIdx < len(lines):
                 numDays = 29;
 
         sun_url = 'https://www.timeanddate.com/sun/@' + str(lat) + ',' + str(lng) + '?month=' + month + '&year=' + year
+        #print(sun_url)
         page = urllib.request.urlopen(sun_url).read()
         soup = BeautifulSoup(page, "lxml")
         table = soup.find_all('table')[0]
@@ -325,6 +328,7 @@ while lIdx < len(lines):
         # Find UTC solar noon.
         # Mali is at 0 longitude and never observes DST, so it is ALWAYS UTC time there.
         mali_url = 'https://www.timeanddate.com/sun/@17.5707,0?month=' + month + '&year=' + year
+        #print(mali_url)
         mali_page = urllib.request.urlopen(mali_url).read()
         mali_soup = BeautifulSoup(mali_page, "lxml")
         mali_table = mali_soup.find_all('table')[0]
