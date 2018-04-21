@@ -130,5 +130,15 @@ for i in range(data.types['test']):
 
     # Haversine formula for computing distance.
     # https://www.movable-type.co.uk/scripts/latlong.html
+    radius_of_earth = 6371 # km
+    actual_lat_rad = math.radians(actual_lat)
+    pred_lat_rad = math.radians(pred_lat)
+    diff_lat_rad = actual_lat_rad - pred_lat_rad
+    diff_lng_rad = math.radians(actual_lng - pred_lng)
+    temp = math.sin(diff_lat_rad / 2) ** 2 + \
+           math.cos(pred_lat_rad) * math.cos(actual_lat_rad) * math.sin(diff_lng_rad / 2) ** 2
+    temp1 = 2 * math.atan2(math.sqrt(temp), math.sqrt(1 - temp))
+    distance = radius_of_earth * temp1 # km?
+
 
 # Make sure get_local_time works.
