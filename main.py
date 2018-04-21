@@ -121,6 +121,10 @@ def train_epoch(epoch, model, data_loader, optimizer):
     model.train()
 
     for batch_idx, (data, target) in enumerate(data_loader):
+        vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
+        print('V-Memory Before Train Epoch: ' + str(epoch) + '\n' + str(vmem.stdout).replace('\\n', '\n'))
+        sys.stdout.flush()
+
         data, target = Variable(data), Variable(target)
 
         target = target.float()
@@ -142,9 +146,6 @@ def train_epoch(epoch, model, data_loader, optimizer):
                   epoch, batch_idx * len(data), len(data_loader.dataset),
                   100. * batch_idx / len(data_loader), loss.data[0]))
             sys.stdout.flush()
-
-    vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
-    print('V-Memory After Train Epoch: ' + str(epoch) + '\n' + str(vmem.stdout).replace('\\n', '\n'))
 
 def test_epoch(model, data_loader):
     model.eval()

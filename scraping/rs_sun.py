@@ -164,6 +164,7 @@ def get_sun_info(country, name, year, month, day, html_rows, mali_html_rows, lat
                         time.sleep(2)  # Possibly rate limited.
                         retries += 1
                     else:
+                        print(time_data['status'])
                         print('Exceed Google API quota - sleeping.')  # Exceed quota for the day.
                         sys.stdout.flush()
                         time.sleep(3600)  # 1 hour
@@ -188,6 +189,7 @@ def get_sun_info(country, name, year, month, day, html_rows, mali_html_rows, lat
                         time.sleep(2)  # Possibly rate limited.
                         retries += 1
                     else:
+                        print(time_data['status'])
                         print('Exceed Google API quota - sleeping.')  # Exceed quota for the day.
                         sys.stdout.flush()
                         time.sleep(3600)  # 1 hour
@@ -342,6 +344,7 @@ while lIdx < len(lines):
                 pass
         month_t1 = time.time()
         print('Month Time (sec): ' + str((month_t1 - month_t0)))
+        sys.stdout.flush()
         
     lIdx += 2
 
