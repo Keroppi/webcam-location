@@ -80,7 +80,7 @@ class WebcamData():
         except FileNotFoundError:
             print('WARNING - No location.txt! ' + place_dir)
             sys.stdout.flush()
-            return
+            return []
 
         years = next(os.walk(place_dir))[1]
 
@@ -199,7 +199,7 @@ class WebcamData():
             line_idx = 0
             while line_idx < len(rs_lines):
                 country = rs_lines[line_idx]
-                num_webcams = rs_lines[line_idx + 1]
+                num_webcams = int(rs_lines[line_idx + 1].split()[2])
 
                 line_idx += 2
 
