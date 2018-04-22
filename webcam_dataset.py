@@ -1,4 +1,5 @@
 import os, sys, calendar, glob, datetime, time, functools, numpy as np, constants, PIL, hashlib, torch, subprocess
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from day import Day
 from torch.utils.data.dataset import Dataset
 
@@ -41,7 +42,7 @@ class WebcamData():
         else:
             return 'valid'
 
-    def load_images(self):
+    def load_images(self, thread_place):
         if constants.CLUSTER:
             image_dir = '/srv/glusterfs/vli/data/'
         else:
@@ -173,7 +174,7 @@ class WebcamData():
                                     self.types[train_test_valid] += 1
 
         #sort_t0 = time.time()
-        data.sort(key=functools.cmp_to_key(WebcamData.compare_data_types)) # Sorted in order of test, train, valid
+        #data.sort(key=functools.cmp_to_key(WebcamData.compare_data_types)) # Sorted in order of test, train, valid
         #sort_t1 = time.time()
         #print('Sorting filenames time (s): ' + str(sort_t1 - sort_t0))
         #sys.stdout.flush()
@@ -184,7 +185,40 @@ class WebcamData():
         self.types = {'train': 0, 'test': 0, 'valid':0}
 
         load_t0 = time.time()
-        self.days = self.load_images()
+
+        #self.days = self.load_images()
+
+        # Get a list of all the places.
+        places = []
+        with open('/home/vli/roundshot.txt', 'r') as rs_file:
+            rs_lines = rs_file.read().splitlines()
+
+            line_idx = 0
+            while line_idx < len(rs_lines):
+                country = rs_lines[line_idx]
+                num_webcams = rs_lines[line_idx + 1]
+
+                line_idx += 2
+
+                for _ in range(num_webcams):
+                    place = rs_lines[line_idx]
+                    place = place.replace('/', '-')
+                    places.append('roundshot/' + country + '/' + place)
+                    line_idx += 5
+
+                line_idx += 2
+
+        # Each thread handles one location.
+        self.days = []
+        with ThreadPoolExecutor(len(places)) as executor:
+            future_download = {executor.submit(self.load_images, place): place for place in places}
+
+            for future in as_completed(future_download):
+                self.days += future.result()
+
+        # Sort the list based on test/train/valid here after getting all of them.
+        self.days.sort(key=functools.cmp_to_key(WebcamData.compare_data_types))  # Sorted in order of test, train, valid
+
         load_t1 = time.time()
         print('Load File Paths Time (min): ' + str((load_t1 - load_t0) / 60))
         sys.stdout.flush()
