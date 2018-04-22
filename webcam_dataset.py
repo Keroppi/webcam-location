@@ -128,9 +128,7 @@ class WebcamData():
                                     date += datetime.timedelta(days=1)
                                     date_str = str(date.date())
                                 '''
-                                print(place)
-                                print(year + ' ' + month)
-                                sys.stdout.flush()
+                                
                                 time_offset = int(sun_lines[3]) # seconds
                                 sunrise_str = sun_lines[4] #date_str + ' ' + sun_lines[4]
                                 sunset_str = sun_lines[5] #date_str + ' ' + sun_lines[5]
