@@ -80,6 +80,8 @@ while True: # Try random models until we get one where the convolutions produce 
             pass
         elif str(e).find('not enough memory: you tried to allocate') >= 0: # Configuration uses too much memory.
             pass
+        elif str(e).find("Kernel size can't greater than actual input size") >= 0: # Kernel is bigger than input.
+            pass
         else:
             raise e
 model_t1 = time.time()
@@ -223,8 +225,6 @@ for epoch in range(start_epoch, constants.EPOCHS):
 
 # Pickle or whatever all patches?
 # Does it make sense to save these patches to disk?
-
-# Could parallelize the load_images() in webcam_dataset
 
 # Each img_stack = 32 * 3 * 128 * 128 * 4 bytes = 6.29 MB
 # Batched 12 GB / 6.29 MB ~ 1900 stacks per batch
