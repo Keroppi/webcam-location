@@ -216,7 +216,7 @@ class WebcamData():
         sys.stdout.flush()
 
         self.days = []
-        with ThreadPoolExecutor(len(places)) as executor:
+        with ThreadPoolExecutor(20) as executor:
             future_download = {executor.submit(self.load_images, place): place for place in places}
 
             for future in as_completed(future_download):
