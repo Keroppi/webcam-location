@@ -124,12 +124,12 @@ sys.stdout.flush()
 def train_epoch(epoch, model, data_loader, optimizer):
     model.train()
 
-    vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
-    print('V-Memory Before Train Epoch: ' + str(epoch) + '\n' + str(vmem.stdout).replace('\\n', '\n'))
-    sys.stdout.flush()
-
     for batch_idx, (data, target) in enumerate(data_loader):
-
+        if batch_idx == 0:
+            vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
+            print('V-Memory Before Train Epoch: ' + str(epoch) + '\n' + str(vmem.stdout).replace('\\n', '\n'))
+            sys.stdout.flush()
+            
         data, target = Variable(data), Variable(target)
 
         target = target.float()
