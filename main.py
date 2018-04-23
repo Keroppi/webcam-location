@@ -71,9 +71,10 @@ while True: # Try random models until we get one where the convolutions produce 
         model = WebcamLocation(*model_args)
         model_memory_mb = count_parameters(model) * 4 / 1000 / 1000
 
-        if model_memory_mb < 5000: # Only proceed if the model's memory is less than 5 GB
+        if model_memory_mb < 4000: # Only proceed if the model's memory is less than 4 GB
             print('Model memory (MB): ' + str(model_memory_mb))
             sys.stdout.flush()
+
             break
     except RuntimeError as e: # Very hacky.
         if str(e).find('Output size is too small') >= 0: # Invalid configuration.
@@ -84,6 +85,7 @@ while True: # Try random models until we get one where the convolutions produce 
             pass
         else:
             raise e
+
 model_t1 = time.time()
 print('Time to find a valid model (s): ' + str(model_t1 - model_t0))
 sys.stdout.flush()
@@ -227,7 +229,7 @@ for epoch in range(start_epoch, constants.EPOCHS):
 # Pickle or whatever all patches?
 # Does it make sense to save these patches to disk?
 
-# Each img_stack = 32 * 3 * 128 * 128 * 4 bytes = 6.29 MB
+
 # Batched 12 GB / 6.29 MB ~ 1900 stacks per batch
 
 # Could use GPU to transform images...?  ToTensor first step - https://discuss.pytorch.org/t/preprocess-images-on-gpu/5096
