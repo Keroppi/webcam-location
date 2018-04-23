@@ -140,16 +140,16 @@ def train_epoch(epoch, model, data_loader, optimizer):
             data = data.cuda()
             target = target.cuda()
 
-        if batch_idx == 0:
-            vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
-            print('V-Memory Before Train Epoch: ' + str(epoch) + '\n' + str(vmem.stdout).replace('\\n', '\n'))
-            sys.stdout.flush()
-
         optimizer.zero_grad()
         output = model(data)
 
         loss = train_loss_fn(output, target)
         loss.backward()
+
+        if batch_idx == 0:
+            vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
+            print('V-Memory After Train Backward: ' + str(epoch) + '\n' + str(vmem.stdout).replace('\\n', '\n'))
+            sys.stdout.flush()
 
         optimizer.step()
 
@@ -158,6 +158,8 @@ def train_epoch(epoch, model, data_loader, optimizer):
                   epoch, batch_idx * len(data), len(data_loader.dataset),
                   100. * batch_idx / len(data_loader), loss.data[0]))
             sys.stdout.flush()
+
+
 
 def test_epoch(model, data_loader):
     model.eval()
