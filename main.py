@@ -72,7 +72,7 @@ while True: # Try random models until we get one where the convolutions produce 
         model_memory_mb = count_parameters(model) * 4 / 1000 / 1000
 
         if constants.CLUSTER:
-            if model_memory_mb < 4000: # Only proceed if the model's memory is less than 4 GB
+            if model_memory_mb < 2000: # Only proceed if the model's memory is less than 2 GB
                 print('Model memory (MB): ' + str(model_memory_mb))
                 sys.stdout.flush()
 
@@ -139,6 +139,11 @@ def train_epoch(epoch, model, data_loader, optimizer):
         if torch.cuda.is_available():
             data = data.cuda()
             target = target.cuda()
+
+        if batch_idx == 0:
+            vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
+            print('V-Memory Before Train Forward: ' + str(epoch) + '\n' + str(vmem.stdout).replace('\\n', '\n'))
+            sys.stdout.flush()
 
         optimizer.zero_grad()
         output = model(data)
