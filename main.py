@@ -16,8 +16,9 @@ from torch.autograd import Variable
 if constants.CLUSTER:
     d = dict(os.environ)
     print('SGE_GPU: ' + d['SGE_GPU'])
+    sys.stdout.flush()
 
-print('Current Device(s): ' + str(torch.cuda.current_device()))
+#print('Current Device(s): ' + str(torch.cuda.current_device()))
 print('Device Count: ' + str(torch.cuda.device_count()))
 sys.stdout.flush()
 
@@ -209,6 +210,7 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
             best_params.write('Conv Relus: ' + str(model_args[6]) + '\n')
             best_params.write('FC Relus: ' + str(model_args[9]) + '\n')
             best_params.write('Using ' + str(constants.DAYS_PER_MONTH) + ' days per month.')
+            best_params.write('Using ' + str(constants.EPOCHS) + ' epochs.')
             best_params.write(str(state['best_prec1']))
 
 
