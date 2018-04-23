@@ -173,7 +173,7 @@ def RandomizeArgs():
         output_channels = [random.randint(1, 1) for x in range(conv_num_layers)]
 
     paddings = [(0, random.randint(0, 2), random.randint(0, 2)) for x in range(conv_num_layers)]
-    strides = [(random.randint(1, 4), random.randint(1, 3), random.randint(1, 3)) for x in range(conv_num_layers)]
+    strides = [(random.randint(1, 4), random.randint(1, 2), random.randint(1, 2)) for x in range(conv_num_layers)]
     max_poolings = [(random.randint(1, 2), random.randint(2, 4), random.randint(2, 4))
                     if random.randint(1, conv_num_layers) >= 2 else None # On average one layer has no max pooling.
                     for x in range(conv_num_layers)]

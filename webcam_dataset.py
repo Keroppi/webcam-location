@@ -212,9 +212,6 @@ class WebcamData():
                 line_idx += 2
 
         # Each thread handles one location.
-        print('Activating ' + str(len(places)) + ' threads to find files.')
-        sys.stdout.flush()
-
         self.days = []
         with ThreadPoolExecutor(20) as executor:
             future_download = {executor.submit(self.load_images, place): place for place in places}
