@@ -71,11 +71,18 @@ while True: # Try random models until we get one where the convolutions produce 
         model = WebcamLocation(*model_args)
         model_memory_mb = count_parameters(model) * 4 / 1000 / 1000
 
-        if model_memory_mb < 4000: # Only proceed if the model's memory is less than 4 GB
-            print('Model memory (MB): ' + str(model_memory_mb))
-            sys.stdout.flush()
+        if constants.CLUSTER:
+            if model_memory_mb < 4000: # Only proceed if the model's memory is less than 4 GB
+                print('Model memory (MB): ' + str(model_memory_mb))
+                sys.stdout.flush()
 
-            break
+                break
+        else:
+            if model_memory_mb < 200:
+                print('Model memory (MB): ' + str(model_memory_mb))
+                sys.stdout.flush()
+
+                break
     except RuntimeError as e: # Very hacky.
         if str(e).find('Output size is too small') >= 0: # Invalid configuration.
             pass
@@ -125,11 +132,6 @@ def train_epoch(epoch, model, data_loader, optimizer):
     model.train()
 
     for batch_idx, (data, target) in enumerate(data_loader):
-        if batch_idx == 0:
-            vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
-            print('V-Memory Before Train Epoch: ' + str(epoch) + '\n' + str(vmem.stdout).replace('\\n', '\n'))
-            sys.stdout.flush()
-            
         data, target = Variable(data), Variable(target)
 
         target = target.float()
@@ -137,6 +139,11 @@ def train_epoch(epoch, model, data_loader, optimizer):
         if torch.cuda.is_available():
             data = data.cuda()
             target = target.cuda()
+
+        if batch_idx == 0:
+            vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
+            print('V-Memory Before Train Epoch: ' + str(epoch) + '\n' + str(vmem.stdout).replace('\\n', '\n'))
+            sys.stdout.flush()
 
         optimizer.zero_grad()
         output = model(data)
@@ -228,9 +235,6 @@ for epoch in range(start_epoch, constants.EPOCHS):
 
 # Pickle or whatever all patches?
 # Does it make sense to save these patches to disk?
-
-
-# Batched 12 GB / 6.29 MB ~ 1900 stacks per batch
 
 # Could use GPU to transform images...?  ToTensor first step - https://discuss.pytorch.org/t/preprocess-images-on-gpu/5096
 

@@ -160,10 +160,7 @@ class WebcamLocation(nn.Module):
 
 
 def RandomizeArgs():
-    if constants.CLUSTER:
-        conv_num_layers = random.randint(3, 6)
-    else:
-        conv_num_layers = random.randint(1, 1)
+    conv_num_layers = random.randint(3, 6)
 
     kernel_sizes = [(random.randint(1, 4), random.randint(2, 6), random.randint(2, 6)) for x in range(conv_num_layers)]
 
