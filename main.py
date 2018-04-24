@@ -41,7 +41,7 @@ test_dataset = Test(data, test_transformations)
 
 if torch.cuda.is_available():
     pin_memory = True
-    num_workers = 0
+    num_workers = constants.NUM_LOADER_WORKERS
 else:
     print('WARNING - Not using GPU.')
     pin_memory = False
@@ -98,13 +98,14 @@ model_t1 = time.time()
 print('Time to find a valid model (s): ' + str(model_t1 - model_t0))
 sys.stdout.flush()
 
-train_loss_fn = torch.nn.MSELoss().cuda()
-test_loss_fn = torch.nn.MSELoss(size_average=False).cuda()
+train_loss_fn = torch.nn.MSELoss()
+test_loss_fn = torch.nn.MSELoss(size_average=False)
 
 if torch.cuda.is_available():
-    model = model.cuda()
-    train_loss_fn = train_loss_fn.cuda()
-    test_loss_fn = test_loss_fn.cuda()
+    #model = model.cuda()
+    model.cuda()
+    train_loss_fn = train_loss_fn.cuda() # Probably does nothing.
+    test_loss_fn = test_loss_fn.cuda() # Probably does nothing.
 
 optimizer = torch.optim.Adagrad(model.parameters(), lr=1e-3)
 start_epoch = 0

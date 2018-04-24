@@ -95,11 +95,11 @@ class WebcamLocation(nn.Module):
         '''
 
         if torch.cuda.device_count() > 1:
-            print('Wrapped in DataParallel')
+            print('Wrapped in DataParallel.')
             sys.stdout.flush()
-            self.network = torch.nn.DataParallel(nn.Sequential(*(self.conv_layers + self.fc_layers)), device_ids=list(range(constants.GPUS)))
+            self.network = torch.nn.DataParallel(nn.Sequential(*(self.conv_layers + self.fc_layers)))
         else:
-            print('Single GPU module')
+            print('Single or no GPU module.')
             sys.stdout.flush()
             self.network = nn.Sequential(*(self.conv_layers + self.fc_layers))
 
@@ -109,7 +109,9 @@ class WebcamLocation(nn.Module):
     # Used to get output size of convolutions.
     def get_conv_output(self, shape):
         batch_size = 1 # Not important.
-        input = Variable(torch.rand(batch_size, *shape))
+        input = Variable(torch.rand(batch_size, *shape), requires_grad=False)
+        print('Is this random variable cuda? ' + str(input.is_cuda))
+        sys.stdout.flush()
         output_feat = self.forward_features(input)
         flattened_size = self.num_flat_features(output_feat)
 
