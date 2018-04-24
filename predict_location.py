@@ -128,6 +128,12 @@ for i in range(data.types['test']):
     pred_lat = places_lat_lng[place][0]
     pred_lng = places_lat_lng[place][1]
 
+    #print(actual_lat)
+    #print(actual_lng)
+    #print(pred_lat)
+    #print(pred_lng)
+    #print('')
+
     # Haversine formula for computing distance.
     # https://www.movable-type.co.uk/scripts/latlong.html
     radius_of_earth = 6371 # km

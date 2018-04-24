@@ -16,6 +16,7 @@ from torch.autograd import Variable
 if constants.CLUSTER:
     d = dict(os.environ)
     print('SGE_GPU: ' + d['SGE_GPU'])
+    first_device = int(d['SGE_GPU'].split(',')[0])
     sys.stdout.flush()
 
 #print('Current Device(s): ' + str(torch.cuda.current_device()))
@@ -98,16 +99,16 @@ model_t1 = time.time()
 print('Time to find a valid model (s): ' + str(model_t1 - model_t0))
 sys.stdout.flush()
 
-train_loss_fn = torch.nn.MSELoss().cuda()
-test_loss_fn = torch.nn.MSELoss(size_average=False).cuda()
+train_loss_fn = torch.nn.MSELoss().cuda(device=first_device)
+test_loss_fn = torch.nn.MSELoss(size_average=False).cuda(device=first_device)
 
 if torch.cuda.is_available():
     if torch.cuda.device_count() > 1:
         model = torch.nn.DataParallel(model)
 
-    model = model.cuda()
-    train_loss_fn = train_loss_fn.cuda()
-    test_loss_fn = test_loss_fn.cuda()
+    model = model.cuda(device=first_device)
+    train_loss_fn = train_loss_fn.cuda(device=first_device)
+    test_loss_fn = test_loss_fn.cuda(device=first_device)
 
 optimizer = torch.optim.Adagrad(model.parameters(), lr=1e-3)
 start_epoch = 0
@@ -138,8 +139,8 @@ def train_epoch(epoch, model, data_loader, optimizer):
         target = target.float()
 
         if torch.cuda.is_available():
-            data = data.cuda()
-            target = target.cuda()
+            data = data.cuda(device=first_device)
+            target = target.cuda(device=first_device)
 
         if batch_idx == 0:
             vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
@@ -175,8 +176,8 @@ def test_epoch(model, data_loader):
         target = target.float()
 
         if torch.cuda.is_available():
-            data = data.cuda()
-            target = target.cuda()
+            data = data.cuda(device=first_device)
+            target = target.cuda(device=first_device)
 
         output = model(data)
         test_loss += test_loss_fn(output, target).data[0] # sum up batch loss

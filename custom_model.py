@@ -95,6 +95,8 @@ class WebcamLocation(nn.Module):
         '''
 
         self.network = nn.Sequential(*(self.conv_layers + self.fc_layers))
+        #self.features = nn.Sequential(*self.conv_layers)
+        #self.classifier = nn.Sequential(*self.fc_layers)
 
     # Used to get output size of convolutions.
     def get_conv_output(self, shape):
