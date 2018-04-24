@@ -9,8 +9,8 @@ from torch.utils.data.dataset import Dataset
 # SMALL TEST CASE TO CHECK IF DATAPARALLEL FAILS HERE TOO.
 
 # Arbitrary input/output.
-input = torch.randn(100, 10000000)
-output = torch.randn(100, 1)
+input = torch.randn(600, 10000000)
+output = torch.randn(600, 1)
 
 class TestModule(nn.Module):
     def __init__(self):
@@ -50,6 +50,7 @@ def train_epoch(epoch, model, data_loader, optimizer):
             data = data.cuda()
             target = target.cuda()
 
+        print('Batch idx: ' + str(batch_idx))
         print('Before forward.')
         sys.stdout.flush()
 
