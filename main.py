@@ -141,6 +141,8 @@ def train_epoch(epoch, model, data_loader, optimizer):
 
         batch_load_time_t1 = time.time()
         batch_load_time_min = (batch_load_time_t1 - batch_train_time_t0) / 60
+        print('Load Time (min): {:.4f}'.format(batch_load_time_min))
+        sys.stdout.flush()
 
         if batch_idx == 0:
             vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
