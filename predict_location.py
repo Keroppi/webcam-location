@@ -5,6 +5,8 @@ from webcam_dataset import Test
 from custom_transforms import Resize, RandomPatch, ToTensor
 from torch.autograd import Variable
 
+constants.CLUSTER = False # VLI
+
 if constants.CLUSTER:
     directory = '/srv/glusterfs/vli/models/best/'
 else:
@@ -24,6 +26,7 @@ sunrise_model.eval()
 sunset_model.eval()
 
 data = WebcamData()
+days = data.days
 test_transformations = torchvision.transforms.Compose([Resize(), RandomPatch(constants.PATCH_SIZE), ToTensor()])
 test_dataset = Test(data, test_transformations)
 
@@ -36,6 +39,7 @@ else:
     num_workers = constants.NUM_LOADER_WORKERS
 
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=constants.BATCH_SIZE, num_workers=num_workers, pin_memory=pin_memory)
+#print(len(test_loader.dataset))
 
 sunrises = []
 for batch_idx, (input, _) in enumerate(test_loader):
@@ -45,14 +49,13 @@ for batch_idx, (input, _) in enumerate(test_loader):
         input = input.cuda()
 
     sunrise_idx = sunrise_model(input)
-
     # Convert sunrise_idx into a local time.
 
     # Assume that data is in the same order as the batch, since it's not shuffled.
-    batch_days = data[batch_idx * constants.BATCH_SIZE:(batch_idx + 1) * constants.BATCH_SIZE]
+    batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunrise_idx.size()[0]]
 
     for d_idx, day in enumerate(batch_days):
-        local_sunrise = day.get_local_time(sunrise_idx[d_idx, 0])
+        local_sunrise = day.get_local_time(sunrise_idx[d_idx, 0].data[0])
         #utc_sunrise = local_sunrise - datetime.timedelta(seconds=day.time_offset)
         sunrises.append(local_sunrise)
 
@@ -68,10 +71,10 @@ for batch_idx, (input, _) in enumerate(test_loader):
     # Convert sunset_idx into a local time.
 
     # Assume that data is in the same order as the batch, since it's not shuffled.
-    batch_days = data[batch_idx * constants.BATCH_SIZE:(batch_idx + 1) * constants.BATCH_SIZE]
+    batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunrise_idx.size()[0]]
 
     for d_idx, day in enumerate(batch_days):
-        local_sunset = day.get_local_time(sunrise_idx[d_idx, 0])
+        local_sunset = day.get_local_time(sunset_idx[d_idx, 0].data[0])
         #utc_sunset = local_sunset - datetime.timedelta(seconds=day.time_offset)
         sunsets.append(local_sunset)
 
@@ -86,9 +89,9 @@ for sunrise, sunset in zip(sunrises, sunsets):
 # Compute longitude.
 longitudes = []
 for d_idx, solar_noon in enumerate(solar_noons):
-    utc_diff = data[d_idx].mali_solar_noon - solar_noon # Sun rises in the east and sets in the west.
+    utc_diff = days[d_idx].mali_solar_noon - solar_noon # Sun rises in the east and sets in the west.
 
-    hours_time_zone_diff = data[d_idx].time_offset / 60 / 60
+    hours_time_zone_diff = days[d_idx].time_offset / 60 / 60
     hours_utc_diff = utc_diff.total_seconds() / 60 / 60
     longitudes.append((hours_utc_diff + hours_time_zone_diff) * 15)
 
@@ -97,7 +100,7 @@ latitudes = []
 for d_idx, day_length in enumerate(day_lengths):
     day_length_hours = day_length / 3600
 
-    ts = pd.Series(pd.to_datetime([str(data[d_idx].date.date())]))
+    ts = pd.Series(pd.to_datetime([str(days[d_idx].date)]))
     day_of_year = int(ts.dt.dayofyear) # Brock model, day_of_year from 1 to 365, inclusive
 
     declination = math.radians(23.45) * math.sin(math.radians(360 * (283 + day_of_year) / 365))
@@ -109,21 +112,21 @@ for d_idx, day_length in enumerate(day_lengths):
 places = {}
 
 for i in range(data.types['test']):
-    if places.get(data[i].place) is None:
-        places[data[i].place] = [0, 0, 0] # lat, lng, number of data points to average, average
+    if places.get(days[i].place) is None:
+        places[days[i].place] = [0, 0, 0] # lat, lng, number of data points to average, average
 
-    places[data[i].place][0] += latitudes[i]
-    places[data[i].place][1] += longitudes[i]
-    places[data[i].place][2] += 1
+    places[days[i].place][0] += latitudes[i]
+    places[days[i].place][1] += longitudes[i]
+    places[days[i].place][2] += 1
 
 places_lat_lng = {}
 for key in places:
     places_lat_lng[key] = (places[key][0] / places[key][2], places[key][1] / places[key][2])
 
 for i in range(data.types['test']):
-    place = data[i].place
-    actual_lat = data[i].lat
-    actual_lng = data[i].lng
+    place = days[i].place
+    actual_lat = days[i].lat
+    actual_lng = days[i].lng
 
     pred_lat = places_lat_lng[place][0]
     pred_lng = places_lat_lng[place][1]
@@ -140,5 +143,4 @@ for i in range(data.types['test']):
     temp1 = 2 * math.atan2(math.sqrt(temp), math.sqrt(1 - temp))
     distance = radius_of_earth * temp1 # km?
 
-
-# Make sure get_local_time works.
+    print(distance)
