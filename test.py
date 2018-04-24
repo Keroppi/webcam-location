@@ -30,7 +30,7 @@ class TestDataset(Dataset):
 dataset = TestDataset()
 
 if torch.cuda.is_available():
-    loader = torch.utils.data.DataLoader(dataset, batch_size=6, num_workers=4, pin_memory=True)
+    loader = torch.utils.data.DataLoader(dataset, batch_size=6, num_workers=0, pin_memory=True)
 
 
 loss_fn = torch.nn.MSELoss()
@@ -66,6 +66,7 @@ def train_epoch(epoch, model, data_loader, optimizer):
             sys.stdout.flush()
 
         optimizer.step()
+        del loss
 
 for epoch in range(1):
     train_epoch(epoch, model, loader, optimizer)
