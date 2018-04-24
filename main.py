@@ -135,6 +135,7 @@ def train_epoch(epoch, model, data_loader, optimizer):
     print('Batch Load Time (min): ' + str((batch_load_time_t1 - batch_load_time_t0) / 60))
 
     for batch_idx, (data, target) in curr_batch:
+        batch_train_time_t0 = time.time()
         data, target = Variable(data), Variable(target)
 
         target = target.float()
@@ -160,11 +161,13 @@ def train_epoch(epoch, model, data_loader, optimizer):
             sys.stdout.flush()
 
         optimizer.step()
+        batch_train_time_t1 = time.time()
+        batch_train_time_min = (batch_train_time_t1 - batch_train_time_t0) / 60
 
         if batch_idx % constants.LOG_INTERVAL == 0:
-            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tBatch Loss: {:.6f}'.format(
+            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tBatch Loss: {:.6f}\tTime (min): {:.4f}'.format(
                   epoch, batch_idx * len(data), len(data_loader.dataset),
-                  100. * batch_idx / len(data_loader), loss.data[0]))
+                  100. * batch_idx / len(data_loader), loss.data[0], batch_train_time_min))
             sys.stdout.flush()
 
 
