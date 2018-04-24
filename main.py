@@ -41,7 +41,7 @@ test_dataset = Test(data, test_transformations)
 
 if torch.cuda.is_available():
     pin_memory = True
-    num_workers = 1
+    num_workers = 8 # VLI
 else:
     print('WARNING - Not using GPU.')
     pin_memory = False
@@ -129,7 +129,12 @@ sys.stdout.flush()
 def train_epoch(epoch, model, data_loader, optimizer):
     model.train()
 
-    for batch_idx, (data, target) in enumerate(data_loader):
+    batch_load_time_t0 = time.time()
+    curr_batch = enumerate(data_loader)
+    batch_load_time_t1 = time.time()
+    print('Batch Load Time (min): ' + str((batch_load_time_t1 - batch_load_time_t0) / 60))
+
+    for batch_idx, (data, target) in curr_batch:
         data, target = Variable(data), Variable(target)
 
         target = target.float()
@@ -157,7 +162,7 @@ def train_epoch(epoch, model, data_loader, optimizer):
         optimizer.step()
 
         if batch_idx % constants.LOG_INTERVAL == 0:
-            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tBatch Loss: {:.6f}'.format(
                   epoch, batch_idx * len(data), len(data_loader.dataset),
                   100. * batch_idx / len(data_loader), loss.data[0]))
             sys.stdout.flush()
@@ -207,7 +212,7 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
             best_params.write('Conv Relus: ' + str(model_args[6]) + '\n')
             best_params.write('FC Relus: ' + str(model_args[9]) + '\n')
             best_params.write('Using ' + str(constants.DAYS_PER_MONTH) + ' days per month.')
-            best_params.write('Using ' + str(constants.EPOCHS) + ' epochs.')
+            best_params.write('Using ' + str(state['epoch']) + ' epochs.')
             best_params.write(str(state['best_prec1']))
 
 
