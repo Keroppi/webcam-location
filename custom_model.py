@@ -72,8 +72,7 @@ class WebcamLocation(nn.Module):
         self.fc_sizes = fc_sizes
         self.fc_relus = fc_relus + [False] # Output layer doesn't need ReLu
 
-        # Example (2 hidden layers):
-        # self.linear_sizes = [2000, 200]
+
 
         # Compute output size of convolutions to get input to fc layers.
         self.first_fc_layer_size = self.get_conv_output(input_shape)
@@ -89,6 +88,8 @@ class WebcamLocation(nn.Module):
 
         # Example below for 2 hidden FC layers:
         '''
+        # Example (2 hidden layers):
+        linear_sizes = [2000, 200]
         self.fc1 = nn.Linear(first_fc_layer_size, linear_sizes[0])
         self.fc2 = nn.Linear(linear_sizes[0], linear_sizes[1])
         self.fc3 = nn.Linear(linear_sizes[1], 1)
@@ -110,8 +111,10 @@ class WebcamLocation(nn.Module):
     def get_conv_output(self, shape):
         batch_size = 1 # Not important.
         input = Variable(torch.rand(batch_size, *shape), requires_grad=False)
-        print('Is this random variable cuda? ' + str(input.is_cuda))
-        sys.stdout.flush()
+
+        #print('Is this random variable cuda? ' + str(input.is_cuda)) # False
+        #sys.stdout.flush()
+
         output_feat = self.forward_features(input)
         flattened_size = self.num_flat_features(output_feat)
 
