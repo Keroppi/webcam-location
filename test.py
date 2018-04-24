@@ -9,8 +9,8 @@ from torch.utils.data.dataset import Dataset
 # SMALL TEST CASE TO CHECK IF DATAPARALLEL FAILS HERE TOO.
 
 # Arbitrary input/output.
-input = torch.randn(600, 10000000)
-output = torch.randn(600, 1)
+input = torch.randn(400, 10000000)
+output = torch.randn(400, 1)
 
 class TestModule(nn.Module):
     def __init__(self):
@@ -29,6 +29,9 @@ class TestDataset(Dataset):
 
 dataset = TestDataset()
 
+
+print('Devices: {:.0f}'.format(torch.cuda.device_count()))
+sys.stdout.flush()
 if torch.cuda.is_available():
     loader = torch.utils.data.DataLoader(dataset, batch_size=6, num_workers=0, pin_memory=True)
 
