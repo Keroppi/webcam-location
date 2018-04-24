@@ -7,13 +7,13 @@ from torch.utils.data.dataset import Dataset
 # SMALL TEST CASE TO CHECK IF DATAPARALLEL FAILS HERE TOO.
 
 # Arbitrary input/output.
-input = torch.randn(100, 50000)
+input = torch.randn(100, 50000000)
 output = torch.randn(100, 1)
 
 class TestModule(nn.Module):
     def __init__(self):
         super(TestModule, self).__init__()
-        self.fc = nn.Linear(50000, 1)
+        self.fc = nn.Linear(50000000, 1)
 
     def forward(self, x):
         return self.fc(x)
