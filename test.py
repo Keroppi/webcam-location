@@ -1,3 +1,5 @@
+#!/srv/glusterfs/vli/.pyenv/shims/python
+
 import torch, sys, random
 import torch.nn as nn
 from torch.autograd import Variable
