@@ -139,11 +139,6 @@ def train_epoch(epoch, model, data_loader, optimizer):
             data = data.cuda()
             target = target.cuda()
 
-        batch_load_time_t1 = time.time()
-        batch_load_time_min = (batch_load_time_t1 - batch_train_time_t0) / 60
-        print('Load Time (min): {:.4f}'.format(batch_load_time_min))
-        sys.stdout.flush()
-
         if batch_idx == 0:
             vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
             print('V-Memory Before Train Forward: ' + str(epoch) + '\n' + str(vmem.stdout).replace('\\n', '\n'))
@@ -165,9 +160,9 @@ def train_epoch(epoch, model, data_loader, optimizer):
         batch_train_time_min = (batch_train_time_t1 - batch_train_time_t0) / 60
 
         if batch_idx % constants.LOG_INTERVAL == 0:
-            print('Train Epoch: {} [{}/{} ({:.0f}%)] | Batch Loss: {:.4f} | Total Time (min): {:.4f} | Load Time (min): {:.4f}'.format(
+            print('Train Epoch: {} [{}/{} ({:.0f}%)] | Batch Loss: {:.4f} | Total Time (min): {:.4f}'.format(
                   epoch, batch_idx * len(data), len(data_loader.dataset),
-                  100. * batch_idx / len(data_loader), loss.data[0], batch_train_time_min, batch_load_time_min))
+                  100. * batch_idx / len(data_loader), loss.data[0], batch_train_time_min))
             sys.stdout.flush()
 
 

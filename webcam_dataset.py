@@ -242,6 +242,7 @@ class Train(Dataset):
         img_paths = self.data[index].img_paths
 
         #img_stack = np.asarray([])
+        #stack_t0 = time.time()
         img_stack = [0] * constants.IMAGES_PER_DAY
         for i, image in enumerate(img_paths):
             #img_rgb = np.asarray(PIL.Image.open(image))
@@ -249,13 +250,19 @@ class Train(Dataset):
             img_stack[i] = img
             #img_stack = np.stack(img_stack, img), axis=2) if img_stack.size else img # should this be 3D stack or 4D?
         #img_stack = np.stack(img_stack, axis=0)
+        #stack_t1 = time.time()
+        #print('Open and Stack Img Time (s): {:.3f}'.format(stack_t1 - stack_t0))
 
         #print(img_stack.shape)
         #frogs = img_stack.reshape(height, width, 32 * 3)
         #print(np.shares_memory(img_stack, frogs))
 
+        transform_t0 = time.time()
         if self.transforms is not None:
             img_stack = self.transforms(img_stack)
+        transform_t1 = time.time()
+        print('Transform Time (s): {:.3f}'.format(transform_t1 - transform_t0))
+        sys.stdout.flush()
 
         if constants.LEARNING_SUNRISE:
             return (img_stack, self.sunrise_label[index])

@@ -39,6 +39,7 @@ class RandomResize():
         img_stack = [0] * constants.IMAGES_PER_DAY
         for i in range(constants.IMAGES_PER_DAY):
             img_stack[i] = skimage.transform.resize(sample[i], (new_height, new_width, channels), preserve_range=True, mode='reflect')
+            #print(np.shares_memory(img_stack[i], sample[i]))
             #img_stack[i] = skimage.transform.rescale(sample[i], new_ratio, preserve_range=True, mode='reflect')
 
             #patch = PIL.Image.fromarray(np.uint8(img_stack[i]))
@@ -49,6 +50,20 @@ class RandomResize():
         return img_stack
 
 class RandomPatch():
+    def crop_patch(self, sample):
+        height, width, _ = sample[0].shape
+
+        random_w = random.randint(0, width - self.output_size[1])  # To consistently look at one patch (instead of random patches).
+        random_h = random.randint(0, height - self.output_size[0])  # To consistently look at one patch (instead of random patches).
+
+        img_stack = [0] * constants.IMAGES_PER_DAY
+        for i in range(constants.IMAGES_PER_DAY):
+            img_stack[i] = sample[i][random_h:random_h + self.output_size[0], random_w:random_w + self.output_size[1], :]
+            #print(img_stack[i].shape)
+            #print(np.shares_memory(img_stack[i], sample[i]))
+
+        return img_stack
+
     def __init__(self, output_size): # int for square, else (height, width)
         assert isinstance(output_size, (int, tuple))
         if isinstance(output_size, int):
@@ -58,19 +73,22 @@ class RandomPatch():
             self.output_size = output_size
 
     def __call__(self, sample):
-        random_int = random.randint(0, 2 ** 32 - 1)  # To consistently look at one patch (instead of random patches).
+        #random_int = random.randint(0, 2 ** 32 - 1)  # To consistently look at one patch (instead of random patches).
 
-        img_stack = [0] * constants.IMAGES_PER_DAY
-        for i in range(constants.IMAGES_PER_DAY):
+        #img_stack = [0] * constants.IMAGES_PER_DAY
+        #for i in range(constants.IMAGES_PER_DAY):
             # cv2.imwrite('/home/vli/patches/test' + str(int(i / constants.NUM_CHANNELS)) + '.jpg', sample[i])
 
-            img_stack[i] = extract_patches_2d(sample[i], self.output_size, max_patches=1, random_state=random_int)[0]
+            #img_stack[i] = extract_patches_2d(sample[i], self.output_size, max_patches=1, random_state=random_int)[0]
+            #print(np.shares_memory(img_stack[i], sample[i]))
             # cv2.imwrite('/home/vli/patches/test' + str(i) + '.jpg', patch)
             #patch = PIL.Image.fromarray(np.uint8(img_stack[i]))
             #patch.save('/home/vli/patches/sample' + str(i) + '.jpg')
         #img_stack = np.stack(img_stack, axis=0)
 
-        return img_stack
+        return self.crop_patch(sample)
+
+        #return img_stack
 
 class ToTensor():
     def __call__(self, sample):
