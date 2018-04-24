@@ -109,8 +109,6 @@ if torch.cuda.is_available():
     train_loss_fn = train_loss_fn.cuda()
     test_loss_fn = test_loss_fn.cuda()
 
-
-
 optimizer = torch.optim.Adagrad(model.parameters(), lr=1e-3)
 start_epoch = 0
 best_error = float('inf')
@@ -205,7 +203,7 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
 
     torch.save(state, directory + prefix + filename)
     if is_best:
-        shutil.copyfile(directory + filename, directory + prefix + 'model_best.pth.tar')
+        shutil.copyfile(directory + prefix + filename, directory + prefix + 'model_best.pth.tar')
         with open(directory + prefix + 'best_params.txt', 'w') as best_params:
             best_params.write(str(model.network) + '\n')
             best_params.write('Max Pooling: ' + str(model_args[5]) + '\n')
