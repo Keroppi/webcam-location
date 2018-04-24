@@ -264,12 +264,12 @@ class Train(Dataset):
         #frogs = img_stack.reshape(height, width, 32 * 3)
         #print(np.shares_memory(img_stack, frogs))
 
-        transform_t0 = time.time()
+        #transform_t0 = time.time()
         if self.transforms is not None:
             img_stack = self.transforms(img_stack)
-        transform_t1 = time.time()
-        print('Transform Time (s): {:.3f}'.format(transform_t1 - transform_t0))
-        sys.stdout.flush()
+        #transform_t1 = time.time()
+        #print('Transform Time (s): {:.3f}'.format(transform_t1 - transform_t0))
+        #sys.stdout.flush()
 
         if constants.LEARNING_SUNRISE:
             return (img_stack, self.sunrise_label[index])

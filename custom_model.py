@@ -97,7 +97,7 @@ class WebcamLocation(nn.Module):
         if torch.cuda.device_count() > 1:
             print('Wrapped in DataParallel')
             sys.stdout.flush()
-            self.network = torch.nn.DataParallel(nn.Sequential(*(self.conv_layers + self.fc_layers)))
+            self.network = torch.nn.DataParallel(nn.Sequential(*(self.conv_layers + self.fc_layers)), device_ids=list(range(constants.GPUS)))
         else:
             print('Single GPU module')
             sys.stdout.flush()
