@@ -1,4 +1,4 @@
-import os, sys, calendar, glob, datetime, time, functools, numpy as np, constants, PIL, hashlib, torch, subprocess
+import os, sys, calendar, glob, datetime, time, functools, numpy as np, constants, PIL, hashlib, torch, subprocess, copy
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from day import Day
 from torch.utils.data.dataset import Dataset
@@ -145,6 +145,13 @@ class WebcamData():
                     for size in constants.SIZE:
                         image_dir = day_dir + size + '/'
                         images = glob.glob(image_dir + '*.jpg')
+
+                        # Check for malformed images of size 0.
+                        checked_images = []
+                        for image in images:
+                            if os.path.getsize(image) > 0:
+                                checked_images.append(image)
+                        images = checked_images
 
                         done = glob.glob(image_dir + '*.txt')
                         if len(done) < 1: # no done.txt file, so skip it
