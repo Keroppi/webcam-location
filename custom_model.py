@@ -94,7 +94,15 @@ class WebcamLocation(nn.Module):
         self.fc3 = nn.Linear(linear_sizes[1], 1)
         '''
 
-        self.network = nn.Sequential(*(self.conv_layers + self.fc_layers))
+        if torch.cuda.device_count() > 1:
+            print('Wrapped in DataParallel')
+            sys.stdout.flush()
+            self.network = torch.nn.DataParallel(nn.Sequential(*(self.conv_layers + self.fc_layers)))
+        else:
+            print('Single GPU module')
+            sys.stdout.flush()
+            self.network = nn.Sequential(*(self.conv_layers + self.fc_layers))
+
         #self.features = nn.Sequential(*self.conv_layers)
         #self.classifier = nn.Sequential(*self.fc_layers)
 
