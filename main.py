@@ -41,7 +41,7 @@ test_dataset = Test(data, test_transformations)
 
 if torch.cuda.is_available():
     pin_memory = True
-    num_workers = 8 # VLI
+    num_workers = constants.NUM_LOADER_WORKERS
 else:
     print('WARNING - Not using GPU.')
     pin_memory = False
