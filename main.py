@@ -162,7 +162,6 @@ def train_epoch(epoch, model, data_loader, optimizer):
             sys.stdout.flush()
 
         optimizer.step()
-        del loss # https://discuss.pytorch.org/t/best-practices-for-maximum-gpu-utilization/13863/5
 
         batch_train_time_t1 = time.time()
         batch_train_time_min = (batch_train_time_t1 - batch_train_time_t0) / 60
@@ -172,6 +171,8 @@ def train_epoch(epoch, model, data_loader, optimizer):
                   epoch, batch_idx * len(data), len(data_loader.dataset),
                   100. * batch_idx / len(data_loader), loss.data[0], batch_train_time_min))
             sys.stdout.flush()
+
+        del loss  # https://discuss.pytorch.org/t/best-practices-for-maximum-gpu-utilization/13863/5
 
 
 

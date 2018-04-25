@@ -11,6 +11,8 @@ class WebcamLocation(nn.Module):
                  input_shape=(3, 32, 128, 128)):
         super(WebcamLocation, self).__init__()
 
+        ### Convolutional layers ###
+
         self.num_conv_layers = num_conv_layers
         self.kernel_sizes = kernel_sizes
         self.output_channels = output_channels
@@ -78,6 +80,10 @@ class WebcamLocation(nn.Module):
                                padding=self.paddings[3])
         '''
 
+        self.features = nn.Sequential(*self.conv_layers)
+
+        ### Fully connected layers ###
+
         self.num_hidden_fc_layers = num_hidden_fc_layers
         self.fc_sizes = fc_sizes
         self.fc_relus = fc_relus + [False] # Output layer doesn't need ReLu
@@ -114,7 +120,7 @@ class WebcamLocation(nn.Module):
 
         #self.network = nn.Sequential(*(self.conv_layers + self.fc_layers))
 
-        self.features = nn.Sequential(*self.conv_layers)
+
         self.regressor = nn.Sequential(*self.fc_layers)
         #print(self.features)
         #print(self.regressor)
@@ -123,27 +129,25 @@ class WebcamLocation(nn.Module):
 
     # Used to get output size of convolutions.
     def get_conv_output(self, shape):
+        self.features.eval()
         batch_size = 1 # Not important.
         input = Variable(torch.rand(batch_size, *shape), requires_grad=False)
-
         #print('Is this random variable cuda? ' + str(input.is_cuda)) # False
         #sys.stdout.flush()
+        output_feat = self.features(input)
+        self.features.train()
+        return self.num_flat_features(output_feat)
 
-        output_feat = self.forward_features(input)
-        flattened_size = self.num_flat_features(output_feat)
+    #def forward_features(self, x):
+    #    for i in range(self.num_conv_layers):
+    #        x = self.conv_layers[i](x)
+    #        if self.conv_relus[i]:
+    #            x = F.relu(x)
 
-        return flattened_size
+    #       if self.max_poolings[i] is not None:
+    #            x = F.max_pool3d(x, self.max_poolings[i])
 
-    def forward_features(self, x):
-        for i in range(self.num_conv_layers):
-            x = self.conv_layers[i](x)
-            if self.conv_relus[i]:
-                x = F.relu(x)
-
-            if self.max_poolings[i] is not None:
-                x = F.max_pool3d(x, self.max_poolings[i])
-
-        return x
+    #    return x
 
     def forward(self, x):
         # Convolutional layers.
@@ -211,7 +215,7 @@ def RandomizeArgs():
     else:
         num_hidden_fc_layers = random.randint(1, 1)
 
-    fc_sizes = [random.randint(20 + x * 20, 100 + x * 20) for x in range(num_hidden_fc_layers - 1, 0, -1)]
+    fc_sizes = [random.randint(20 + x * 20, 120 + x * 20) for x in range(num_hidden_fc_layers - 1, -1, -1)]
 
     #for i in range(1, num_hidden_fc_layers): # Decreasing width of layers.
     #    fc_sizes[i] = int(fc_sizes[i - 1] * 0.8)

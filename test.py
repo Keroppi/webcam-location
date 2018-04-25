@@ -6,7 +6,7 @@ from torch.autograd import Variable
 import os, sys, calendar, glob, datetime, time, functools, numpy as np, constants, PIL, hashlib, torch, subprocess, copy, torchvision, shutil, argparse
 from torch.utils.data.dataset import Dataset
 
-# This file is just for random testing. 
+# This file is just for random testing.
 
 # Arbitrary input/output.
 input = torch.randn(400, 3, 32, 128, 128)
