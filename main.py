@@ -218,12 +218,14 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
     if is_best:
         shutil.copyfile(directory + prefix + filename, directory + prefix + 'model_best.pth.tar')
         with open(directory + prefix + 'best_params.txt', 'w') as best_params:
-            best_params.write(str(model.network) + '\n')
+            best_params.write(str(model.features) + '\n')
+            best_params.write(str(model.regressor) + '\n')
             best_params.write('Max Pooling: ' + str(model_args[5]) + '\n')
             best_params.write('Conv Relus: ' + str(model_args[6]) + '\n')
             best_params.write('FC Relus: ' + str(model_args[9]) + '\n')
-            best_params.write('Using ' + str(constants.DAYS_PER_MONTH) + ' days per month.')
-            best_params.write('Using ' + str(state['epoch']) + ' epochs.')
+            best_params.write('Using ' + str(constants.DAYS_PER_MONTH) + ' days per month.\n')
+            best_params.write('Using ' + str(state['epoch']) + ' epochs.\n')
+            best_params.write('Using batch size of ' + str(constants.BATCH_SIZE) + '.\n')
             best_params.write(str(state['best_prec1']))
 
 
