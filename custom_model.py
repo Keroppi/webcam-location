@@ -1,4 +1,4 @@
-import torch, sys, random
+import torch, sys, random, pickle
 import torch.nn as nn
 from torch.autograd import Variable
 import torch.nn.functional as F
@@ -12,13 +12,15 @@ class WebcamLocation(nn.Module):
         super(WebcamLocation, self).__init__()
 
         self.num_conv_layers = num_conv_layers
-        self.conv_layers = [0] * self.num_conv_layers # Initialize
         self.kernel_sizes = kernel_sizes
         self.output_channels = output_channels
         self.paddings = paddings
         self.strides = strides
+        self.num_pool_layers = len(max_poolings) - max_poolings.count(None)
         self.max_poolings = max_poolings
+        self.num_conv_relu_layers = conv_relus.count(True)
         self.conv_relus = conv_relus
+        self.conv_layers = [0] * (self.num_conv_layers + self.num_pool_layers + self.num_conv_relu_layers) # Initialize
 
         # Example below for 4 CNN layers:
         '''
@@ -33,19 +35,28 @@ class WebcamLocation(nn.Module):
         self.conv_relus = [True, True, False, True]
         '''
 
+        j = 0
         for i in range(self.num_conv_layers):
             if i == 0:
-                self.conv_layers[i] = nn.Conv3d(constants.NUM_CHANNELS,
+                self.conv_layers[j] = nn.Conv3d(constants.NUM_CHANNELS,
                                                 self.output_channels[i],
                                                 kernel_size=self.kernel_sizes[i],
                                                 stride=self.strides[i],
                                                 padding=self.paddings[i])
             else:
-                self.conv_layers[i] = nn.Conv3d(self.output_channels[i - 1],
+                self.conv_layers[j] = nn.Conv3d(self.output_channels[i - 1],
                                                 self.output_channels[i],
                                                 kernel_size=self.kernel_sizes[i],
                                                 stride=self.strides[i],
                                                 padding=self.paddings[i])
+            j += 1
+
+            if self.conv_relus[i]:
+                self.conv_layers[j] = nn.ReLU()
+                j += 1
+            if self.max_poolings[i] is not None:
+                self.conv_layers[j] = nn.MaxPool3d(self.max_poolings[i])
+                j += 1
 
         # Example below for 4 CNN layers:
         '''
@@ -68,23 +79,29 @@ class WebcamLocation(nn.Module):
         '''
 
         self.num_hidden_fc_layers = num_hidden_fc_layers
-        self.fc_layers = [0] * (self.num_hidden_fc_layers + 1) # Initialize
         self.fc_sizes = fc_sizes
         self.fc_relus = fc_relus + [False] # Output layer doesn't need ReLu
-
-
+        self.fc_layers = [0] * (self.num_hidden_fc_layers + 1 + self.fc_relus.count(True))
 
         # Compute output size of convolutions to get input to fc layers.
         self.first_fc_layer_size = self.get_conv_output(input_shape)
 
         # an affine operation: y = Wx + b
+        j = 0
         for i in range(self.num_hidden_fc_layers + 1):
             if i == 0:
-                self.fc_layers[i] = nn.Linear(self.first_fc_layer_size, self.fc_sizes[0])
+                self.fc_layers[j] = nn.Linear(self.first_fc_layer_size, self.fc_sizes[0])
             elif i < self.num_hidden_fc_layers:
-                self.fc_layers[i] = nn.Linear(self.fc_sizes[i - 1], self.fc_sizes[i])
+                self.fc_layers[j] = nn.Linear(self.fc_sizes[i - 1], self.fc_sizes[i])
             else:
-                self.fc_layers[i] = nn.Linear(self.fc_sizes[i - 1], 1)
+                self.fc_layers[j] = nn.Linear(self.fc_sizes[i - 1], 1)
+
+            j += 1
+
+            if self.fc_relus[i]:
+                self.fc_layers[j] = nn.ReLU()
+                j += 1
+
 
         # Example below for 2 hidden FC layers:
         '''
@@ -95,17 +112,14 @@ class WebcamLocation(nn.Module):
         self.fc3 = nn.Linear(linear_sizes[1], 1)
         '''
 
-        if torch.cuda.device_count() > 1:
-            print('Wrapped in DataParallel.')
-            sys.stdout.flush()
-            self.network = torch.nn.DataParallel(nn.Sequential(*(self.conv_layers + self.fc_layers)))
-        else:
-            print('Single or no GPU module.')
-            sys.stdout.flush()
-            self.network = nn.Sequential(*(self.conv_layers + self.fc_layers))
+        #self.network = nn.Sequential(*(self.conv_layers + self.fc_layers))
 
-        #self.features = nn.Sequential(*self.conv_layers)
-        #self.classifier = nn.Sequential(*self.fc_layers)
+        self.features = nn.Sequential(*self.conv_layers)
+        self.regressor = nn.Sequential(*self.fc_layers)
+        #print(self.features)
+        #print(self.regressor)
+        #sys.stdout.flush()
+
 
     # Used to get output size of convolutions.
     def get_conv_output(self, shape):
@@ -133,7 +147,8 @@ class WebcamLocation(nn.Module):
 
     def forward(self, x):
         # Convolutional layers.
-        x = self.forward_features(x)
+        #x = self.forward_features(x)
+        x = self.features(x)
 
         '''
         # Max pooling over a (2, 2) window
@@ -151,11 +166,11 @@ class WebcamLocation(nn.Module):
         x = x.view(-1, self.first_fc_layer_size)
 
         # Fully connected layers.
-        for i in range(self.num_hidden_fc_layers + 1):
-            x = self.fc_layers[i](x)
+        #for i in range(self.num_hidden_fc_layers + 1):
+        #    x = self.fc_layers[i](x)
 
-            if self.fc_relus[i]:
-                x = F.relu(x)
+        #    if self.fc_relus[i]:
+        #        x = F.relu(x)
 
         '''
         x = F.relu(self.fc1(x))
@@ -163,7 +178,7 @@ class WebcamLocation(nn.Module):
         x = self.fc3(x)
         '''
 
-        return x
+        return self.regressor(x)
 
 
     def num_flat_features(self, x):
@@ -196,15 +211,25 @@ def RandomizeArgs():
     else:
         num_hidden_fc_layers = random.randint(1, 1)
 
-    fc_sizes = [random.randint(1000, 5000)] * num_hidden_fc_layers #[random.randint(30, 3000) for x in range(num_hidden_fc_layers)]
+    fc_sizes = [random.randint(20 + x * 20, 100 + x * 20) for x in range(num_hidden_fc_layers - 1, 0, -1)]
 
-    for i in range(1, num_hidden_fc_layers): # Decreasing width of layers.
-        fc_sizes[i] = int(fc_sizes[i - 1] / 2)
+    #for i in range(1, num_hidden_fc_layers): # Decreasing width of layers.
+    #    fc_sizes[i] = int(fc_sizes[i - 1] * 0.8)
 
     fc_relus = [True if random.randint(0, 1) == 1 else False for x in range(num_hidden_fc_layers)]
 
-    return (conv_num_layers, output_channels, kernel_sizes, paddings, strides, max_poolings, conv_relus,
-            num_hidden_fc_layers, fc_sizes, fc_relus,
-            (constants.NUM_CHANNELS, constants.IMAGES_PER_DAY, constants.PATCH_SIZE[0], constants.PATCH_SIZE[1]))
+    parameters = (conv_num_layers, output_channels, kernel_sizes, paddings, strides, max_poolings, conv_relus,
+                  num_hidden_fc_layers, fc_sizes, fc_relus,
+                  (constants.NUM_CHANNELS, constants.IMAGES_PER_DAY, constants.PATCH_SIZE[0], constants.PATCH_SIZE[1]))
+
+    # Pickle to find batch size later.
+    if constants.CLUSTER:
+        dir = '/srv/glusterfs/vli/pickle/'
+    else:
+        dir = '/home/vli/pickle/'
+    with open(dir + 'model_structure.pkl', 'wb') as f:
+        pickle.dump(parameters, f)
+
+    return parameters
 
 

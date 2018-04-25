@@ -25,6 +25,8 @@ sys.stdout.flush()
 parser = argparse.ArgumentParser(description='Webcam Locator')
 parser.add_argument('--resume', default='', type=str, metavar='PATH',
                     help='path to latest checkpoint (default: none)')
+parser.add_argument('--model_args', default='', type=str, metavar='PATH',
+                    help='path to pickled model args (default: none)')
 args = parser.parse_args()
 
 if not constants.CLUSTER:
@@ -102,6 +104,9 @@ train_loss_fn = torch.nn.MSELoss()
 test_loss_fn = torch.nn.MSELoss(size_average=False)
 
 if torch.cuda.is_available():
+    if torch.cuda.device_count() > 1:
+        model = torch.nn.DataParallel(model)
+
     #model = model.cuda()
     model.cuda()
     train_loss_fn = train_loss_fn.cuda() # Probably does nothing.
