@@ -1,6 +1,6 @@
 #!/srv/glusterfs/vli/.pyenv/shims/python
 
-import torch, torchvision, os, time, shutil, os, argparse, subprocess, sys
+import torch, torchvision, os, time, shutil, os, argparse, subprocess, sys, pickle
 
 sys.path.append('/home/vli/webcam-location') # For importing .py files in the same directory on the cluster.
 import constants
@@ -25,7 +25,7 @@ sys.stdout.flush()
 parser = argparse.ArgumentParser(description='Webcam Locator')
 parser.add_argument('--resume', default='', type=str, metavar='PATH',
                     help='path to latest checkpoint (default: none)')
-parser.add_argument('--model_args', default='', type=str, metavar='PATH',
+parser.add_argument('--load_model_args', default='', type=str, metavar='PATH',
                     help='path to pickled model args (default: none)')
 args = parser.parse_args()
 
@@ -67,38 +67,43 @@ sys.stdout.flush()
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
-model_t0 = time.time()
-while True: # Try random models until we get one where the convolutions produce a valid size.
-    try:
-        model_args = RandomizeArgs()
+if not args.load_model_args:
+    model_t0 = time.time()
+    while True: # Try random models until we get one where the convolutions produce a valid size.
+        try:
+            model_args = RandomizeArgs()
+            model = WebcamLocation(*model_args)
+            model_memory_mb = count_parameters(model) * 4 / 1000 / 1000
+
+            if constants.CLUSTER:
+                if model_memory_mb < 2000: # Only proceed if the model's memory is less than 2 GB
+                    print('Model memory (MB): ' + str(model_memory_mb))
+                    sys.stdout.flush()
+
+                    break
+            else:
+                if model_memory_mb < 200:
+                    print('Model memory (MB): ' + str(model_memory_mb))
+                    sys.stdout.flush()
+
+                    break
+        except RuntimeError as e: # Very hacky.
+            if str(e).find('Output size is too small') >= 0: # Invalid configuration.
+                pass
+            elif str(e).find('not enough memory: you tried to allocate') >= 0: # Configuration uses too much memory.
+                pass
+            elif str(e).find("Kernel size can't greater than actual input size") >= 0: # Kernel is bigger than input.
+                pass
+            else:
+                raise e
+
+    model_t1 = time.time()
+    print('Time to find a valid model (s): ' + str(model_t1 - model_t0))
+    sys.stdout.flush()
+else:
+    with open(args.load_model_args, 'rb') as pkl_f:
+        model_args = pickle.load(pkl_f)
         model = WebcamLocation(*model_args)
-        model_memory_mb = count_parameters(model) * 4 / 1000 / 1000
-
-        if constants.CLUSTER:
-            if model_memory_mb < 2000: # Only proceed if the model's memory is less than 2 GB
-                print('Model memory (MB): ' + str(model_memory_mb))
-                sys.stdout.flush()
-
-                break
-        else:
-            if model_memory_mb < 200:
-                print('Model memory (MB): ' + str(model_memory_mb))
-                sys.stdout.flush()
-
-                break
-    except RuntimeError as e: # Very hacky.
-        if str(e).find('Output size is too small') >= 0: # Invalid configuration.
-            pass
-        elif str(e).find('not enough memory: you tried to allocate') >= 0: # Configuration uses too much memory.
-            pass
-        elif str(e).find("Kernel size can't greater than actual input size") >= 0: # Kernel is bigger than input.
-            pass
-        else:
-            raise e
-
-model_t1 = time.time()
-print('Time to find a valid model (s): ' + str(model_t1 - model_t0))
-sys.stdout.flush()
 
 train_loss_fn = torch.nn.MSELoss()
 test_loss_fn = torch.nn.MSELoss(size_average=False)
