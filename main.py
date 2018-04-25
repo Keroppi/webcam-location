@@ -132,10 +132,11 @@ if args.resume:
         optimizer.load_state_dict(checkpoint['optimizer'])
         print("=> loaded checkpoint '{}' (epoch {})"
               .format(args.resume, checkpoint['epoch']))
+        sys.stdout.flush()
     else:
         print("=> no checkpoint found at '{}'".format(args.resume))
+        sys.stdout.flush()
         sys.exit()
-sys.stdout.flush()
 
 def train_epoch(epoch, model, data_loader, optimizer):
     model.train()
