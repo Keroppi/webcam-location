@@ -54,7 +54,8 @@ def train_epoch(epoch, model, data_loader, optimizer):
             target = target.cuda()
 
         print('Batch idx: ' + str(batch_idx))
-        print('Before forward.')
+        vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
+        print('V-Memory Before: \n' + str(vmem.stdout).replace('\\n', '\n'))
         sys.stdout.flush()
 
         optimizer.zero_grad()
@@ -62,7 +63,8 @@ def train_epoch(epoch, model, data_loader, optimizer):
         loss = loss_fn(output, target)
         loss.backward()
 
-        print('After backward.')
+        vmem = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE)
+        print('V-Memory After: \n' + str(vmem.stdout).replace('\\n', '\n'))
         sys.stdout.flush()
 
         optimizer.step()
