@@ -134,8 +134,8 @@ if args.resume:
               .format(args.resume, checkpoint['epoch']))
     else:
         print("=> no checkpoint found at '{}'".format(args.resume))
+        sys.exit()
 sys.stdout.flush()
-
 
 def train_epoch(epoch, model, data_loader, optimizer):
     model.train()
