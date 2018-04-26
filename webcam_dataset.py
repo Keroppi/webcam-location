@@ -253,7 +253,7 @@ class Train(Dataset):
         img_stack = [0] * constants.IMAGES_PER_DAY
         for i, image in enumerate(img_paths):
             #img_rgb = np.asarray(PIL.Image.open(image))
-            img = np.asarray(PIL.Image.open(image).convert('YCbCr'))
+            img = np.asarray(PIL.Image.open(image).convert('YCbCr'), dtype=np.float32)
             img_stack[i] = img
             #img_stack = np.stack(img_stack, img), axis=2) if img_stack.size else img # should this be 3D stack or 4D?
         #img_stack = np.stack(img_stack, axis=0)
@@ -294,7 +294,7 @@ class Test(Dataset):
         img_stack = [0] * constants.IMAGES_PER_DAY
         for i, image in enumerate(img_paths):
             #img_rgb = np.asarray(PIL.Image.open(image))
-            img = np.asarray(PIL.Image.open(image).convert('YCbCr'))
+            img = np.asarray(PIL.Image.open(image).convert('YCbCr'), dtype=np.float32)
             img_stack[i] = img
         #img_stack = np.stack(img_stack, axis=0)
 
@@ -325,7 +325,7 @@ class Validation(Dataset):
         img_stack = [0] * constants.IMAGES_PER_DAY
         for i, image in enumerate(img_paths):
             #img_rgb = np.asarray(PIL.Image.open(image)) #cv2.imread(image)
-            img = np.asarray(PIL.Image.open(image).convert('YCbCr'))
+            img = np.asarray(PIL.Image.open(image).convert('YCbCr'), dtype=np.float32)
             img_stack[i] = img
         #img_stack = np.stack(img_stack, axis=0)
 

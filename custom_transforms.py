@@ -90,6 +90,20 @@ class RandomPatch():
 
         #return img_stack
 
+class Center():
+    def __call__(self, sample):
+        channel_means = np.zeros((constants.PATCH_SIZE[0], constants.PATCH_SIZE[1], constants.NUM_CHANNELS), dtype=np.float32)
+
+        for i in range(constants.IMAGES_PER_DAY):
+            channel_means = channel_means + sample[i]
+
+        channel_means = channel_means / constants.IMAGES_PER_DAY
+
+        for i in range(constants.IMAGES_PER_DAY):
+            sample[i] = sample[i] - channel_means
+
+        return sample
+
 class ToTensor():
     def __call__(self, sample):
         img_stack = [0] * constants.IMAGES_PER_DAY
@@ -108,7 +122,7 @@ class ToTensor():
         #print(transposed.shape)
 
         torch_image = torch.from_numpy(transposed)
-        torch_image = torch_image.float().div(255) # scale to [0, 1], and create float tensor
+        torch_image = torch_image.float().div(255) # scale to [0, 1]
         #torch_image = torch.from_numpy(reshaped)
 
         #print(sample[5, :, :, 1])
