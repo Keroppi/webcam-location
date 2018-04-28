@@ -1,6 +1,5 @@
 import constants
 import numpy as np, sys, PIL, math, time, datetime
-from sklearn.feature_extraction.image import extract_patches_2d
 
 class Day():
     def get_local_time(self, idx):
@@ -42,7 +41,7 @@ class Day():
                 max_sunset_idx = sunset_idx
                 break
 
-            sunset_idx +=1
+            sunset_idx += 1
 
         if max_sunrise_idx is None: # Past the last image.
             sunrise_idx = constants.IMAGES_PER_DAY - 1
@@ -62,7 +61,7 @@ class Day():
             sunset_idx += extra
         elif max_sunset_idx == 0:
             sunset_idx = 0
-            extra = (sunset- times[0]) / time_diff
+            extra = (sunset - times[0]) / time_diff
             sunset_idx += extra
         else:
             remainder = (sunset - times[max_sunset_idx - 1]) / (times[max_sunset_idx] - times[max_sunset_idx - 1])
@@ -91,7 +90,6 @@ class Day():
         self.mali_solar_noon = mali_solar_noon
         self.img_paths = img_paths
         self.time_offset = time_offset # Time zone offset in seconds.
-
 
         # Determine height / width
         # Perhaps unnecessary?
