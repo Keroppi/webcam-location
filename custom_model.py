@@ -193,18 +193,18 @@ class WebcamLocation(nn.Module):
         return num_features
 
 
-def RandomizeArgs():
+def RandomizeArgs(SGE_TASK_ID):
     conv_num_layers = random.randint(3, 6)
 
-    kernel_sizes = [(random.randint(1, 4), random.randint(2, 6), random.randint(2, 6)) for x in range(conv_num_layers)]
+    kernel_sizes = [(1, random.randint(2, 6), random.randint(2, 6))] + [(random.randint(1, 4), random.randint(2, 6), random.randint(2, 6)) for x in range(conv_num_layers - 1)]
 
     if constants.CLUSTER:
-        output_channels = [random.randint(5, 50) for x in range(conv_num_layers)]
+        output_channels = [random.randint(8, 64) for x in range(conv_num_layers)]
     else:
         output_channels = [random.randint(1, 1) for x in range(conv_num_layers)]
 
     paddings = [(0, random.randint(0, 2), random.randint(0, 2)) for x in range(conv_num_layers)]
-    strides = [(random.randint(1, 4), random.randint(1, 2), random.randint(1, 2)) for x in range(conv_num_layers)]
+    strides = [(1, random.randint(1, 2), random.randint(1, 2))] + [(random.randint(1, 4), random.randint(1, 2), random.randint(1, 2)) for x in range(conv_num_layers - 1)]
     max_poolings = [(random.randint(1, 2), random.randint(2, 4), random.randint(2, 4))
                     if random.randint(1, conv_num_layers) >= 2 else None # On average one layer has no max pooling.
                     for x in range(conv_num_layers)]
@@ -231,7 +231,7 @@ def RandomizeArgs():
         dir = '/srv/glusterfs/vli/pickle/'
     else:
         dir = '/home/vli/pickle/'
-    with open(dir + 'model_structure.pkl', 'wb') as f:
+    with open(dir + 'model_structure' + SGE_TASK_ID + '.pkl', 'wb') as f:
         pickle.dump(parameters, f)
 
     return parameters

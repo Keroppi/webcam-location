@@ -1,11 +1,9 @@
-import torch, torchvision, os, datetime, time, math, pandas as pd
+import torch, torchvision, os, datetime, time, math, pandas as pd, sys
 import constants
 from webcam_dataset import WebcamData
 from webcam_dataset import Test
 from custom_transforms import Resize, RandomPatch, ToTensor
 from torch.autograd import Variable
-
-constants.CLUSTER = False # VLI
 
 if constants.CLUSTER:
     directory = '/srv/glusterfs/vli/models/best/'
@@ -120,6 +118,7 @@ places_lat_lng = {}
 for key in places:
     places_lat_lng[key] = (places[key][0] / places[key][2], places[key][1] / places[key][2])
 
+average_dist = 0
 for i in range(data.types['test']):
     place = days[i].place
     actual_lat = days[i].lat
@@ -145,5 +144,9 @@ for i in range(data.types['test']):
            math.cos(pred_lat_rad) * math.cos(actual_lat_rad) * math.sin(diff_lng_rad / 2) ** 2
     temp1 = 2 * math.atan2(math.sqrt(temp), math.sqrt(1 - temp))
     distance = radius_of_earth * temp1 # km?
+    average_dist += distance
+    #print(distance)
 
-    print(distance)
+average_dist /= len(test_loader.dataset)
+print(average_dist)
+sys.stdout.flush()

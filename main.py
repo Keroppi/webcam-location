@@ -16,7 +16,10 @@ from torch.autograd import Variable
 if constants.CLUSTER:
     d = dict(os.environ)
     print('SGE_GPU: ' + d['SGE_GPU'])
+    SGE_TASK_ID = os.environ.get('SGE_TASK_ID')
     sys.stdout.flush()
+else:
+    SGE_TASK_ID = ''
 
 #print('Current Device(s): ' + str(torch.cuda.current_device()))
 print('Device Count: ' + str(torch.cuda.device_count()))
@@ -69,7 +72,7 @@ if not args.load_model_args:
     model_t0 = time.time()
     while True: # Try random models until we get one where the convolutions produce a valid size.
         try:
-            model_args = RandomizeArgs()
+            model_args = RandomizeArgs(SGE_TASK_ID)
             model = WebcamLocation(*model_args)
             model_memory_mb = count_parameters(model) * 4 / 1000 / 1000
 
@@ -202,7 +205,7 @@ def test_epoch(model, data_loader):
 
     return test_loss
 
-def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
+def save_checkpoint(state, is_best, filename='checkpoint' + SGE_TASK_ID + '.pth.tar'):
     if constants.CLUSTER:
         directory = '/srv/glusterfs/vli/models/'
     else:
@@ -216,8 +219,8 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
 
     torch.save(state, directory + prefix + filename)
     if is_best:
-        shutil.copyfile(directory + prefix + filename, directory + prefix + 'model_best.pth.tar')
-        with open(directory + prefix + 'best_params.txt', 'w') as best_params:
+        shutil.copyfile(directory + prefix + filename, directory + prefix + 'model_best' + SGE_TASK_ID + '.pth.tar')
+        with open(directory + prefix + 'best_params' + SGE_TASK_ID + '.txt', 'w') as best_params:
             best_params.write(str(model.features) + '\n')
             best_params.write(str(model.regressor) + '\n')
             #best_params.write('Max Pooling: ' + str(model_args[5]) + '\n')
