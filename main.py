@@ -77,7 +77,7 @@ if not args.load_model_args:
             model_memory_mb = count_parameters(model) * 4 / 1000 / 1000
 
             if constants.CLUSTER:
-                if model_memory_mb < 2000: # Only proceed if the model's memory is less than 2 GB
+                if model_memory_mb < 3000: # Only proceed if the model's memory is less than 3 GB
                     print('Model memory (MB): ' + str(model_memory_mb))
                     sys.stdout.flush()
 

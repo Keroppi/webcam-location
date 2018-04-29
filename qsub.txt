@@ -9,6 +9,6 @@ CUDA_VISIBLE_DEVICES=$SGE_GPU ~/webcam-location/main.py
 # Possibly add --load_model_args=/srv/glusterfs/vli/pickle/model_structure.pkl
 
 qsub command for deep learning:
-qsub -l gpu -l h_vmem=40G -q gpu.long.q@biwirender* -R y -j y -t 1:1 -o /srv/glusterfs/vli/job_logs ~/gpu.sh
+qsub -l gpu -l h_vmem=30G -q gpu.long.q@biwirender* -R y -j y -t 1 -o /srv/glusterfs/vli/job_logs ~/gpu.sh
 
 Note: Try not to use biwirender02 - only 5 GB GPUs
