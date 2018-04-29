@@ -106,6 +106,10 @@ else:
         model_args = pickle.load(pkl_f)
         model = WebcamLocation(*model_args)
 
+    model_memory_mb = count_parameters(model) * 4 / 1000 / 1000
+    print('Model memory (MB): ' + str(model_memory_mb))
+    sys.stdout.flush()
+
 train_loss_fn = torch.nn.MSELoss()
 test_loss_fn = torch.nn.MSELoss(size_average=False)
 

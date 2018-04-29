@@ -215,7 +215,7 @@ def RandomizeArgs(SGE_TASK_ID):
     else:
         num_hidden_fc_layers = random.randint(1, 1)
 
-    fc_sizes = [random.randint(20 + x * 20, 120 + x * 20) for x in range(num_hidden_fc_layers - 1, -1, -1)]
+    fc_sizes = [random.randint(20 + x * 200, 1000 + x * 200) for x in range(num_hidden_fc_layers - 1, -1, -1)]
 
     #for i in range(1, num_hidden_fc_layers): # Decreasing width of layers.
     #    fc_sizes[i] = int(fc_sizes[i - 1] * 0.8)
