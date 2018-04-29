@@ -6,7 +6,7 @@ import constants
 
 class WebcamLocation(nn.Module):
     def __init__(self,
-                 num_conv_layers, output_channels, kernel_sizes, paddings, strides, max_poolings, conv_relus, # Conv inputs.
+                 num_conv_layers, output_channels, kernel_sizes, paddings, strides, max_poolings, max_pooling_strides, conv_relus, # Conv inputs.
                  num_hidden_fc_layers, fc_sizes, fc_relus, # FC inputs.
                  input_shape=(3, 32, 128, 128)):
         super(WebcamLocation, self).__init__()
@@ -20,6 +20,7 @@ class WebcamLocation(nn.Module):
         self.strides = strides
         self.num_pool_layers = len(max_poolings) - max_poolings.count(None)
         self.max_poolings = max_poolings
+        self.max_pooling_strides = max_pooling_strides
         self.num_conv_relu_layers = conv_relus.count(True)
         self.conv_relus = conv_relus
         self.conv_layers = [0] * (self.num_conv_layers + self.num_pool_layers + self.num_conv_relu_layers) # Initialize
@@ -57,7 +58,7 @@ class WebcamLocation(nn.Module):
                 self.conv_layers[j] = nn.ReLU()
                 j += 1
             if self.max_poolings[i] is not None:
-                self.conv_layers[j] = nn.MaxPool3d(self.max_poolings[i])
+                self.conv_layers[j] = nn.MaxPool3d(self.max_poolings[i], self.max_pooling_strides[i])
                 j += 1
 
         # Example below for 4 CNN layers:
@@ -204,10 +205,11 @@ def RandomizeArgs(SGE_TASK_ID):
         output_channels = [random.randint(1, 1) for x in range(conv_num_layers)]
 
     paddings = [(0, random.randint(0, 2), random.randint(0, 2)) for x in range(conv_num_layers)]
-    strides = [(1, random.randint(1, 2), random.randint(1, 2))] + [(random.randint(1, 4), random.randint(1, 2), random.randint(1, 2)) for x in range(conv_num_layers - 1)]
+    strides = [(1, random.randint(1, 2), random.randint(1, 2))] + [(random.randint(1, 3), random.randint(1, 2), random.randint(1, 2)) for x in range(conv_num_layers - 1)]
     max_poolings = [(random.randint(1, 2), random.randint(2, 4), random.randint(2, 4))
-                    if random.randint(1, conv_num_layers) >= 2 else None # On average one layer has no max pooling.
+                    if random.randint(1, conv_num_layers) >= 3 else None # On average 2 layers have no max pooling.
                     for x in range(conv_num_layers)]
+    max_pooling_strides = [(1, random.randint(1, 2), random.randint(1, 2))] + [(random.randint(1, 3), random.randint(1, 2), random.randint(1, 2)) for x in range(conv_num_layers - 1)]
     conv_relus = [True if random.randint(0, 1) == 1 else False for x in range(conv_num_layers)]
 
     if constants.CLUSTER:
@@ -222,7 +224,7 @@ def RandomizeArgs(SGE_TASK_ID):
 
     fc_relus = [True if random.randint(0, 1) == 1 else False for x in range(num_hidden_fc_layers)]
 
-    parameters = (conv_num_layers, output_channels, kernel_sizes, paddings, strides, max_poolings, conv_relus,
+    parameters = (conv_num_layers, output_channels, kernel_sizes, paddings, strides, max_poolings, max_pooling_strides, conv_relus,
                   num_hidden_fc_layers, fc_sizes, fc_relus,
                   (constants.NUM_CHANNELS, constants.IMAGES_PER_DAY, constants.PATCH_SIZE[0], constants.PATCH_SIZE[1]))
 
