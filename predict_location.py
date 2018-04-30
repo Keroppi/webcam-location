@@ -236,5 +236,5 @@ for i in range(data.types['test']):
     #print(distance)
 
 average_dist /= len(finished_places)
-print(average_dist)
+print('Average Distance Error: {:.6f}'.format(average_dist))
 sys.stdout.flush()
