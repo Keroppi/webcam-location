@@ -235,6 +235,6 @@ for i in range(data.types['test']):
 
     #print(distance)
 
-average_dist /= len(test_loader.dataset)
+average_dist /= len(finished_places)
 print(average_dist)
 sys.stdout.flush()
