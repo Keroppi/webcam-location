@@ -106,16 +106,16 @@ for sunrise, sunset in zip(sunrises, sunsets):
 # Sort by date field - convert to an int from [0, 365) - March 1, 2017 onward.
 # Fit a sin/cos with N solar noons (minutes change per day).
 
-# y = A * sin(2 * pi / 365 * (input_day_integer + offset_in_days)) + y_offset - A, offset, y_offset are unknowns
+# y = A * sin(2 * pi / 365 * (input_day_integer + x_offset_in_days)) + y_offset - A, offset, y_offset are unknowns
 # randomly take one point from each month?
 # take the mean of points to get y_offset
 # take the max or min value, subtract from estimated y_offset, take abs value to guess amplitude
-# try all values of offset_in_days - [0, 365)? - maybe slow
+# try all values of x_offset_in_days - [0, 365)? - could be very slow, maybe parallelize the locations...
 # repeat many times...?
 # reestimate with inliers
 # https://ch.mathworks.com/matlabcentral/answers/178528-fitting-a-sinusoidal-curve-to-a-set-of-data-points
-
 # Threshold ~20 minutes for inliers?
+# May not work for locations near the equator... almost constant model.
 
 # RANSAC for solar noons.
 # Maybe not possible - not really linear...
@@ -132,7 +132,7 @@ for d_idx, solar_noon in enumerate(solar_noons):
     hours_time_zone_diff = days[d_idx].time_offset / 60 / 60
     hours_utc_diff = utc_diff.total_seconds() / 60 / 60
 
-    if random.randint(1, 10) < 2: # VLI
+    if random.randint(1, 100) < 2: # VLI
         print('Lng')
         print((hours_utc_diff + hours_time_zone_diff) * 15)
         print('')
@@ -151,7 +151,7 @@ for d_idx, day_length in enumerate(day_lengths):
     declination = math.radians(23.45) * math.sin(math.radians(360 * (283 + day_of_year) / 365))
     lat = math.degrees(math.atan(-math.cos(math.radians(15 * day_length_hours / 2)) / math.tan(declination)))
 
-    if random.randint(1, 10) < 2: # VLI
+    if random.randint(1, 100) < 2: # VLI
         print('Lat')
         print(lat)
         print('')
@@ -203,9 +203,13 @@ for i in range(data.types['test']):
     average_dist += distance
 
 
-    if random.randint(1, 10) < 2: # VLI
+    if random.randint(1, 100) < 2: # VLI
         print('Distance')
         print(distance)
+        print(actual_lat)
+        print(actual_lng)
+        print(pred_lat)
+        print(pred_lng)
         print('')
         sys.stdout.flush()
 
