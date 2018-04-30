@@ -88,9 +88,16 @@ sys.stdout.flush()
 # Compute solar noon and day length.
 solar_noons = []
 day_lengths = []
-for sunrise, sunset in zip(sunrises, sunsets):
+for d_idx, (sunrise, sunset) in enumerate(zip(sunrises, sunsets)):
+    # Threshold sunrise to be at earliest midnight.
+    # Threshold sunset to be at latest 2 AM the next day.
+    if sunrise.date() < days[d_idx].date:
+        sunrise = datetime.datetime.combine(sunrise, datetime.time.min)
+    if sunset > datetime.datetime.combine(days[d_idx].date + datetime.timedelta(days=1), datetime.time(2, 0, 0)):
+        sunset = datetime.datetime.combine(days[d_idx].date + datetime.timedelta(days=1), datetime.time(2, 0, 0))
+
     solar_noon = (sunset - sunrise) / 2 + sunrise
-    if random.randint(1, 10) < 2: # VLI
+    if random.randint(1, 100) < 5: # VLI
         print('Sunrise / sunset / solar noon')
         print(sunrise)
         print(sunset)
@@ -131,14 +138,21 @@ for d_idx, solar_noon in enumerate(solar_noons):
 
     hours_time_zone_diff = days[d_idx].time_offset / 60 / 60
     hours_utc_diff = utc_diff.total_seconds() / 60 / 60
+    lng = (hours_utc_diff + hours_time_zone_diff) * 15
 
-    if random.randint(1, 100) < 2: # VLI
+    # What to do if outside [-180, 180] range?
+    if lng < -180:
+        lng += 360
+    elif lng > 180:
+        lng -= 360
+
+    if random.randint(1, 100) < 5: # VLI
         print('Lng')
-        print((hours_utc_diff + hours_time_zone_diff) * 15)
+        print(lng)
         print('')
         sys.stdout.flush()
 
-    longitudes.append((hours_utc_diff + hours_time_zone_diff) * 15)
+    longitudes.append(lng)
 
 # Compute latitude.
 latitudes = []
@@ -151,7 +165,7 @@ for d_idx, day_length in enumerate(day_lengths):
     declination = math.radians(23.45) * math.sin(math.radians(360 * (283 + day_of_year) / 365))
     lat = math.degrees(math.atan(-math.cos(math.radians(15 * day_length_hours / 2)) / math.tan(declination)))
 
-    if random.randint(1, 100) < 2: # VLI
+    if random.randint(1, 100) < 5: # VLI
         print('Lat')
         print(lat)
         print('')
@@ -175,7 +189,7 @@ for key in places:
     places_lat_lng[key] = (places[key][0] / places[key][2], places[key][1] / places[key][2])
 
 average_dist = 0
-for i in range(data.types['test']):
+for i in range(data.types['test']): # Change to place by place rather than day by day. # VLI
     place = days[i].place
     actual_lat = days[i].lat
     actual_lng = days[i].lng
@@ -203,13 +217,11 @@ for i in range(data.types['test']):
     average_dist += distance
 
 
-    if random.randint(1, 100) < 2: # VLI
+    if random.randint(1, 100) < 5: # VLI
         print('Distance')
         print(distance)
-        print(actual_lat)
-        print(actual_lng)
-        print(pred_lat)
-        print(pred_lng)
+        print(str(actual_lat) + ', ' + str(actual_lng))
+        print(str(pred_lat) + ', ' + str(pred_lng))
         print('')
         sys.stdout.flush()
 
