@@ -1,6 +1,6 @@
 #!/srv/glusterfs/vli/.pyenv/shims/python
 
-import torch, torchvision, os, datetime, time, math, pandas as pd, sys
+import torch, torchvision, os, datetime, time, math, pandas as pd, sys, random
 
 sys.path.append('/home/vli/webcam-location') # For importing .py files in the same directory on the cluster.
 import constants
@@ -82,6 +82,13 @@ solar_noons = []
 day_lengths = []
 for sunrise, sunset in zip(sunrises, sunsets):
     solar_noon = (sunset - sunrise) / 2 + sunrise
+    if random.randint(1, 10) < 2: # VLI
+        print('Sunrise / sunset / solar noon')
+        print(sunrise)
+        print(sunset)
+        print(solar_noon)
+        print('')
+        sys.stdout.flush()
     solar_noons.append(solar_noon)
     day_lengths.append((sunset - sunrise).total_seconds())
 
@@ -92,6 +99,13 @@ for d_idx, solar_noon in enumerate(solar_noons):
 
     hours_time_zone_diff = days[d_idx].time_offset / 60 / 60
     hours_utc_diff = utc_diff.total_seconds() / 60 / 60
+
+    if random.randint(1, 10) < 2: # VLI
+        print('Lng')
+        print((hours_utc_diff + hours_time_zone_diff) * 15)
+        print('')
+        sys.stdout.flush()
+
     longitudes.append((hours_utc_diff + hours_time_zone_diff) * 15)
 
 # Compute latitude.
@@ -104,6 +118,12 @@ for d_idx, day_length in enumerate(day_lengths):
 
     declination = math.radians(23.45) * math.sin(math.radians(360 * (283 + day_of_year) / 365))
     lat = math.degrees(math.atan(-math.cos(math.radians(15 * day_length_hours / 2)) / math.tan(declination)))
+
+    if random.randint(1, 10) < 2: # VLI
+        print('Lat')
+        print(lat)
+        print('')
+        sys.stdout.flush()
 
     latitudes.append(lat) # Only one day to predict latitude - could average across many days.
 
@@ -149,6 +169,14 @@ for i in range(data.types['test']):
     temp1 = 2 * math.atan2(math.sqrt(temp), math.sqrt(1 - temp))
     distance = radius_of_earth * temp1 # km?
     average_dist += distance
+
+
+    if random.randint(1, 10) < 2: # VLI
+        print('Distance')
+        print(distance)
+        print('')
+        sys.stdout.flush()
+
     #print(distance)
 
 average_dist /= len(test_loader.dataset)
