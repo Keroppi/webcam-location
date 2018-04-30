@@ -11,8 +11,8 @@ else:
     directory = '~/models/best/'
     directory = os.path.expanduser(directory)
 
-sunrise_model = directory + 'sunrise_model_best.pth.tar'
-sunset_model = directory + 'sunset_model_best.pth.tar'
+sunrise_model = directory + 'sunrise_model_best1.pth.tar'
+sunset_model = directory + 'sunset_model_best2.pth.tar'
 
 sunrise_checkpt = torch.load(sunrise_model)
 sunset_checkpt = torch.load(sunset_model)
