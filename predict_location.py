@@ -188,9 +188,17 @@ places_lat_lng = {}
 for key in places:
     places_lat_lng[key] = (places[key][0] / places[key][2], places[key][1] / places[key][2])
 
+finished_places = []
 average_dist = 0
-for i in range(data.types['test']): # Change to place by place rather than day by day. # VLI
+for i in range(data.types['test']):
     place = days[i].place
+
+    # Go through each place.
+    if place in finished_places:
+        continue
+    else:
+        finished_places.append(place)
+
     actual_lat = days[i].lat
     actual_lng = days[i].lng
 
@@ -217,7 +225,7 @@ for i in range(data.types['test']): # Change to place by place rather than day b
     average_dist += distance
 
 
-    if random.randint(1, 100) < 5: # VLI
+    if random.randint(1, 100) < 30: # VLI
         print('Distance')
         print(distance)
         print(str(actual_lat) + ', ' + str(actual_lng))
