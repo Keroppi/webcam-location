@@ -10,7 +10,7 @@ from webcam_dataset import Train
 from webcam_dataset import Test
 from webcam_dataset import Validation
 from custom_transforms import Resize, RandomResize, RandomPatch, Center, ToTensor
-from custom_model import WebcamLocation, RandomizeArgs
+from custom_model import WebcamLocation, RandomizeArgs, ManualArgs
 from torch.autograd import Variable
 
 if constants.CLUSTER:
@@ -56,11 +56,11 @@ test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=constants.BAT
 
 #'''
 print("Train/Test Sizes: ")
-print(len(train_loader))
-print(len(test_loader))
+print('# Train Batches: {}'.format(len(train_loader)))
+print('# Test Batches: {}'.format(len(test_loader)))
 #print(len(valid_loader))
-print(len(train_loader.dataset))
-print(len(test_loader.dataset))
+print('# Train Examples: {}'.format(len(train_loader.dataset)))
+print('# Test Examples: {}'.format(len(test_loader.dataset)))
 #print(len(valid_loader.dataset))
 sys.stdout.flush()
 #'''
@@ -72,7 +72,7 @@ if not args.load_model_args:
     model_t0 = time.time()
     while True: # Try random models until we get one where the convolutions produce a valid size.
         try:
-            model_args = RandomizeArgs(SGE_TASK_ID)
+            model_args = ManualArgs(SGE_TASK_ID) #RandomizeArgs(SGE_TASK_ID)
             model = WebcamLocation(*model_args)
             model_memory_mb = count_parameters(model) * 4 / 1000 / 1000
 
