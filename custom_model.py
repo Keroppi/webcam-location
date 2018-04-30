@@ -254,7 +254,7 @@ def ManualArgs(SGE_TASK_ID):
 
     num_hidden_fc_layers = 2
     fc_sizes = [2000, 200]
-    fc_relus = [False, False]
+    fc_relus = [True, True]
     parameters = (conv_num_layers, output_channels, kernel_sizes, paddings, strides, max_poolings, max_pooling_strides, conv_relus,
                   num_hidden_fc_layers, fc_sizes, fc_relus,
                   (constants.NUM_CHANNELS, constants.IMAGES_PER_DAY, constants.PATCH_SIZE[0], constants.PATCH_SIZE[1]))
