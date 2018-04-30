@@ -66,7 +66,7 @@ for batch_idx, (input, _) in enumerate(test_loader):
     sunset_idx = sunset_model(input)
 
     # Convert sunset_idx into a local time.
-    batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunrise_idx.size()[0]]
+    batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunset_idx.size()[0]]
 
     for d_idx, day in enumerate(batch_days):
         local_sunset = day.get_local_time(sunset_idx[d_idx, 0].data[0])
