@@ -43,6 +43,7 @@ else:
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=constants.BATCH_SIZE, num_workers=num_workers, pin_memory=pin_memory)
 #print(len(test_loader.dataset))
 
+sunrise_predict_t0 = time.time()
 sunrises = []
 for batch_idx, (input, _) in enumerate(test_loader):
     input = Variable(input, volatile=True)
@@ -59,7 +60,11 @@ for batch_idx, (input, _) in enumerate(test_loader):
         local_sunrise = day.get_local_time(sunrise_idx[d_idx, 0].data[0])
         #utc_sunrise = local_sunrise - datetime.timedelta(seconds=day.time_offset)
         sunrises.append(local_sunrise)
+sunrise_predict_t1 = time.time()
+print('Sunrise prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
+sys.stdout.flush()
 
+sunset_predict_t0 = time.time()
 sunsets = []
 for batch_idx, (input, _) in enumerate(test_loader):
     input = Variable(input, volatile=True)
@@ -76,6 +81,9 @@ for batch_idx, (input, _) in enumerate(test_loader):
         local_sunset = day.get_local_time(sunset_idx[d_idx, 0].data[0])
         #utc_sunset = local_sunset - datetime.timedelta(seconds=day.time_offset)
         sunsets.append(local_sunset)
+sunset_predict_t1 = time.time()
+print('Sunset prediction time (min): {:.2f}'.format((sunset_predict_t1 - sunset_predict_t0) / 60))
+sys.stdout.flush()
 
 # Compute solar noon and day length.
 solar_noons = []
@@ -91,6 +99,30 @@ for sunrise, sunset in zip(sunrises, sunsets):
         sys.stdout.flush()
     solar_noons.append(solar_noon)
     day_lengths.append((sunset - sunrise).total_seconds())
+
+# RANSAC for day lengths.
+
+# Create tuple with (date, day length) for each place - get date from solar noons?
+# Sort by date field - convert to an int from [0, 365) - March 1, 2017 onward.
+# Fit a sin/cos with N solar noons (minutes change per day).
+
+# y = A * sin(2 * pi / 365 * (input_day_integer + offset_in_days)) + y_offset - A, offset, y_offset are unknowns
+# randomly take one point from each month?
+# take the mean of points to get y_offset
+# take the max or min value, subtract from estimated y_offset, take abs value to guess amplitude
+# try all values of offset_in_days - [0, 365)? - maybe slow
+# repeat many times...?
+# reestimate with inliers
+# https://ch.mathworks.com/matlabcentral/answers/178528-fitting-a-sinusoidal-curve-to-a-set-of-data-points
+
+# Threshold ~20 minutes for inliers?
+
+# RANSAC for solar noons.
+# Maybe not possible - not really linear...
+# Very simple outlier detection - convert to UTC using offset from each day (as done in longitude section).
+# Fit a line.
+# Reject points which are more than... 60 minutes? away.
+# Maybe not that useful.
 
 # Compute longitude.
 longitudes = []
