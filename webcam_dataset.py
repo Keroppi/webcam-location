@@ -146,6 +146,9 @@ class WebcamData():
                     for size in constants.SIZE:
                         image_dir = day_dir + size + '/'
 
+                        if not os.path.isfile(image_dir + 'done.txt'): # no done.txt file, so skip it
+                            continue
+
                         if not os.path.isfile(image_dir + 'list_of_files.txt'): # Create store image names in a file.
                             images = glob.glob(image_dir + '*.jpg')
 
@@ -166,10 +169,6 @@ class WebcamData():
                                 sys.stdout.flush()
 
                         images = checked_images
-
-                        done = glob.glob(image_dir + '*.txt')
-                        if len(done) < 1: # no done.txt file, so skip it
-                            continue
 
                         # Not enough images, so skip it.
                         if len(images) < constants.IMAGES_PER_DAY:
