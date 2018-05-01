@@ -1,6 +1,6 @@
 #!/srv/glusterfs/vli/.pyenv/shims/python
 
-import torch, torchvision, os, datetime, time, math, pandas as pd, sys, random
+import torch, torchvision, os, datetime, time, math, pandas as pd, sys, random, statistics
 
 sys.path.append('/home/vli/webcam-location') # For importing .py files in the same directory on the cluster.
 import constants
@@ -173,23 +173,62 @@ for d_idx, day_length in enumerate(day_lengths):
 
     latitudes.append(lat) # Only one day to predict latitude - could average across many days.
 
-# Average all lat/longs of same places.
-places = {}
-
+# Get mean and median of all lat/longs of same places.
+#places = {}
+lats = {}
+lngs = {}
 for i in range(data.types['test']):
+    '''
     if places.get(days[i].place) is None:
         places[days[i].place] = [0, 0, 0] # lat, lng, number of data points to average, average
 
     places[days[i].place][0] += latitudes[i]
     places[days[i].place][1] += longitudes[i]
     places[days[i].place][2] += 1
+    '''
 
+    # Collect lat/lng based on location.
+    if lats.get(days[i].place) is None:
+        lats[days[i].place] = []
+    lats[days[i].place].append(latitudes[i])
+
+    if lngs.get(days[i].place) is None:
+        lngs[days[i].place] = []
+    lngs[days[i].place].append(longitudes[i])
+
+'''
 places_lat_lng = {}
 for key in places:
     places_lat_lng[key] = (places[key][0] / places[key][2], places[key][1] / places[key][2])
+'''
+
+mean_locations = {}
+median_locations = {}
+for key in lats:
+    mean_locations[key] = (statistics.mean(lats[key]), statistics.mean(lngs[key]))
+    median_locations[key] = (statistics.median(lats[key]), statistics.median(lngs[key]))
+
+
+def compute_distance(lat1, lng1, lat2, lng2): # kilometers
+    # Haversine formula for computing distance.
+    # https://www.movable-type.co.uk/scripts/latlong.html
+
+    radius_of_earth = 6371  # km
+    actual_lat_rad = math.radians(lat1)
+    pred_lat_rad = math.radians(lat2)
+    diff_lat_rad = actual_lat_rad - pred_lat_rad
+    diff_lng_rad = math.radians(lng1 - lng2)
+    temp = math.sin(diff_lat_rad / 2) ** 2 + \
+           math.cos(pred_lat_rad) * math.cos(actual_lat_rad) * math.sin(diff_lng_rad / 2) ** 2
+    temp1 = 2 * math.atan2(math.sqrt(temp), math.sqrt(1 - temp))
+    distance = radius_of_earth * temp1
+
+    return distance
+
 
 finished_places = []
-average_dist = 0
+mean_distances = []
+median_distances = []
 for i in range(data.types['test']):
     place = days[i].place
 
@@ -202,39 +241,31 @@ for i in range(data.types['test']):
     actual_lat = days[i].lat
     actual_lng = days[i].lng
 
-    pred_lat = places_lat_lng[place][0]
-    pred_lng = places_lat_lng[place][1]
+    mean_pred_lat = mean_locations[key][0]
+    mean_pred_lng = mean_locations[key][1]
+    median_pred_lat = median_locations[key][0] #places_lat_lng[place][0]
+    median_pred_lng = median_locations[key][1] #places_lat_lng[place][1]
 
-    #print(actual_lat)
-    #print(actual_lng)
-    #print(pred_lat)
-    #print(pred_lng)
-    #print('')
+    mean_distance = compute_distance(actual_lat, actual_lng, mean_pred_lat, mean_pred_lng)
+    mean_distances.append(mean_distance)
+    median_distance = compute_distance(actual_lat, actual_lng, median_pred_lat, median_pred_lng)
+    median_distances.append(median_distance)
 
-    # Haversine formula for computing distance.
-    # https://www.movable-type.co.uk/scripts/latlong.html
-    radius_of_earth = 6371 # km
-    actual_lat_rad = math.radians(actual_lat)
-    pred_lat_rad = math.radians(pred_lat)
-    diff_lat_rad = actual_lat_rad - pred_lat_rad
-    diff_lng_rad = math.radians(actual_lng - pred_lng)
-    temp = math.sin(diff_lat_rad / 2) ** 2 + \
-           math.cos(pred_lat_rad) * math.cos(actual_lat_rad) * math.sin(diff_lng_rad / 2) ** 2
-    temp1 = 2 * math.atan2(math.sqrt(temp), math.sqrt(1 - temp))
-    distance = radius_of_earth * temp1 # km?
-    average_dist += distance
-
-
-    if random.randint(1, 100) < 30: # VLI
+    if random.randint(1, 100) < 20: # VLI
         print('Distance')
-        print(distance)
+        print('Using mean: ' + str(mean_distance))
+        print('Using median: ' + str(median_distance))
         print(str(actual_lat) + ', ' + str(actual_lng))
-        print(str(pred_lat) + ', ' + str(pred_lng))
+        print(str(mean_pred_lat) + ', ' + str(mean_pred_lng))
+        print(str(median_pred_lat) + ', ' + str(median_pred_lng))
         print('')
         sys.stdout.flush()
 
     #print(distance)
 
-average_dist /= len(finished_places)
-print('Average Distance Error: {:.6f}'.format(average_dist))
+#average_dist /= len(finished_places)
+print('Means Avg. Distance Error: {:.6f}'.format(statistics.mean(mean_distances)))
+print('Medians Avg. Distance Error: {:.6f}'.format(statistics.mean(median_distances)))
+print('Means Max Distance Error: {:.6f}'.format(max(mean_distances)))
+print('Means Min Distance Error: {:.6f}'.format(min(mean_distances)))
 sys.stdout.flush()
