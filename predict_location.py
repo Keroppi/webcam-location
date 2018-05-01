@@ -130,6 +130,11 @@ for d_idx, (sunrise, sunset) in enumerate(zip(sunrises, sunsets)):
 # Fit a line.
 # Reject points which are more than... 60 minutes? away.
 # Maybe not that useful.
+# Could just threshold? Anything past ... 3:10 PM is probably wrong. (Round to 3:30 PM)
+# https://astronomy.stackexchange.com/questions/18737/what-time-and-where-on-earth-is-the-latest-solar-noon
+# Anything before... 9:30 AM (9 AM to be safe) is probaby wrong too?
+# https://www.timeanddate.com/sun/greenland/daneborg - 10:02 AM solar noon
+# http://www.dailymail.co.uk/sciencetech/article-2572317/Are-YOU-living-sync-Amazing-map-reveals-manmade-timezones-countries-false-sense-sun-rises.html
 
 # Compute longitude.
 longitudes = []
