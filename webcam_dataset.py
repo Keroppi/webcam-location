@@ -158,8 +158,8 @@ class WebcamData():
                                     list_of_files_f.write(image + '\n')
                         # Read from file a list of images.
                         else:
-                            if os.path.getsize(image_dir + 'list_of_files.txt') == 0: # VLI can remove later
-                                os.remove(image_dir + 'list_of_files.txt')
+                            if os.path.getsize(image_dir + 'list_of_files.txt') == 0: # No images here.
+                                continue
 
                             with open(image_dir + 'list_of_files.txt', 'r') as list_of_files_f:
                                 images = list_of_files_f.read().splitlines()
