@@ -90,9 +90,9 @@ solar_noons = []
 day_lengths = []
 for d_idx, (sunrise, sunset) in enumerate(zip(sunrises, sunsets)):
     # Threshold sunrise to be at earliest midnight.
-    # Threshold sunset to be at latest 2 AM the next day.
     if sunrise.date() < days[d_idx].date:
         sunrise = datetime.datetime.combine(sunrise, datetime.time.min)
+    # Threshold sunset to be at latest 2 AM the next day.
     if sunset > datetime.datetime.combine(days[d_idx].date + datetime.timedelta(days=1), datetime.time(2, 0, 0)):
         sunset = datetime.datetime.combine(days[d_idx].date + datetime.timedelta(days=1), datetime.time(2, 0, 0))
 
