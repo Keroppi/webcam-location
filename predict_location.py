@@ -97,6 +97,14 @@ for d_idx, (sunrise, sunset) in enumerate(zip(sunrises, sunsets)):
         sunset = datetime.datetime.combine(days[d_idx].date + datetime.timedelta(days=1), datetime.time(2, 0, 0))
 
     solar_noon = (sunset - sunrise) / 2 + sunrise
+
+    # Latest solar noon in the world is in western China at 15:10, so truncate any time past ~15:14
+    if solar_noon.hour > 15 or (solar_noon.hour == 15 and solar_noon.minute >= 14):
+        solar_noon = solar_noon.replace(hour=15, minute=14, second=0, microsecond=0)
+    # Earliest solar noon in the world is in Greenland around 10:04 AM, so truncate any time before ~10 AM.
+    if solar_noon.hour < 10:
+        solar_noon = solar_noon.replace(hour=10, minute=0, second=0, microsecond=0)
+
     if random.randint(1, 100) < 5: # VLI
         print('Sunrise / sunset / solar noon')
         print(sunrise)
@@ -130,10 +138,10 @@ for d_idx, (sunrise, sunset) in enumerate(zip(sunrises, sunsets)):
 # Fit a line.
 # Reject points which are more than... 60 minutes? away.
 # Maybe not that useful.
-# Could just threshold? Anything past ... 3:10 PM is probably wrong. (Round to 3:30 PM)
+# Could just threshold? Anything past ... 3:10 PM is probably wrong.
 # https://astronomy.stackexchange.com/questions/18737/what-time-and-where-on-earth-is-the-latest-solar-noon
-# Anything before... 9:30 AM (9 AM to be safe) is probaby wrong too?
-# https://www.timeanddate.com/sun/greenland/daneborg - 10:02 AM solar noon
+# Anything before... 10 AM?
+# https://www.timeanddate.com/sun/greenland/daneborg - 10:04 AM solar noon
 # http://www.dailymail.co.uk/sciencetech/article-2572317/Are-YOU-living-sync-Amazing-map-reveals-manmade-timezones-countries-false-sense-sun-rises.html
 
 # Compute longitude.
