@@ -1,4 +1,4 @@
-import os, sys, calendar, glob, datetime, time, functools, numpy as np, constants, PIL, hashlib, torch, subprocess, copy
+import os, sys, calendar, glob, datetime, time, functools, numpy as np, constants, PIL, hashlib, torch, subprocess, copy, imghdr
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from day import Day
 from torch.utils.data.dataset import Dataset
@@ -82,17 +82,18 @@ class WebcamData():
             sys.stdout.flush()
             return []
 
-        years = next(os.walk(place_dir))[1]
+        #years = next(os.walk(place_dir))[1]
 
-        for year in years:
+        for year in ['2017', '2018']: #years:
             year_dir = place_dir + year + '/'
 
-            months = next(os.walk(year_dir))[1]
+            #months = next(os.walk(year_dir))[1]
+            if year == '2017':
+                months = ["{0:0=2d}".format(x) for x in range(4, 13)] # Apr to Dec, inclusive
+            elif year == '2018':
+                months = ["{0:0=2d}".format(x) for x in range(1, 4)] # Jan to Mar, inclusive
 
             for month in months:
-                if int(month) < 4 and year == '2017': # VLI # skip anything before April 2017 for now...
-                    continue
-
                 month_dir = year_dir + month + '/'
 
                 if constants.DAYS_PER_MONTH == 'MAX':
@@ -105,7 +106,7 @@ class WebcamData():
 
                     day_dir = month_dir + day + '/'
 
-                    # May need to change if we add LARGE sizes as well. # VLI
+                    # May need to change if we add LARGE sizes as well.
                     train_test_valid = WebcamData.determine_train_test_valid(day_dir)
 
                     try:
@@ -144,19 +145,30 @@ class WebcamData():
 
                     for size in constants.SIZE:
                         image_dir = day_dir + size + '/'
-                        images = glob.glob(image_dir + '*.jpg')
+
+                        if not os.path.isfile(image_dir + 'list_of_files.txt'): # Create store image names in a file.
+                            images = glob.glob(image_dir + '*.jpg')
+
+                            with open(image_dir + 'list_of_files.txt', 'w') as list_of_files_f:
+                                for image in images:
+                                    list_of_files_f.write(image + '\n')
+                        else: # Read from file a list of images.
+                            with open(image_dir + 'list_of_files.txt', 'r') as list_of_files_f:
+                                images = list_of_files_f.read().splitlines()
 
                         # Check for malformed images of size 0.
                         checked_images = []
                         for image in images:
-                            if os.path.getsize(image) > 0:
+                            if os.path.getsize(image) > 0 and imghdr.what(image) == 'jpeg': # Check it's a valid jpg.
                                 checked_images.append(image)
+                            else:
+                                print('WARNING - ' + image + ' is not a valid jpeg.')
+                                sys.stdout.flush()
+
                         images = checked_images
 
                         done = glob.glob(image_dir + '*.txt')
                         if len(done) < 1: # no done.txt file, so skip it
-                            if year == '2018': # VLI
-                                print('WARNING - 2018 is unfinished! ' + image_dir) # VLI
                             continue
 
                         # Not enough images, so skip it.

@@ -262,12 +262,4 @@ for epoch in range(start_epoch, constants.EPOCHS):
         'optimizer': optimizer.state_dict(),
     }, is_best)
 
-
-
-# Pickle or whatever all patches?
-# Does it make sense to save these patches to disk?
-
 # Could use GPU to transform images...?  ToTensor first step - https://discuss.pytorch.org/t/preprocess-images-on-gpu/5096
-
-# Multiple GPUs
-# http://pytorch.org/tutorials/beginner/former_torchies/parallelism_tutorial.html
