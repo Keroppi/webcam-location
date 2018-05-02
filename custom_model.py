@@ -200,7 +200,7 @@ def RandomizeArgs(SGE_TASK_ID):
     kernel_sizes = [(1, random.randint(2, 6), random.randint(2, 6))] + [(random.randint(1, 4), random.randint(2, 6), random.randint(2, 6)) for x in range(conv_num_layers - 1)]
 
     if constants.CLUSTER:
-        output_channels = [random.randint(8, 64) for x in range(conv_num_layers)]
+        output_channels = [random.randint(8, 100) for x in range(conv_num_layers)]
     else:
         output_channels = [random.randint(1, 1) for x in range(conv_num_layers)]
 

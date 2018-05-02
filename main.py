@@ -72,7 +72,7 @@ if not args.load_model_args:
     model_t0 = time.time()
     while True: # Try random models until we get one where the convolutions produce a valid size.
         try:
-            model_args = ManualArgs(SGE_TASK_ID) #RandomizeArgs(SGE_TASK_ID)
+            model_args = RandomizeArgs(SGE_TASK_ID) #ManualArgs(SGE_TASK_ID)
             model = WebcamLocation(*model_args)
             model_memory_mb = count_parameters(model) * 4 / 1000 / 1000
 
