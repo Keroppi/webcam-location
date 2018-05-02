@@ -57,11 +57,11 @@ def get_sun_info(country, name, year, month, day, html_rows, mali_html_rows, lat
     # If file already exists and has size > 0, skip this.
     sun_file_str = wrtPth + '/sun.txt'
     #if not (os.path.isfile(sun_file_str) and os.path.getsize(sun_file_str) > 0):
-    if True: # VLI
-        with open(sun_file_str, 'r') as some_stuff: # VLI
-            existing_offset = some_stuff.read().splitlines()[3] # VLI
-            if existing_offset.find('UNKNOWN') >= 0: # VLI
-                return # VLI
+    if True:
+        with open(sun_file_str, 'r') as some_stuff:
+            existing_offset = some_stuff.read().splitlines()[3]
+            if existing_offset.find('UNKNOWN') >= 0:
+                return
             existing_offset = int(existing_offset)
 
 
@@ -156,7 +156,7 @@ def get_sun_info(country, name, year, month, day, html_rows, mali_html_rows, lat
         d = datetime.datetime.strptime(str(sunrise_date.date()) + ' ' + local_sunrise_str, "%Y-%m-%d %H:%M:%S")
         d = d.replace(tzinfo=pytz.utc) # Don't let python guess DST.
         d1 = datetime.datetime.strptime(str(sunset_date.date()) + ' ' + local_sunset_str, "%Y-%m-%d %H:%M:%S")
-        timestamp = time.mktime(d.timetuple()) + 3600 # For some reason, datetime.datetime.fromtimestamp(0) is 1 AM not midnight, so add 1 hour back
+        timestamp = d.timestamp()
         google_url = 'https://maps.googleapis.com/maps/api/timezone/json?location=' + str(lat) + ',' + \
                      str(lng) + '&timestamp=' + str(timestamp) + '&key=' + GOOGLE_MAPS_API_KEY
 
@@ -182,7 +182,7 @@ def get_sun_info(country, name, year, month, day, html_rows, mali_html_rows, lat
         utc_d = d - datetime.timedelta(seconds=offset)
 
         # Requery time zone using estimate of UTC time.
-        timestamp = time.mktime(utc_d.timetuple()) + 3600 # For some reason, datetime.datetime.fromtimestamp(0) is 1 AM not midnight, so add 1 hour back
+        timestamp = utc_d.timestamp()
         google_url = 'https://maps.googleapis.com/maps/api/timezone/json?location=' + str(lat) + ',' + \
                      str(lng) + '&timestamp=' + str(timestamp) + '&key=' + GOOGLE_MAPS_API_KEY
         retries = 0
@@ -205,7 +205,7 @@ def get_sun_info(country, name, year, month, day, html_rows, mali_html_rows, lat
 
         offset = time_data['dstOffset'] + time_data['rawOffset'];  # seconds
 
-        if existing_offset != offset: # VLI
+        if existing_offset != offset:
             print('Offset has changed!')
             print(name)
             print('New offset: ' + str(existing_offset))
