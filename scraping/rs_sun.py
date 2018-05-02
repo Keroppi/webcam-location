@@ -56,13 +56,15 @@ def get_sun_info(country, name, year, month, day, html_rows, mali_html_rows, lat
     
     # If file already exists and has size > 0, skip this.
     sun_file_str = wrtPth + '/sun.txt'
-    if not (os.path.isfile(sun_file_str) and os.path.getsize(sun_file_str) > 0):
-    #if True:
-        #with open(sun_file_str, 'r') as some_stuff:
-        #    existing_offset = some_stuff.read().splitlines()[3]
-        #    if existing_offset.find('UNKNOWN') >= 0:
-        #        return
-        #    existing_offset = int(existing_offset)
+    #if not (os.path.isfile(sun_file_str) and os.path.getsize(sun_file_str) > 0):
+    if True:
+        #"""
+        with open(sun_file_str, 'r') as some_stuff:
+            existing_offset = some_stuff.read().splitlines()[3]
+            if existing_offset.find('UNKNOWN') >= 0:
+                return
+            existing_offset = int(existing_offset)
+        #"""
 
         # Find which row of the table corresponds to this day.
         for row_idx in range(len(html_rows)):
@@ -180,37 +182,49 @@ def get_sun_info(country, name, year, month, day, html_rows, mali_html_rows, lat
         offset = time_data['dstOffset'] + time_data['rawOffset']  # seconds
         utc_d = d - datetime.timedelta(seconds=offset)
 
-        # Requery time zone using estimate of UTC time.
-        timestamp = utc_d.timestamp()
-        google_url = 'https://maps.googleapis.com/maps/api/timezone/json?location=' + str(lat) + ',' + \
-                     str(lng) + '&timestamp=' + str(timestamp) + '&key=' + GOOGLE_MAPS_API_KEY
-        retries = 0
+        # Requery time zone using new estimates of UTC time.
         while True:
-            with urllib.request.urlopen(google_url) as goog_url_obj:
-                time_data = json.loads(goog_url_obj.read().decode())
+            timestamp = utc_d.timestamp()
+            google_url = 'https://maps.googleapis.com/maps/api/timezone/json?location=' + str(lat) + ',' + \
+                         str(lng) + '&timestamp=' + str(timestamp) + '&key=' + GOOGLE_MAPS_API_KEY
+            retries = 0
+            while True:
+                with urllib.request.urlopen(google_url) as goog_url_obj:
+                    time_data = json.loads(goog_url_obj.read().decode())
 
-                if time_data['status'] == 'OK':
-                    break
-                else:
-                    if retries < 500:
-                        time.sleep(5)  # Possibly rate limited.
-                        retries += 1
+                    if time_data['status'] == 'OK':
+                        break
                     else:
-                        print(time_data['status'])
-                        print('Exceed Google API quota - sleeping.')  # Exceed quota for the day.
-                        sys.stdout.flush()
-                        time.sleep(3600)  # 1 hour
-                        retries = 0
+                        if retries < 500:
+                            time.sleep(5)  # Possibly rate limited.
+                            retries += 1
+                        else:
+                            print(time_data['status'])
+                            print('Exceed Google API quota - sleeping.')  # Exceed quota for the day.
+                            sys.stdout.flush()
+                            time.sleep(3600)  # 1 hour
+                            retries = 0
 
-        offset = time_data['dstOffset'] + time_data['rawOffset'];  # seconds
+            offset = time_data['dstOffset'] + time_data['rawOffset']  # seconds
 
-        #if existing_offset != offset:
-        #    print('Offset has changed!')
-        #    print(name)
-        #    print('New offset: ' + str(existing_offset))
-        #    print('Old offset: ' + str(offset))
-        #    print('Date: ' + str(date))
-        #    sys.stdout.flush()
+            utc_d_new = d - datetime.timedelta(seconds=offset)
+            if utc_d_new == utc_d: # UTC time and offsets from Google have stabilized, so it's done.
+                break
+            else:
+                utc_d = utc_d_new
+
+                print('UTC Time not converged - rerunning offset query.')
+                sys.stdout.flush()
+
+        #'''
+        if existing_offset != offset:
+            print('Offset has changed!')
+            print(name)
+            print('New offset: ' + str(existing_offset))
+            print('Old offset: ' + str(offset))
+            print('Date: ' + str(date))
+            sys.stdout.flush()
+        #'''
 
         # NOTE: Ultimately converting local time to UTC is IMPOSSIBLE because of ambiguity.
         # e.g. If clocks roll back from 2 AM to 1 AM, then we see 1 AM twice - ambiguous!
