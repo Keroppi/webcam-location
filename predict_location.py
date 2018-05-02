@@ -15,7 +15,7 @@ else:
     directory = '~/models/best/'
     directory = os.path.expanduser(directory)
 
-constants.BATCH_SIZE = 200
+constants.BATCH_SIZE = 150
 
 sunrise_model = directory + 'sunrise_model_best1.pth.tar'
 sunset_model = directory + 'sunset_model_best2.pth.tar'
