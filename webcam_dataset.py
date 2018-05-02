@@ -165,6 +165,8 @@ class WebcamData():
                                 images = list_of_files_f.read().splitlines()
 
                         # Check for malformed images of size 0.
+                        # Unnecessary since they've all been checked now.
+                        '''
                         checked_images = []
                         for image in images:
                             if os.path.getsize(image) > 0 and imghdr.what(image) == 'jpeg': # Check it's a valid jpg.
@@ -174,6 +176,7 @@ class WebcamData():
                                 sys.stdout.flush()
 
                         images = checked_images
+                        '''
 
                         # Not enough images, so skip it.
                         if len(images) < constants.IMAGES_PER_DAY:
