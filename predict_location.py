@@ -254,10 +254,10 @@ for i in range(data.types['test']):
     actual_lat = days[i].lat
     actual_lng = days[i].lng
 
-    mean_pred_lat = mean_locations[key][0]
-    mean_pred_lng = mean_locations[key][1]
-    median_pred_lat = median_locations[key][0] #places_lat_lng[place][0]
-    median_pred_lng = median_locations[key][1] #places_lat_lng[place][1]
+    mean_pred_lat = mean_locations[place][0]
+    mean_pred_lng = mean_locations[place][1]
+    median_pred_lat = median_locations[place][0] #places_lat_lng[place][0]
+    median_pred_lng = median_locations[place][1] #places_lat_lng[place][1]
 
     mean_distance = compute_distance(actual_lat, actual_lng, mean_pred_lat, mean_pred_lng)
     mean_distances.append(mean_distance)
