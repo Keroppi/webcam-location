@@ -149,17 +149,25 @@ for d_idx, (sunrise, sunset) in enumerate(zip(sunrises, sunsets)):
 # Compute longitude.
 longitudes = []
 for d_idx, solar_noon in enumerate(solar_noons):
-    utc_diff = days[d_idx].mali_solar_noon - solar_noon # Sun rises in the east and sets in the west.
+    #utc_diff = days[d_idx].mali_solar_noon - solar_noon
+    #hours_time_zone_diff = days[d_idx].time_offset / 60 / 60
+    #hours_utc_diff = utc_diff.total_seconds() / 60 / 60
+    #lng = (hours_utc_diff + hours_time_zone_diff) * 15
 
-    hours_time_zone_diff = days[d_idx].time_offset / 60 / 60
+    utc_solar_noon = solar_noon - datetime.timedelta(seconds=days[d_idx].time_offset)
+    utc_diff = days[d_idx].mali_solar_noon - utc_solar_noon
     hours_utc_diff = utc_diff.total_seconds() / 60 / 60
-    lng = (hours_utc_diff + hours_time_zone_diff) * 15
+    lng = hours_utc_diff * 15
 
     # What to do if outside [-180, 180] range?
     if lng < -180:
         lng += 360
+        print('WARNING - lng below -180')
+        sys.stdout.flush()
     elif lng > 180:
         lng -= 360
+        print('WARNING - lng over 180')
+        sys.stdout.flush()
 
     if random.randint(1, 100) < 5: # VLI
         print('Lng')
@@ -268,6 +276,8 @@ for i in range(data.types['test']):
 
     if random.randint(1, 100) < 20: # VLI
         print('Distance')
+        print(place)
+        print('# Days Used: ' + str(len(lats[place])))
         print('Using mean: ' + str(mean_distance))
         print('Using median: ' + str(median_distance))
         print(str(actual_lat) + ', ' + str(actual_lng))
@@ -283,4 +293,6 @@ print('Means Avg. Distance Error: {:.6f}'.format(statistics.mean(mean_distances)
 print('Medians Avg. Distance Error: {:.6f}'.format(statistics.mean(median_distances)))
 print('Means Max Distance Error: {:.6f}'.format(max(mean_distances)))
 print('Means Min Distance Error: {:.6f}'.format(min(mean_distances)))
+print('Medians Max Distance Error: {:.6f}'.format(max(median_distances)))
+print('Medians Min Distance Error: {:.6f}'.format(min(median_distances)))
 sys.stdout.flush()
