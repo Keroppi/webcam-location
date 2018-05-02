@@ -1,6 +1,6 @@
 #!/srv/glusterfs/vli/.pyenv/shims/python
 
-import string, sys, os, requests, urllib.request, json, multiprocessing as mp, datetime, time, traceback, socket, random, glob
+import string, sys, os, requests, urllib.request, json, multiprocessing as mp, datetime, time, traceback, socket, random, glob, pytz
 from urllib.error import ContentTooShortError
 from http.client import RemoteDisconnected
 from urllib.request import URLError
@@ -56,8 +56,15 @@ def get_sun_info(country, name, year, month, day, html_rows, mali_html_rows, lat
     
     # If file already exists and has size > 0, skip this.
     sun_file_str = wrtPth + '/sun.txt'
-    if not (os.path.isfile(sun_file_str) and os.path.getsize(sun_file_str) > 0):
-    #if True:
+    #if not (os.path.isfile(sun_file_str) and os.path.getsize(sun_file_str) > 0):
+    if True: # VLI
+        with open(sun_file_str, 'r') as some_stuff: # VLI
+            existing_offset = some_stuff.read().splitlines()[3] # VLI
+            if existing_offset.find('UNKNOWN') >= 0: # VLI
+                return # VLI
+            existing_offset = int(existing_offset)
+
+
         # Find which row of the table corresponds to this day.
         for row_idx in range(len(html_rows)):
             headers = html_rows[row_idx].find_all('th')
@@ -147,12 +154,11 @@ def get_sun_info(country, name, year, month, day, html_rows, mali_html_rows, lat
             sunset_date += datetime.timedelta(days=1)
 
         d = datetime.datetime.strptime(str(sunrise_date.date()) + ' ' + local_sunrise_str, "%Y-%m-%d %H:%M:%S")
+        d = d.replace(tzinfo=pytz.utc) # Don't let python guess DST.
         d1 = datetime.datetime.strptime(str(sunset_date.date()) + ' ' + local_sunset_str, "%Y-%m-%d %H:%M:%S")
-        timestamp = time.mktime(d.timetuple())
+        timestamp = time.mktime(d.timetuple()) + 3600 # For some reason, datetime.datetime.fromtimestamp(0) is 1 AM not midnight, so add 1 hour back
         google_url = 'https://maps.googleapis.com/maps/api/timezone/json?location=' + str(lat) + ',' + \
                      str(lng) + '&timestamp=' + str(timestamp) + '&key=' + GOOGLE_MAPS_API_KEY
-
-
 
         retries = 0
         while True:
@@ -176,7 +182,7 @@ def get_sun_info(country, name, year, month, day, html_rows, mali_html_rows, lat
         utc_d = d - datetime.timedelta(seconds=offset)
 
         # Requery time zone using estimate of UTC time.
-        timestamp = time.mktime(utc_d.timetuple())
+        timestamp = time.mktime(utc_d.timetuple()) + 3600 # For some reason, datetime.datetime.fromtimestamp(0) is 1 AM not midnight, so add 1 hour back
         google_url = 'https://maps.googleapis.com/maps/api/timezone/json?location=' + str(lat) + ',' + \
                      str(lng) + '&timestamp=' + str(timestamp) + '&key=' + GOOGLE_MAPS_API_KEY
         retries = 0
@@ -198,6 +204,14 @@ def get_sun_info(country, name, year, month, day, html_rows, mali_html_rows, lat
                         retries = 0
 
         offset = time_data['dstOffset'] + time_data['rawOffset'];  # seconds
+
+        if existing_offset != offset: # VLI
+            print('Offset has changed!')
+            print(name)
+            print('New offset: ' + str(existing_offset))
+            print('Old offset: ' + str(offset))
+            print('Date: ' + str(date))
+            sys.stdout.flush()
 
         # NOTE: Ultimately converting local time to UTC is IMPOSSIBLE because of ambiguity.
         # e.g. If clocks roll back from 2 AM to 1 AM, then we see 1 AM twice - ambiguous!
