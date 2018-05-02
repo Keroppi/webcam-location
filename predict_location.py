@@ -149,15 +149,16 @@ for d_idx, (sunrise, sunset) in enumerate(zip(sunrises, sunsets)):
 # Compute longitude.
 longitudes = []
 for d_idx, solar_noon in enumerate(solar_noons):
-    #utc_diff = days[d_idx].mali_solar_noon - solar_noon
-    #hours_time_zone_diff = days[d_idx].time_offset / 60 / 60
-    #hours_utc_diff = utc_diff.total_seconds() / 60 / 60
-    #lng = (hours_utc_diff + hours_time_zone_diff) * 15
-
-    utc_solar_noon = solar_noon - datetime.timedelta(seconds=days[d_idx].time_offset)
-    utc_diff = days[d_idx].mali_solar_noon - utc_solar_noon
+    utc_diff = days[d_idx].mali_solar_noon - solar_noon
+    hours_time_zone_diff = days[d_idx].time_offset / 60 / 60
     hours_utc_diff = utc_diff.total_seconds() / 60 / 60
-    lng = hours_utc_diff * 15
+    lng = (hours_utc_diff + hours_time_zone_diff) * 15
+
+    # Convert to UTC time first - doesn't make a difference compared to above.
+    #utc_solar_noon = solar_noon - datetime.timedelta(seconds=days[d_idx].time_offset)
+    #utc_diff = days[d_idx].mali_solar_noon - utc_solar_noon
+    #hours_utc_diff = utc_diff.total_seconds() / 60 / 60
+    #lng = hours_utc_diff * 15
 
     # What to do if outside [-180, 180] range?
     if lng < -180:
