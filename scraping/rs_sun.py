@@ -56,15 +56,13 @@ def get_sun_info(country, name, year, month, day, html_rows, mali_html_rows, lat
     
     # If file already exists and has size > 0, skip this.
     sun_file_str = wrtPth + '/sun.txt'
-    #if not (os.path.isfile(sun_file_str) and os.path.getsize(sun_file_str) > 0):
-    if True:
-        #"""
-        with open(sun_file_str, 'r') as some_stuff:
-            existing_offset = some_stuff.read().splitlines()[3]
-            if existing_offset.find('UNKNOWN') >= 0:
-                return
-            existing_offset = int(existing_offset)
-        #"""
+    if not (os.path.isfile(sun_file_str) and os.path.getsize(sun_file_str) > 0):
+    #if True:
+        #with open(sun_file_str, 'r') as some_stuff:
+        #    existing_offset = some_stuff.read().splitlines()[3]
+        #    if existing_offset.find('UNKNOWN') >= 0:
+        #        return
+        #    existing_offset = int(existing_offset)
 
         # Find which row of the table corresponds to this day.
         for row_idx in range(len(html_rows)):
@@ -216,7 +214,7 @@ def get_sun_info(country, name, year, month, day, html_rows, mali_html_rows, lat
                 print('UTC Time not converged - rerunning offset query.')
                 sys.stdout.flush()
 
-        #'''
+        """
         if existing_offset != offset:
             print('Offset has changed!')
             print(name)
@@ -224,7 +222,7 @@ def get_sun_info(country, name, year, month, day, html_rows, mali_html_rows, lat
             print('Old offset: ' + str(offset))
             print('Date: ' + str(date))
             sys.stdout.flush()
-        #'''
+        """
 
         # NOTE: Ultimately converting local time to UTC is IMPOSSIBLE because of ambiguity.
         # e.g. If clocks roll back from 2 AM to 1 AM, then we see 1 AM twice - ambiguous!
