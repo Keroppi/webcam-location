@@ -37,10 +37,16 @@ def RandomizeArgs(SGE_TASK_ID):
 
     # Pickle to find batch size later.
     if constants.CLUSTER:
-        dir = '/srv/glusterfs/vli/pickle/'
+        dir = '/srv/glusterfs/vli/models/'
     else:
-        dir = '/home/vli/pickle/'
-    with open(dir + 'model_structure' + SGE_TASK_ID + '.pkl', 'wb') as f:
+        dir = '/home/vli/models/'
+
+    if constants.LEARNING_SUNRISE:
+        prefix = 'sunrise_'
+    else:
+        prefix = 'sunset_'
+
+    with open(dir + prefix + 'model_structure' + SGE_TASK_ID + '.pkl', 'wb') as f:
         pickle.dump(parameters, f)
 
     return parameters
@@ -68,10 +74,16 @@ def ManualArgs(SGE_TASK_ID):
 
     # Pickle to find batch size later.
     if constants.CLUSTER:
-        dir = '/srv/glusterfs/vli/pickle/'
+        dir = '/srv/glusterfs/vli/models/'
     else:
-        dir = '/home/vli/pickle/'
-    with open(dir + 'model_structure' + SGE_TASK_ID + '.pkl', 'wb') as f:
+        dir = '/home/vli/models/'
+
+    if constants.LEARNING_SUNRISE:
+        prefix = 'sunrise_'
+    else:
+        prefix = 'sunset_'
+
+    with open(dir + prefix + 'model_structure' + SGE_TASK_ID + '.pkl', 'wb') as f:
         pickle.dump(parameters, f)
 
     return parameters

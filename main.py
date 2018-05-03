@@ -66,19 +66,74 @@ print('# Test Examples: {}'.format(len(test_loader.dataset)))
 sys.stdout.flush()
 #'''
 
-if args.resume: # Continue training a model.
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+if not args.load_model_args: # Create a new network structure.
+    model_t0 = time.time()
+    while True: # Try random models until we get one where the convolutions produce a valid size.
+        try:
+            model_args = ManualArgs(SGE_TASK_ID) # RandomizeArgs(SGE_TASK_ID) #
+            model = WebcamLocation(*model_args)
+            model_memory_mb = count_parameters(model) * 4 / 1000 / 1000
+
+            if constants.CLUSTER:
+                if model_memory_mb < 2000: # Only proceed if the model's memory is less than 2 GB
+                    print('Model memory (MB): ' + str(model_memory_mb))
+                    sys.stdout.flush()
+
+                    break
+            else:
+                if model_memory_mb < 200:
+                    print('Model memory (MB): ' + str(model_memory_mb))
+                    sys.stdout.flush()
+
+                    break
+        except RuntimeError as e: # Very hacky.
+            if str(e).find('Output size is too small') >= 0: # Invalid configuration.
+                pass
+            elif str(e).find('not enough memory: you tried to allocate') >= 0: # Configuration uses too much memory.
+                pass
+            elif str(e).find("Kernel size can't greater than actual input size") >= 0: # Kernel is bigger than input.
+                pass
+            else:
+                raise e
+
+    model_t1 = time.time()
+    print('Time to find a valid model (s): ' + str(model_t1 - model_t0))
+    sys.stdout.flush()
+else: # Retrying a specific network structure.
+    with open(args.load_model_args, 'rb') as pkl_f:
+        model_args = pickle.load(pkl_f)
+        model = WebcamLocation(*model_args)
+
+    model_memory_mb = count_parameters(model) * 4 / 1000 / 1000
+    print('Model memory (MB): ' + str(model_memory_mb))
+    sys.stdout.flush()
+
+train_loss_fn = torch.nn.MSELoss()
+test_loss_fn = torch.nn.MSELoss(size_average=False)
+
+if torch.cuda.is_available():
+    if torch.cuda.device_count() > 1:
+        model = torch.nn.DataParallel(model)
+
+    #model = model.cuda()
+    model.cuda()
+    train_loss_fn = train_loss_fn.cuda()
+    test_loss_fn = test_loss_fn.cuda()
+
+optimizer = torch.optim.Adagrad(model.parameters(), lr=1e-3)
+
+if args.resume:  # Continue training a model - requires using --load_model_args option.
     if os.path.isfile(args.resume):
         print("=> loading checkpoint '{}'".format(args.resume))
         checkpoint = torch.load(args.resume)
-        model = checkpoint['model']
+        # model = checkpoint['model']
         start_epoch = checkpoint['epoch']
         best_error = checkpoint['best_prec1']
-        #model.load_state_dict(checkpoint['state_dict'])
-        optimizer = torch.optim.Adagrad(model.parameters(), lr=1e-3)
+        model.load_state_dict(checkpoint['state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer'])
-
-        train_loss_fn = torch.nn.MSELoss().cuda()
-        test_loss_fn = torch.nn.MSELoss(size_average=False).cuda()
 
         print("=> loaded checkpoint '{}' (epoch {})"
               .format(args.resume, checkpoint['epoch']))
@@ -87,65 +142,7 @@ if args.resume: # Continue training a model.
         print("=> no checkpoint found at '{}'".format(args.resume))
         sys.stdout.flush()
         sys.exit()
-else: # Not resuming a model.
-    def count_parameters(model):
-        return sum(p.numel() for p in model.parameters() if p.requires_grad)
-
-    if not args.load_model_args: # Create a new network structure.
-        model_t0 = time.time()
-        while True: # Try random models until we get one where the convolutions produce a valid size.
-            try:
-                model_args = RandomizeArgs(SGE_TASK_ID) #ManualArgs(SGE_TASK_ID)
-                model = WebcamLocation(*model_args)
-                model_memory_mb = count_parameters(model) * 4 / 1000 / 1000
-
-                if constants.CLUSTER:
-                    if model_memory_mb < 2000: # Only proceed if the model's memory is less than 2 GB
-                        print('Model memory (MB): ' + str(model_memory_mb))
-                        sys.stdout.flush()
-
-                        break
-                else:
-                    if model_memory_mb < 200:
-                        print('Model memory (MB): ' + str(model_memory_mb))
-                        sys.stdout.flush()
-
-                        break
-            except RuntimeError as e: # Very hacky.
-                if str(e).find('Output size is too small') >= 0: # Invalid configuration.
-                    pass
-                elif str(e).find('not enough memory: you tried to allocate') >= 0: # Configuration uses too much memory.
-                    pass
-                elif str(e).find("Kernel size can't greater than actual input size") >= 0: # Kernel is bigger than input.
-                    pass
-                else:
-                    raise e
-
-        model_t1 = time.time()
-        print('Time to find a valid model (s): ' + str(model_t1 - model_t0))
-        sys.stdout.flush()
-    else: # Retrying a specific network structure.
-        with open(args.load_model_args, 'rb') as pkl_f:
-            model_args = pickle.load(pkl_f)
-            model = WebcamLocation(*model_args)
-
-        model_memory_mb = count_parameters(model) * 4 / 1000 / 1000
-        print('Model memory (MB): ' + str(model_memory_mb))
-        sys.stdout.flush()
-
-    train_loss_fn = torch.nn.MSELoss()
-    test_loss_fn = torch.nn.MSELoss(size_average=False)
-
-    if torch.cuda.is_available():
-        if torch.cuda.device_count() > 1:
-            model = torch.nn.DataParallel(model)
-
-        #model = model.cuda()
-        model.cuda()
-        train_loss_fn = train_loss_fn.cuda()
-        test_loss_fn = test_loss_fn.cuda()
-
-    optimizer = torch.optim.Adagrad(model.parameters(), lr=1e-3)
+else:
     start_epoch = 0
     best_error = float('inf')
 
