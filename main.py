@@ -133,7 +133,7 @@ if args.resume:
         model = checkpoint['model']
         start_epoch = checkpoint['epoch']
         best_error = checkpoint['best_prec1']
-        model.load_state_dict(checkpoint['state_dict'])
+        #model.load_state_dict(checkpoint['state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer'])
         print("=> loaded checkpoint '{}' (epoch {})"
               .format(args.resume, checkpoint['epoch']))
@@ -233,6 +233,7 @@ def save_checkpoint(state, is_best, filename='checkpoint' + SGE_TASK_ID + '.pth.
             best_params.write('Using ' + str(constants.DAYS_PER_MONTH) + ' days per month.\n')
             best_params.write('Using ' + str(state['epoch']) + ' epochs.\n')
             best_params.write('Using batch size of ' + str(constants.BATCH_SIZE) + '.\n')
+            best_params.write('Model memory size (MB): ' + str(model_memory_mb) + '.\n')
             best_params.write(str(state['best_prec1']))
 
 

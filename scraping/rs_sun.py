@@ -211,9 +211,6 @@ def get_sun_info(country, name, year, month, day, html_rows, mali_html_rows, lat
             else:
                 utc_d = utc_d_new
 
-                print('UTC Time not converged - rerunning offset query.')
-                sys.stdout.flush()
-
         """
         if existing_offset != offset:
             print('Offset has changed!')
@@ -222,6 +219,8 @@ def get_sun_info(country, name, year, month, day, html_rows, mali_html_rows, lat
             print('Old offset: ' + str(offset))
             print('Date: ' + str(date))
             sys.stdout.flush()
+        else:
+            return
         """
 
         # NOTE: Ultimately converting local time to UTC is IMPOSSIBLE because of ambiguity.
@@ -229,6 +228,7 @@ def get_sun_info(country, name, year, month, day, html_rows, mali_html_rows, lat
         # But if sunrise and sunset are not close to DST changes, then it should be ok.
 
         utc_sunrise = d - datetime.timedelta(seconds=offset)
+        utc_sunrise = utc_sunrise.replace(tzinfo=None)
         utc_sunset = d1 - datetime.timedelta(seconds=offset)
 
         for row_idx in range(len(mali_html_rows)):
