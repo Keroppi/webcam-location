@@ -10,7 +10,8 @@ from webcam_dataset import Train
 from webcam_dataset import Test
 from webcam_dataset import Validation
 from custom_transforms import Resize, RandomResize, RandomPatch, Center, ToTensor
-from custom_model import WebcamLocation, RandomizeArgs, ManualArgs
+from custom_model import WebcamLocation
+from choose_args import RandomizeArgs, ManualArgs
 from torch.autograd import Variable
 
 if constants.CLUSTER:
@@ -65,7 +66,7 @@ print('# Test Examples: {}'.format(len(test_loader.dataset)))
 sys.stdout.flush()
 #'''
 
-if args.resume:
+if args.resume: # Continue training a model.
     if os.path.isfile(args.resume):
         print("=> loading checkpoint '{}'".format(args.resume))
         checkpoint = torch.load(args.resume)
