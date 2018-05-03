@@ -1,6 +1,6 @@
 #!/srv/glusterfs/vli/.pyenv/shims/python
 
-import torch, torchvision, os, datetime, time, math, pandas as pd, sys, random, statistics
+import torch, torchvision, os, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, scipy
 
 sys.path.append('/home/vli/webcam-location') # For importing .py files in the same directory on the cluster.
 import constants
@@ -43,7 +43,6 @@ else:
     num_workers = constants.NUM_LOADER_WORKERS
 
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=constants.BATCH_SIZE, num_workers=num_workers, pin_memory=pin_memory)
-#print(len(test_loader.dataset))
 
 sunrise_predict_t0 = time.time()
 sunrises = []
@@ -107,6 +106,7 @@ for d_idx, (sunrise, sunset) in enumerate(zip(sunrises, sunsets)):
     if solar_noon.hour < 10:
         solar_noon = solar_noon.replace(hour=10, minute=0, second=0, microsecond=0)
 
+    '''
     if random.randint(1, 100) < 5: # VLI
         print('Sunrise / sunset / solar noon')
         print(sunrise)
@@ -114,6 +114,8 @@ for d_idx, (sunrise, sunset) in enumerate(zip(sunrises, sunsets)):
         print(solar_noon)
         print('')
         sys.stdout.flush()
+    '''
+
     solar_noons.append(solar_noon)
     day_lengths.append((sunset - sunrise).total_seconds())
 
@@ -170,11 +172,13 @@ for d_idx, solar_noon in enumerate(solar_noons):
         print('WARNING - lng over 180')
         sys.stdout.flush()
 
+    '''
     if random.randint(1, 100) < 5: # VLI
         print('Lng')
         print(lng)
         print('')
         sys.stdout.flush()
+    '''
 
     longitudes.append(lng)
 
@@ -189,11 +193,13 @@ for d_idx, day_length in enumerate(day_lengths):
     declination = math.radians(23.45) * math.sin(math.radians(360 * (283 + day_of_year) / 365))
     lat = math.degrees(math.atan(-math.cos(math.radians(15 * day_length_hours / 2)) / math.tan(declination)))
 
+    '''
     if random.randint(1, 100) < 5: # VLI
         print('Lat')
         print(lat)
         print('')
         sys.stdout.flush()
+    '''
 
     latitudes.append(lat) # Only one day to predict latitude - could average across many days.
 
@@ -232,6 +238,25 @@ for key in lats:
     mean_locations[key] = (statistics.mean(lats[key]), statistics.mean(lngs[key]))
     median_locations[key] = (statistics.median(lats[key]), statistics.median(lngs[key]))
 
+# Kernel density estimation to guess location.
+density_locations = {}
+for key in lats:
+    np_lats = np.array(lats[key])
+    np_lngs = np.array(lngs[key])
+    possible_points = np.vstack((np_lats, np_lngs))
+
+    # Gaussian Kernel Density Estimation
+    kernel = scipy.stats.gaussian_kde(possible_points)
+
+    # Find MLE
+    # Note, this uses around 2.6 GB memory.
+    latitude_search = np.linspace(-90, 90, num=18001) # 0.01 step size
+    longitude_search = np.linspace(-180, 180, num=36001) # 0.01 step size
+    search_space = np.vstack((latitude_search, longitude_search))
+    density = kernel(search_space)
+    ind = np.unravel_index(np.argmax(density, axis=None), density.shape)
+    density_locations[key] = (ind[0] * 0.01 - 90, ind[1] * 0.01 - 180)
+
 
 def compute_distance(lat1, lng1, lat2, lng2): # kilometers
     # Haversine formula for computing distance.
@@ -253,6 +278,7 @@ def compute_distance(lat1, lng1, lat2, lng2): # kilometers
 finished_places = []
 mean_distances = []
 median_distances = []
+density_distances = []
 for i in range(data.types['test']):
     place = days[i].place
 
@@ -269,11 +295,15 @@ for i in range(data.types['test']):
     mean_pred_lng = mean_locations[place][1]
     median_pred_lat = median_locations[place][0] #places_lat_lng[place][0]
     median_pred_lng = median_locations[place][1] #places_lat_lng[place][1]
+    density_pred_lat = density_locations[place][0]
+    density_pred_lng = density_locations[place][1]
 
     mean_distance = compute_distance(actual_lat, actual_lng, mean_pred_lat, mean_pred_lng)
     mean_distances.append(mean_distance)
     median_distance = compute_distance(actual_lat, actual_lng, median_pred_lat, median_pred_lng)
     median_distances.append(median_distance)
+    density_distance = compute_distance(actual_lat, actual_lng, density_pred_lat, density_pred_lng)
+    density_distances.append(density_distance)
 
     if random.randint(1, 100) < 20: # VLI
         print('Distance')
@@ -281,9 +311,11 @@ for i in range(data.types['test']):
         print('# Days Used: ' + str(len(lats[place])))
         print('Using mean: ' + str(mean_distance))
         print('Using median: ' + str(median_distance))
+        print('Using density: ' + str(density_distance))
         print(str(actual_lat) + ', ' + str(actual_lng))
         print(str(mean_pred_lat) + ', ' + str(mean_pred_lng))
         print(str(median_pred_lat) + ', ' + str(median_pred_lng))
+        print(str(density_pred_lat) + ', ' + str(density_pred_lng))
         print('')
         sys.stdout.flush()
 
@@ -292,8 +324,11 @@ for i in range(data.types['test']):
 #average_dist /= len(finished_places)
 print('Means Avg. Distance Error: {:.6f}'.format(statistics.mean(mean_distances)))
 print('Medians Avg. Distance Error: {:.6f}'.format(statistics.mean(median_distances)))
+print('Density Avg. Distance Error: {:.6f}'.format(statistics.mean(density_distances)))
 print('Means Max Distance Error: {:.6f}'.format(max(mean_distances)))
 print('Means Min Distance Error: {:.6f}'.format(min(mean_distances)))
 print('Medians Max Distance Error: {:.6f}'.format(max(median_distances)))
 print('Medians Min Distance Error: {:.6f}'.format(min(median_distances)))
+print('Density Max Distance Error: {:.6f}'.format(max(density_distances)))
+print('Density Min Distance Error: {:.6f}'.format(min(density_distances)))
 sys.stdout.flush()
