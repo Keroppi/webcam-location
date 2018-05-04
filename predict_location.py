@@ -285,6 +285,10 @@ for key in lats:
         density_locations[key] = None
         print('WARNING - NaN or inf found at ' + key)
         print(possible_points)
+        lats_valid = [math.isnan(lat) or math.isinf(lat) for lat in latitudes]
+        lngs_valid = [math.isnan(lng) or math.isinf(lng) for lng in longitudes]
+        print(False in lats_valid)
+        print(False in lngs_valid)
         sys.stdout.flush()
 
 
