@@ -40,6 +40,14 @@ with open(sunset_pkl, 'rb') as sunset_pkl_f:
 sunrise_model.load_state_dict(sunrise_checkpt['state_dict'])
 sunset_model.load_state_dict(sunset_checkpt['state_dict'])
 
+if torch.cuda.is_available():
+    if torch.cuda.device_count() > 1:
+        sunrise_model = torch.nn.DataParallel(sunrise_model)
+        sunset_model = torch.nn.DataParallel(sunset_model)
+
+    sunrise_model.cuda()
+    sunset_model.cuda()
+
 sunrise_model.eval()
 sunset_model.eval()
 
