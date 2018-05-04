@@ -263,6 +263,10 @@ for key in lats:
 # Kernel density estimation to guess location.
 density_locations = {}
 for key in lats:
+    if len(lats[key]) == 1:
+        density_locations[key] = (lats[key][0], lngs[key][0])
+        continue
+
     np_lats = np.array(lats[key])
     np_lngs = np.array(lngs[key])
     possible_points = np.vstack((np_lats, np_lngs))
