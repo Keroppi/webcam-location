@@ -16,7 +16,7 @@ else:
     directory = '~/models/best/'
     directory = os.path.expanduser(directory)
 
-constants.BATCH_SIZE = 150
+constants.BATCH_SIZE = 250
 
 sunrise_model = directory + 'sunrise_model_best1.pth.tar'
 sunset_model = directory + 'sunset_model_best2.pth.tar'
@@ -271,13 +271,13 @@ for key in lats:
     kernel = scipy.stats.gaussian_kde(possible_points)
 
     # Find MLE
-    # Note, this uses around 2.6 GB memory.
-    latitude_search = np.linspace(-90, 90, num=18001) # 0.01 step size
+    # Note, this uses around 5.2 GB memory.
+    latitude_search = np.linspace(-90, 90, num=36001) # 0.005 step size
     longitude_search = np.linspace(-180, 180, num=36001) # 0.01 step size
     search_space = np.vstack((latitude_search, longitude_search))
     density = kernel(search_space)
     ind = np.unravel_index(np.argmax(density, axis=None), density.shape)
-    density_locations[key] = (ind[0] * 0.01 - 90, ind[1] * 0.01 - 180)
+    density_locations[key] = (ind[0] * 0.005 - 90, ind[1] * 0.01 - 180)
 
 
 def compute_distance(lat1, lng1, lat2, lng2): # kilometers
