@@ -1,12 +1,13 @@
 #!/srv/glusterfs/vli/.pyenv/shims/python
 
-import torch, torchvision, os, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, scipy
+import torch, torchvision, os, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, scipy, pickle
 
 sys.path.append('/home/vli/webcam-location') # For importing .py files in the same directory on the cluster.
 import constants
 from webcam_dataset import WebcamData
 from webcam_dataset import Test
 from custom_transforms import Resize, RandomPatch, ToTensor
+from custom_model import WebcamLocation
 from torch.autograd import Variable
 
 if constants.CLUSTER:
@@ -19,12 +20,24 @@ constants.BATCH_SIZE = 150
 
 sunrise_model = directory + 'sunrise_model_best1.pth.tar'
 sunset_model = directory + 'sunset_model_best2.pth.tar'
+sunrise_pkl = directory + 'sunrise_model_structure1.pkl'
+sunset_pkl = directory + 'sunrise_model_structure2.pkl'
 
 sunrise_checkpt = torch.load(sunrise_model)
 sunset_checkpt = torch.load(sunset_model)
 
-sunrise_model = sunrise_checkpt['model']
-sunset_model = sunset_checkpt['model']
+#sunrise_model = sunrise_checkpt['model']
+#sunset_model = sunset_checkpt['model']
+with open(sunrise_pkl, 'rb') as sunrise_pkl_f:
+    sunrise_model_args = pickle.load(sunrise_pkl_f)
+    sunrise_model = WebcamLocation(*sunrise_model_args)
+
+with open(sunset_pkl, 'rb') as sunset_pkl_f:
+    sunset_model_args = pickle.load(sunset_pkl_f)
+    sunset_model = WebcamLocation(*sunset_model_args)
+
+sunrise_model.load_state_dict(sunrise_checkpt['state_dict'])
+sunset_model.load_state_dict(sunset_checkpt['state_dict'])
 
 sunrise_model.eval()
 sunset_model.eval()
