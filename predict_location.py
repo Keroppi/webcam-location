@@ -276,8 +276,8 @@ for key in lats:
     longitude_search = np.linspace(-180, 180, num=36001) # 0.01 step size
     search_space = np.vstack((latitude_search, longitude_search))
     density = kernel(search_space)
-    ind = np.unravel_index(np.argmax(density, axis=None), density.shape)
-    density_locations[key] = (ind[0] * 0.005 - 90, ind[1] * 0.01 - 180)
+    ind = np.argmax(density, axis=None)
+    density_locations[key] = (latitude_search[ind], longitude_search[ind])
 
 
 def compute_distance(lat1, lng1, lat2, lng2): # kilometers
