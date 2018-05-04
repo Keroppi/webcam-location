@@ -267,17 +267,24 @@ for key in lats:
     np_lngs = np.array(lngs[key])
     possible_points = np.vstack((np_lats, np_lngs))
 
-    # Gaussian Kernel Density Estimation
-    kernel = scipy.stats.gaussian_kde(possible_points)
+    finite = np.where(np.isfinite(possible_points) == False)[0].shape == (0,) # Check all values are not inf or NaN
 
-    # Find MLE
-    # Note, this uses around 5.2 GB memory.
-    latitude_search = np.linspace(-90, 90, num=36001) # 0.005 step size
-    longitude_search = np.linspace(-180, 180, num=36001) # 0.01 step size
-    search_space = np.vstack((latitude_search, longitude_search))
-    density = kernel(search_space)
-    ind = np.argmax(density, axis=None)
-    density_locations[key] = (latitude_search[ind], longitude_search[ind])
+    if finite:
+        # Gaussian Kernel Density Estimation
+        kernel = scipy.stats.gaussian_kde(possible_points)
+
+        # Find MLE
+        # Note, this uses around 5.2 GB memory.
+        latitude_search = np.linspace(-90, 90, num=36001) # 0.005 step size
+        longitude_search = np.linspace(-180, 180, num=36001) # 0.01 step size
+        search_space = np.vstack((latitude_search, longitude_search))
+        density = kernel(search_space)
+        ind = np.argmax(density, axis=None)
+        density_locations[key] = (latitude_search[ind], longitude_search[ind])
+    else:
+        density_locations[key] = None
+        print('WARNING - NaN or inf found at ' + key)
+        sys.stdout.flush()
 
 
 def compute_distance(lat1, lng1, lat2, lng2): # kilometers
@@ -317,15 +324,19 @@ for i in range(data.types['test']):
     mean_pred_lng = mean_locations[place][1]
     median_pred_lat = median_locations[place][0] #places_lat_lng[place][0]
     median_pred_lng = median_locations[place][1] #places_lat_lng[place][1]
-    density_pred_lat = density_locations[place][0]
-    density_pred_lng = density_locations[place][1]
+
+    if density_locations[place] is not None:
+        density_pred_lat = density_locations[place][0]
+        density_pred_lng = density_locations[place][1]
 
     mean_distance = compute_distance(actual_lat, actual_lng, mean_pred_lat, mean_pred_lng)
     mean_distances.append(mean_distance)
     median_distance = compute_distance(actual_lat, actual_lng, median_pred_lat, median_pred_lng)
     median_distances.append(median_distance)
-    density_distance = compute_distance(actual_lat, actual_lng, density_pred_lat, density_pred_lng)
-    density_distances.append(density_distance)
+
+    if density_locations[place] is not None:
+        density_distance = compute_distance(actual_lat, actual_lng, density_pred_lat, density_pred_lng)
+        density_distances.append(density_distance)
 
     if random.randint(1, 100) < 20: # VLI
         print('Distance')
@@ -337,7 +348,10 @@ for i in range(data.types['test']):
         print(str(actual_lat) + ', ' + str(actual_lng))
         print(str(mean_pred_lat) + ', ' + str(mean_pred_lng))
         print(str(median_pred_lat) + ', ' + str(median_pred_lng))
-        print(str(density_pred_lat) + ', ' + str(density_pred_lng))
+
+        if density_locations[place] is not None:
+            print(str(density_pred_lat) + ', ' + str(density_pred_lng))
+
         print('')
         sys.stdout.flush()
 
@@ -347,6 +361,9 @@ for i in range(data.types['test']):
 print('Means Avg. Distance Error: {:.6f}'.format(statistics.mean(mean_distances)))
 print('Medians Avg. Distance Error: {:.6f}'.format(statistics.mean(median_distances)))
 print('Density Avg. Distance Error: {:.6f}'.format(statistics.mean(density_distances)))
+print('Means Median Distance Error: {:.6f}'.format(statistics.median(mean_distances)))
+print('Medians Median Distance Error: {:.6f}'.format(statistics.median(median_distances)))
+print('Density Median Distance Error: {:.6f}'.format(statistics.median(density_distances)))
 print('Means Max Distance Error: {:.6f}'.format(max(mean_distances)))
 print('Means Min Distance Error: {:.6f}'.format(min(mean_distances)))
 print('Medians Max Distance Error: {:.6f}'.format(max(median_distances)))
