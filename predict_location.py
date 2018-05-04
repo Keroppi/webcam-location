@@ -21,13 +21,14 @@ constants.BATCH_SIZE = 150
 sunrise_model = directory + 'sunrise_model_best1.pth.tar'
 sunset_model = directory + 'sunset_model_best2.pth.tar'
 sunrise_pkl = directory + 'sunrise_model_structure1.pkl'
-sunset_pkl = directory + 'sunrise_model_structure2.pkl'
+sunset_pkl = directory + 'sunset_model_structure2.pkl'
 
 sunrise_checkpt = torch.load(sunrise_model)
 sunset_checkpt = torch.load(sunset_model)
 
 #sunrise_model = sunrise_checkpt['model']
 #sunset_model = sunset_checkpt['model']
+
 with open(sunrise_pkl, 'rb') as sunrise_pkl_f:
     sunrise_model_args = pickle.load(sunrise_pkl_f)
     sunrise_model = WebcamLocation(*sunrise_model_args)
