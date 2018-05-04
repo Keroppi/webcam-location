@@ -284,6 +284,7 @@ for key in lats:
     else:
         density_locations[key] = None
         print('WARNING - NaN or inf found at ' + key)
+        print(possible_points)
         sys.stdout.flush()
 
 
