@@ -266,6 +266,9 @@ for key in lats:
     if len(lats[key]) == 1:
         density_locations[key] = (lats[key][0], lngs[key][0])
         continue
+    elif len(lats[key]) == 2: # Points are colinear, results in singular matrix
+        density_locations[key] = (statistics.mean(lats[key]), statistics.mean(lngs[key]))
+        continue
 
     np_lats = np.array(lats[key])
     np_lngs = np.array(lngs[key])
