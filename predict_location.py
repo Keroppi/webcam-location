@@ -271,29 +271,29 @@ for key in lats:
     np_lngs = np.array(lngs[key])
     possible_points = np.vstack((np_lats, np_lngs))
 
-    finite = np.where(np.isfinite(possible_points) == False)[0].shape == (0,) # Check all values are not inf or NaN
+    #finite = np.where(np.isfinite(possible_points) == False)[0].shape == (0,) # Check all values are not inf or NaN
 
-    if finite:
-        # Gaussian Kernel Density Estimation
-        kernel = scipy.stats.gaussian_kde(possible_points)
+    #if finite:
+    # Gaussian Kernel Density Estimation
+    kernel = scipy.stats.gaussian_kde(possible_points, bw_method=8)
 
-        # Find MLE
-        # Note, this uses around 5.2 GB memory.
-        latitude_search = np.linspace(-90, 90, num=36001) # 0.005 step size
-        longitude_search = np.linspace(-180, 180, num=36001) # 0.01 step size
-        search_space = np.vstack((latitude_search, longitude_search))
-        density = kernel(search_space)
-        ind = np.argmax(density, axis=None)
-        density_locations[key] = (latitude_search[ind], longitude_search[ind])
-    else:
-        density_locations[key] = None
-        print('WARNING - NaN or inf found at ' + key)
-        print(possible_points)
-        lats_valid = [math.isnan(lat) or math.isinf(lat) for lat in latitudes]
-        lngs_valid = [math.isnan(lng) or math.isinf(lng) for lng in longitudes]
-        print(False in lats_valid)
-        print(False in lngs_valid)
-        sys.stdout.flush()
+    # Find MLE
+    # Note, this uses around 5.2 GB memory.
+    latitude_search = np.linspace(-90, 90, num=36001) # 0.005 step size
+    longitude_search = np.linspace(-180, 180, num=36001) # 0.01 step size
+    search_space = np.vstack((latitude_search, longitude_search))
+    density = kernel(search_space)
+    ind = np.argmax(density, axis=None)
+    density_locations[key] = (latitude_search[ind], longitude_search[ind])
+    #else:
+    #    density_locations[key] = None
+    #    print('WARNING - NaN or inf found at ' + key)
+    #    print(possible_points)
+    #    lats_valid = [math.isnan(lat) or math.isinf(lat) for lat in latitudes]
+    #    lngs_valid = [math.isnan(lng) or math.isinf(lng) for lng in longitudes]
+    #    print(False in lats_valid)
+    #    print(False in lngs_valid)
+    #    sys.stdout.flush()
 
 
 def compute_distance(lat1, lng1, lat2, lng2): # kilometers
@@ -334,18 +334,18 @@ for i in range(data.types['test']):
     median_pred_lat = median_locations[place][0] #places_lat_lng[place][0]
     median_pred_lng = median_locations[place][1] #places_lat_lng[place][1]
 
-    if density_locations[place] is not None:
-        density_pred_lat = density_locations[place][0]
-        density_pred_lng = density_locations[place][1]
+    #if density_locations[place] is not None:
+    density_pred_lat = density_locations[place][0]
+    density_pred_lng = density_locations[place][1]
 
     mean_distance = compute_distance(actual_lat, actual_lng, mean_pred_lat, mean_pred_lng)
     mean_distances.append(mean_distance)
     median_distance = compute_distance(actual_lat, actual_lng, median_pred_lat, median_pred_lng)
     median_distances.append(median_distance)
 
-    if density_locations[place] is not None:
-        density_distance = compute_distance(actual_lat, actual_lng, density_pred_lat, density_pred_lng)
-        density_distances.append(density_distance)
+    #if density_locations[place] is not None:
+    density_distance = compute_distance(actual_lat, actual_lng, density_pred_lat, density_pred_lng)
+    density_distances.append(density_distance)
 
     if random.randint(1, 100) < 20: # VLI
         print('Distance')
@@ -358,8 +358,8 @@ for i in range(data.types['test']):
         print(str(mean_pred_lat) + ', ' + str(mean_pred_lng))
         print(str(median_pred_lat) + ', ' + str(median_pred_lng))
 
-        if density_locations[place] is not None:
-            print(str(density_pred_lat) + ', ' + str(density_pred_lng))
+        #if density_locations[place] is not None:
+        print(str(density_pred_lat) + ', ' + str(density_pred_lng))
 
         print('')
         sys.stdout.flush()
