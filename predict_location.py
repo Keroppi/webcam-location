@@ -1,6 +1,8 @@
 #!/srv/glusterfs/vli/.pyenv/shims/python
 
-import torch, torchvision, os, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, scipy, pickle
+import torch, torchvision, os, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, scipy, pickle,
+from sklearn.neighbors.kde import KernelDensity
+from sklearn.neighbors import DistanceMetric
 
 sys.path.append('/home/vli/webcam-location') # For importing .py files in the same directory on the cluster.
 import constants
@@ -263,8 +265,8 @@ for key in lats:
 # Kernel density estimation to guess location.
 density_locations = {}
 # Note, this uses around 5.2 GB memory.
-latitude_search = np.linspace(-90, 90, num=4501)  # 0.005 step size, 0.04 step size
-longitude_search = np.linspace(-180, 180, num=4501)  # 0.01 step size
+latitude_search = np.linspace(-90, 90, num=36001)  # 0.005 step size, 0.04 step size
+longitude_search = np.linspace(-180, 180, num=36001)  # 0.01 step size, 0.08 step size
 search_space = np.vstack((latitude_search, longitude_search))
 for key in lats:
     if len(lats[key]) == 1:
@@ -281,6 +283,15 @@ for key in lats:
     #finite = np.where(np.isfinite(possible_points) == False)[0].shape == (0,) # Check all values are not inf or NaN
 
     #if finite:
+
+
+    sklearn_kernel = KernelDensity(kernel='gaussian', bandwidth=1, metric='haversine').fit(possible_points.T)
+    sklearn_density = sklearn_kernel.score_samples(search_space)
+    sklearn_ind = np.argmax(sklearn_density, axis=None)
+    density_locations[key] = (latitude_search[ind], longitude_search[ind])
+
+    continue # VLI
+
     # Gaussian Kernel Density Estimation
     kernel = scipy.stats.gaussian_kde(possible_points, bw_method='silverman')
 
