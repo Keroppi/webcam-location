@@ -263,8 +263,8 @@ for key in lats:
 # Kernel density estimation to guess location.
 density_locations = {}
 # Note, this uses around 5.2 GB memory.
-latitude_search = np.linspace(-90, 90, num=36001)  # 0.005 step size
-longitude_search = np.linspace(-180, 180, num=36001)  # 0.01 step size
+latitude_search = np.linspace(-90, 90, num=4501)  # 0.005 step size, 0.04 step size
+longitude_search = np.linspace(-180, 180, num=4501)  # 0.01 step size
 search_space = np.vstack((latitude_search, longitude_search))
 for key in lats:
     if len(lats[key]) == 1:
@@ -283,8 +283,6 @@ for key in lats:
     #if finite:
     # Gaussian Kernel Density Estimation
     kernel = scipy.stats.gaussian_kde(possible_points, bw_method='silverman')
-    print('Kernel cov factor: ' + str(kernel.covariance_factor()))
-    sys.stdout.flush()
 
     # Find MLE
     density = kernel(search_space)
