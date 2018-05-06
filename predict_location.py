@@ -286,7 +286,7 @@ for key in lats:
 
 
     sklearn_kernel = KernelDensity(kernel='gaussian', bandwidth=1, metric='haversine').fit(possible_points.T)
-    sklearn_density = sklearn_kernel.score_samples(search_space)
+    sklearn_density = sklearn_kernel.score_samples(search_space.T)
     sklearn_ind = np.argmax(sklearn_density, axis=None)
     density_locations[key] = (latitude_search[ind], longitude_search[ind])
 
