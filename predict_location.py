@@ -262,6 +262,10 @@ for key in lats:
 
 # Kernel density estimation to guess location.
 density_locations = {}
+# Note, this uses around 5.2 GB memory.
+latitude_search = np.linspace(-90, 90, num=36001)  # 0.005 step size
+longitude_search = np.linspace(-180, 180, num=36001)  # 0.01 step size
+search_space = np.vstack((latitude_search, longitude_search))
 for key in lats:
     if len(lats[key]) == 1:
         density_locations[key] = (lats[key][0], lngs[key][0])
@@ -278,13 +282,11 @@ for key in lats:
 
     #if finite:
     # Gaussian Kernel Density Estimation
-    kernel = scipy.stats.gaussian_kde(possible_points, bw_method=25)
+    kernel = scipy.stats.gaussian_kde(possible_points, bw_method='silverman')
+    print('Kernel cov factor: ' + str(kernel.covariance_factor()))
+    sys.stdout.flush()
 
     # Find MLE
-    # Note, this uses around 5.2 GB memory.
-    latitude_search = np.linspace(-90, 90, num=36001) # 0.005 step size
-    longitude_search = np.linspace(-180, 180, num=36001) # 0.01 step size
-    search_space = np.vstack((latitude_search, longitude_search))
     density = kernel(search_space)
     ind = np.argmax(density, axis=None)
     density_locations[key] = (latitude_search[ind], longitude_search[ind])
@@ -298,6 +300,9 @@ for key in lats:
     #    print(False in lngs_valid)
     #    sys.stdout.flush()
 
+del latitude_search
+del longitude_search
+del search_space
 
 def compute_distance(lat1, lng1, lat2, lng2): # kilometers
     # Haversine formula for computing distance.
@@ -357,6 +362,7 @@ for i in range(data.types['test']):
         print('Using mean: ' + str(mean_distance))
         print('Using median: ' + str(median_distance))
         print('Using density: ' + str(density_distance))
+        print(np.vstack((np.array(lats[place]), np.array(lngs[place]))))
         print(str(actual_lat) + ', ' + str(actual_lng))
         print(str(mean_pred_lat) + ', ' + str(mean_pred_lng))
         print(str(median_pred_lat) + ', ' + str(median_pred_lng))
