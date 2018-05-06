@@ -2,7 +2,7 @@
 
 import torch, torchvision, os, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, scipy, pickle
 from sklearn.neighbors.kde import KernelDensity
-from sklearn.neighbors import DistanceMetric
+
 
 sys.path.append('/home/vli/webcam-location') # For importing .py files in the same directory on the cluster.
 import constants
@@ -265,9 +265,9 @@ for key in lats:
 # Kernel density estimation to guess location.
 density_locations = {}
 # Note, this uses around 5.2 GB memory.
-latitude_search = np.linspace(-90, 90, num=36001)  # 0.005 step size, 0.04 step size
-longitude_search = np.linspace(-180, 180, num=36001)  # 0.01 step size, 0.08 step size
-search_space = np.vstack((latitude_search, longitude_search))
+#latitude_search = np.linspace(-90, 90, num=18001)  # 0.01 step size
+longitude_search = np.linspace(-180, 180, num=18001)  # 0.02 step size
+
 for key in lats:
     if len(lats[key]) == 1:
         density_locations[key] = (lats[key][0], lngs[key][0])
@@ -284,21 +284,31 @@ for key in lats:
 
     #if finite:
 
+    #sklearn_kernel = KernelDensity(kernel='gaussian', bandwidth=1, metric='haversine').fit(possible_points.T)
+    kernel = scipy.stats.gaussian_kde(possible_points, bw_method=None)
 
-    sklearn_kernel = KernelDensity(kernel='gaussian', bandwidth=1, metric='haversine').fit(possible_points.T)
-    sklearn_density = sklearn_kernel.score_samples(search_space.T)
-    sklearn_ind = np.argmax(sklearn_density, axis=None)
-    density_locations[key] = (latitude_search[sklearn_ind], longitude_search[sklearn_ind])
+    best_score = -float('inf')
+    best_idx = -1
+    best_latitude = -91
 
-    continue # VLI
+    for i in range(18001):
+        latitude_search = np.array([-90 + 0.01 * i] * 18001)
+        search_space = np.vstack((latitude_search, longitude_search))
 
-    # Gaussian Kernel Density Estimation
-    kernel = scipy.stats.gaussian_kde(possible_points, bw_method='silverman')
+        #sklearn_density = sklearn_kernel.score_samples(search_space.T)
+        density = kernel(search_space)
+        ind = np.argmax(density, axis=None)
 
-    # Find MLE
-    density = kernel(search_space)
-    ind = np.argmax(density, axis=None)
-    density_locations[key] = (latitude_search[ind], longitude_search[ind])
+        if best_score < density[ind]:
+            best_score = density[ind]
+            best_idx = ind
+            best_latitude = -90 + 0.01 * i
+
+        del latitude_search
+        del search_space
+        del density
+
+    density_locations[key] = (best_latitude, longitude_search[best_idx])
     #else:
     #    density_locations[key] = None
     #    print('WARNING - NaN or inf found at ' + key)
@@ -309,9 +319,7 @@ for key in lats:
     #    print(False in lngs_valid)
     #    sys.stdout.flush()
 
-del latitude_search
 del longitude_search
-del search_space
 
 def compute_distance(lat1, lng1, lat2, lng2): # kilometers
     # Haversine formula for computing distance.
