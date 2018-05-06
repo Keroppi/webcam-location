@@ -1,6 +1,6 @@
 #!/srv/glusterfs/vli/.pyenv/shims/python
 
-import torch, torchvision, os, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, scipy, pickle,
+import torch, torchvision, os, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, scipy, pickle
 from sklearn.neighbors.kde import KernelDensity
 from sklearn.neighbors import DistanceMetric
 
