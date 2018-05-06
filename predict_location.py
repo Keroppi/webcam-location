@@ -264,7 +264,7 @@ for key in lats:
 
 # Kernel density estimation to guess location.
 density_locations = {}
-# Note, this uses around 5.2 GB memory.
+# Note, this uses around 2.6 GB memory.
 #latitude_search = np.linspace(-90, 90, num=18001)  # 0.01 step size
 longitude_search = np.linspace(-180, 180, num=18001)  # 0.02 step size
 
@@ -284,8 +284,8 @@ for key in lats:
 
     #if finite:
 
-    #sklearn_kernel = KernelDensity(kernel='gaussian', bandwidth=1, metric='haversine').fit(possible_points.T)
-    kernel = scipy.stats.gaussian_kde(possible_points, bw_method=None)
+    kernel = KernelDensity(kernel='gaussian', bandwidth=1, metric='haversine').fit(possible_points.T)
+    #kernel = scipy.stats.gaussian_kde(possible_points, bw_method=None)
 
     best_score = -float('inf')
     best_idx = -1
@@ -295,8 +295,8 @@ for key in lats:
         latitude_search = np.array([-90 + 0.01 * i] * 18001)
         search_space = np.vstack((latitude_search, longitude_search))
 
-        #sklearn_density = sklearn_kernel.score_samples(search_space.T)
-        density = kernel(search_space)
+        density = kernel.score_samples(search_space.T)
+        #density = kernel(search_space)
         ind = np.argmax(density, axis=None)
 
         if best_score < density[ind]:
