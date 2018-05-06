@@ -278,7 +278,7 @@ for key in lats:
 
     #if finite:
     # Gaussian Kernel Density Estimation
-    kernel = scipy.stats.gaussian_kde(possible_points, bw_method=50)
+    kernel = scipy.stats.gaussian_kde(possible_points, bw_method=25)
 
     # Find MLE
     # Note, this uses around 5.2 GB memory.
