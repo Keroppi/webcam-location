@@ -266,8 +266,9 @@ for key in lats:
 density_locations = {}
 # Note, this uses around 2.6 GB memory.
 #latitude_search = np.linspace(-90, 90, num=18001)  # 0.01 step size
-longitude_search = np.linspace(-180, 180, num=18001)  # 0.02 step size
+#longitude_search = np.linspace(-180, 180, num=18001)  # 0.02 step size
 
+kernel_t0 = time.time()
 for key in lats:
     if len(lats[key]) == 1:
         density_locations[key] = (lats[key][0], lngs[key][0])
@@ -288,27 +289,39 @@ for key in lats:
     #kernel = scipy.stats.gaussian_kde(possible_points, bw_method=None)
 
     best_score = -float('inf')
-    best_idx = -1
+    best_longitude = -181
     best_latitude = -91
 
-    for i in range(18001):
-        latitude_search = np.array([-90 + 0.01 * i] * 18001)
-        search_space = np.vstack((latitude_search, longitude_search))
+    min_lat = min(lats[key])
+    max_lat = max(lats[key])
+    min_lng = min(lngs[key])
+    max_lng = max(lngs[key])
+
+    latitude_search = np.linspace(min_lat, max_lat, num=1126) # Worst case 0.16 step size.
+    longitude_search = np.linspace(min_lng, max_lng, num=2251) # Worst case 0.16 step size.
+    #lat_v, lng_v = np.meshgrid(latitude_search, longitude_search)
+    for i in range(latitude_search.shape[0]):
+        curr_lat = np.array([latitude_search[i]] * longitude_search.shape[0])
+        search_space = np.vstack((curr_lat, longitude_search))
 
         density = kernel.score_samples(search_space.T)
         #density = kernel(search_space)
+
         ind = np.argmax(density, axis=None)
 
         if best_score < density[ind]:
             best_score = density[ind]
-            best_idx = ind
-            best_latitude = -90 + 0.01 * i
+            best_longitude = longitude_search[ind]
+            best_latitude = latitude_search[i]
 
-        del latitude_search
+        del curr_lat
         del search_space
         del density
 
-    density_locations[key] = (best_latitude, longitude_search[best_idx])
+    del latitude_search
+    del longitude_search
+
+    density_locations[key] = (best_latitude, best_longitude)
     #else:
     #    density_locations[key] = None
     #    print('WARNING - NaN or inf found at ' + key)
@@ -318,8 +331,10 @@ for key in lats:
     #    print(False in lats_valid)
     #    print(False in lngs_valid)
     #    sys.stdout.flush()
+kernel_t1 = time.time()
+print('Calculating density time (h): ' + str((kernel_t1 - kernel_t0) / 3600))
+sys.stdout.flush()
 
-del longitude_search
 
 def compute_distance(lat1, lng1, lat2, lng2): # kilometers
     # Haversine formula for computing distance.
