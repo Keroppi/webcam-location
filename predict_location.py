@@ -277,8 +277,8 @@ for key in lats:
         density_locations[key] = (statistics.mean(lats[key]), statistics.mean(lngs[key]))
         continue
 
-    np_lats = np.array(lats[key])
-    np_lngs = np.array(lngs[key])
+    np_lats = np.array([math.radians(x) for x in lats[key]])
+    np_lngs = np.array([math.radians(x) for x in lngs[key]])
     possible_points = np.vstack((np_lats, np_lngs))
 
     #finite = np.where(np.isfinite(possible_points) == False)[0].shape == (0,) # Check all values are not inf or NaN
@@ -292,13 +292,13 @@ for key in lats:
     best_longitude = -181
     best_latitude = -91
 
-    min_lat = min(lats[key])
-    max_lat = max(lats[key])
-    min_lng = min(lngs[key])
-    max_lng = max(lngs[key])
+    min_lat = min(np_lats)
+    max_lat = max(np_lats)
+    min_lng = min(np_lngs)
+    max_lng = max(np_lngs)
 
-    latitude_search = np.linspace(min_lat, max_lat, num=1126) # Worst case 0.16 step size.
-    longitude_search = np.linspace(min_lng, max_lng, num=2251) # Worst case 0.16 step size.
+    latitude_search = np.linspace(min_lat, max_lat, num=1001) # Worst case pi/1000 radians step size.
+    longitude_search = np.linspace(min_lng, max_lng, num=2001) # Worst case pi/1000 radians step size.
     #lat_v, lng_v = np.meshgrid(latitude_search, longitude_search)
     for i in range(latitude_search.shape[0]):
         curr_lat = np.array([latitude_search[i]] * longitude_search.shape[0])
@@ -311,8 +311,8 @@ for key in lats:
 
         if best_score < density[ind]:
             best_score = density[ind]
-            best_longitude = longitude_search[ind]
-            best_latitude = latitude_search[i]
+            best_longitude = math.degrees(longitude_search[ind])
+            best_latitude = math.degrees(latitude_search[i])
 
         del curr_lat
         del search_space
