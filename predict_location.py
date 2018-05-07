@@ -285,7 +285,7 @@ for key in lats:
 
     #if finite:
 
-    kernel = KernelDensity(kernel='gaussian', bandwidth=1, metric='haversine').fit(possible_points.T)
+    kernel = KernelDensity(kernel='gaussian', bandwidth=5, metric='haversine').fit(possible_points.T)
     #kernel = scipy.stats.gaussian_kde(possible_points, bw_method=None)
 
     best_score = -float('inf')
