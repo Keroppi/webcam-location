@@ -297,7 +297,7 @@ for key in lats:
     min_lng = min(np_lngs)
     max_lng = max(np_lngs)
 
-    latitude_search = np.linspace(min_lat, max_lat, num=1001) # Worst case pi/1000 radians step size.
+    latitude_search = np.linspace(min_lat, max_lat, num=1001) # Worst case pi/1000 radians (0.18 degrees) step size.
     longitude_search = np.linspace(min_lng, max_lng, num=2001) # Worst case pi/1000 radians step size.
     #lat_v, lng_v = np.meshgrid(latitude_search, longitude_search)
     for i in range(latitude_search.shape[0]):
