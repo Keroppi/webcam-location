@@ -83,10 +83,10 @@ for batch_idx, (input, target) in enumerate(train_loader):
 
     sunrise_features = sunrise_model.forward_features(input)
 
-    if batch_idx == 0: # VLI delete
-        print(sunrise_features.size())
-        print(target.size())
-        sys.stdout.flush()
+    #if batch_idx == 0:
+    #    print(sunrise_features.size())
+    #    print(target.size())
+    #    sys.stdout.flush()
 
     end = min(len(train_loader.dataset), (batch_idx + 1) * constants.BATCH_SIZE)
     train_sunrise_input[batch_idx * constants.BATCH_SIZE:end, :] = sunrise_features.numpy()
