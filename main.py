@@ -38,8 +38,12 @@ if not constants.CLUSTER:
 
 data = WebcamData()
 
-transformations = torchvision.transforms.Compose([RandomResize(constants.PATCH_SIZE), RandomPatch(constants.PATCH_SIZE), ToTensor()])
-test_transformations = torchvision.transforms.Compose([Resize(), RandomPatch(constants.PATCH_SIZE), ToTensor()])
+if constants.CENTER:
+    transformations = torchvision.transforms.Compose([RandomResize(constants.PATCH_SIZE), RandomPatch(constants.PATCH_SIZE), Center(), ToTensor()])
+    test_transformations = torchvision.transforms.Compose([Resize(), RandomPatch(constants.PATCH_SIZE), Center(), ToTensor()])
+else:
+    transformations = torchvision.transforms.Compose([RandomResize(constants.PATCH_SIZE), RandomPatch(constants.PATCH_SIZE), ToTensor()])
+    test_transformations = torchvision.transforms.Compose([Resize(), RandomPatch(constants.PATCH_SIZE), ToTensor()])
 
 train_dataset = Train(data, transformations)
 test_dataset = Test(data, test_transformations)
@@ -73,7 +77,7 @@ if not args.load_model_args: # Create a new network structure.
     model_t0 = time.time()
     while True: # Try random models until we get one where the convolutions produce a valid size.
         try:
-            model_args = RandomizeArgs(SGE_TASK_ID) # ManualArgs(SGE_TASK_ID) 
+            model_args = RandomizeArgs(SGE_TASK_ID) # ManualArgs(SGE_TASK_ID)
             model = WebcamLocation(*model_args)
             model_memory_mb = count_parameters(model) * 4 / 1000 / 1000
 
@@ -123,7 +127,7 @@ if torch.cuda.is_available():
     train_loss_fn = train_loss_fn.cuda()
     test_loss_fn = test_loss_fn.cuda()
 
-optimizer = torch.optim.Adagrad(model.parameters(), lr=1e-3)
+optimizer = torch.optim.Adagrad(model.parameters(), lr=1e-3, weight_decay=0)
 
 if args.resume:  # Continue training a model - requires using --load_model_args option.
     if os.path.isfile(args.resume):

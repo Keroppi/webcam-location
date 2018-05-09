@@ -170,6 +170,7 @@ class WebcamLocation(nn.Module):
         # Flatten into vector.
         x = x.view(-1, self.first_fc_layer_size)
 
+
         # Fully connected layers.
         #for i in range(self.num_hidden_fc_layers + 1):
         #    x = self.fc_layers[i](x)
@@ -184,6 +185,15 @@ class WebcamLocation(nn.Module):
         '''
 
         return self.regressor(x)
+
+    def forward_features(self, x):
+        # Convolutional layers.
+        x = self.features(x)
+
+        # Flatten into vector.
+        x = x.view(-1, self.first_fc_layer_size)
+
+        return x
 
 
     def num_flat_features(self, x):

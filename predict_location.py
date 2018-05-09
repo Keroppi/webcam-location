@@ -8,7 +8,7 @@ sys.path.append('/home/vli/webcam-location') # For importing .py files in the sa
 import constants
 from webcam_dataset import WebcamData
 from webcam_dataset import Test
-from custom_transforms import Resize, RandomPatch, ToTensor
+from custom_transforms import Resize, RandomPatch, Center, ToTensor
 from custom_model import WebcamLocation
 from torch.autograd import Variable
 
@@ -17,8 +17,6 @@ if constants.CLUSTER:
 else:
     directory = '~/models/best/'
     directory = os.path.expanduser(directory)
-
-constants.BATCH_SIZE = 150
 
 sunrise_model = directory + 'sunrise_model_best1.pth.tar'
 sunset_model = directory + 'sunset_model_best2.pth.tar'
@@ -55,7 +53,10 @@ sunset_model.eval()
 
 data = WebcamData()
 days = data.days
-test_transformations = torchvision.transforms.Compose([Resize(), RandomPatch(constants.PATCH_SIZE), ToTensor()])
+if constants.CENTER:
+    test_transformations = torchvision.transforms.Compose([Resize(), RandomPatch(constants.PATCH_SIZE), Center(), ToTensor()])
+else:
+    test_transformations = torchvision.transforms.Compose([Resize(), RandomPatch(constants.PATCH_SIZE), ToTensor()])
 test_dataset = Test(data, test_transformations)
 
 if torch.cuda.is_available():

@@ -14,5 +14,6 @@ SPLIT_TOTAL = 100
 SPLIT_TRAIN = 75 # 75% train
 SPLIT_TEST = 100 # 25% test, 0% validation
 BANDWIDTH = 0.125
+CENTER = False
 
 
