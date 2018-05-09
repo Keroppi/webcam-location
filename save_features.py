@@ -89,7 +89,7 @@ for batch_idx, (input, target) in enumerate(train_loader):
     #    sys.stdout.flush()
 
     end = min(len(train_loader.dataset), (batch_idx + 1) * constants.BATCH_SIZE)
-    train_sunrise_input[batch_idx * constants.BATCH_SIZE:end, :] = sunrise_features.data.numpy()
+    train_sunrise_input[batch_idx * constants.BATCH_SIZE:end, :] = sunrise_features.cpu().data.numpy()
     train_sunrise_output[batch_idx * constants.BATCH_SIZE:end] = target.data.numpy()
 
 sunrise_predict_t1 = time.time()
@@ -109,7 +109,7 @@ for batch_idx, (input, target) in enumerate(train_loader):
 
     sunset_features = sunset_model.forward_features(input)
     end = min(len(train_loader.dataset), (batch_idx + 1) * constants.BATCH_SIZE)
-    train_sunset_input[batch_idx * constants.BATCH_SIZE:end, :] = sunset_features.data.numpy()
+    train_sunset_input[batch_idx * constants.BATCH_SIZE:end, :] = sunset_features.cpu().data.numpy()
     train_sunset_output[batch_idx * constants.BATCH_SIZE:end] = target.data.numpy()
 
 sunset_predict_t1 = time.time()
