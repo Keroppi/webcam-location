@@ -73,7 +73,7 @@ test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=constants.BAT
 # sunrise
 
 train_sunrise_input = np.zeros((len(train_loader.dataset), sunrise_model.first_fc_layer_size))
-train_sunrise_output = np.zeros((len(train_loader.dataset), 1))
+train_sunrise_output = np.zeros((len(train_loader.dataset),))
 sunrise_predict_t0 = time.time()
 for batch_idx, (input, target) in enumerate(train_loader):
     input = Variable(input, volatile=True)
@@ -83,14 +83,14 @@ for batch_idx, (input, target) in enumerate(train_loader):
 
     sunrise_features = sunrise_model.forward_features(input)
 
-    if batch_idx == 0:
-        print(sunrise_features.size())
-        print(target.size())
-        sys.stdout.flush()
+    #if batch_idx == 0:
+    #    print(sunrise_features.size())
+    #    print(target.size())
+    #    sys.stdout.flush()
 
     end = min(len(train_loader.dataset), (batch_idx + 1) * constants.BATCH_SIZE)
-    train_sunrise_input[batch_idx * constants.BATCH_SIZE:end, :] = sunrise_features.numpy()
-    train_sunrise_output[batch_idx * constants.BATCH_SIZE:end, :] = target.numpy()
+    train_sunrise_input[batch_idx * constants.BATCH_SIZE:end, :] = sunrise_features.data.numpy()
+    train_sunrise_output[batch_idx * constants.BATCH_SIZE:end] = target.data.numpy()
 
 sunrise_predict_t1 = time.time()
 print('Sunrise training prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
@@ -99,7 +99,7 @@ sys.stdout.flush()
 # sunset
 
 train_sunset_input = np.zeros((len(train_loader.dataset), sunset_model.first_fc_layer_size))
-train_sunset_output = np.zeros((len(train_loader.dataset), 1))
+train_sunset_output = np.zeros((len(train_loader.dataset),))
 sunset_predict_t0 = time.time()
 for batch_idx, (input, target) in enumerate(train_loader):
     input = Variable(input, volatile=True)
@@ -109,8 +109,8 @@ for batch_idx, (input, target) in enumerate(train_loader):
 
     sunset_features = sunset_model.forward_features(input)
     end = min(len(train_loader.dataset), (batch_idx + 1) * constants.BATCH_SIZE)
-    train_sunset_input[batch_idx * constants.BATCH_SIZE:end, :] = sunset_features.numpy()
-    train_sunset_output[batch_idx * constants.BATCH_SIZE:end, :] = target.numpy()
+    train_sunset_input[batch_idx * constants.BATCH_SIZE:end, :] = sunset_features.data.numpy()
+    train_sunset_output[batch_idx * constants.BATCH_SIZE:end] = target.data.numpy()
 
 sunset_predict_t1 = time.time()
 print('Sunset training prediction time (min): {:.2f}'.format((sunset_predict_t1 - sunset_predict_t0) / 60))
