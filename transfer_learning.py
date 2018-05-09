@@ -82,10 +82,15 @@ for batch_idx, (input, target) in enumerate(train_loader):
         input = input.cuda()
 
     sunrise_features = sunrise_model.forward_features(input)
+
+    if batch_idx == 0: # VLI delete
+        print(sunrise_features.size())
+        print(target.size())
+        sys.stdout.flush()
+
     end = min(len(train_loader.dataset), (batch_idx + 1) * constants.BATCH_SIZE)
     train_sunrise_input[batch_idx * constants.BATCH_SIZE:end, :] = sunrise_features.numpy()
     train_sunrise_output[batch_idx * constants.BATCH_SIZE:end, :] = target.numpy()
-
 
 sunrise_predict_t1 = time.time()
 print('Sunrise training prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
