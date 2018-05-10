@@ -1,6 +1,6 @@
 #!/srv/glusterfs/vli/.pyenv/shims/python
 
-import torch, torchvision, os, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, scipy, pickle
+import torch, torchvision, argparse, os, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, scipy, pickle
 
 sys.path.append('/home/vli/webcam-location') # For importing .py files in the same directory on the cluster.
 import constants
@@ -10,16 +10,31 @@ from custom_transforms import RandomResize, Resize, RandomPatch, Center, ToTenso
 from custom_model import WebcamLocation
 from torch.autograd import Variable
 
-if constants.CLUSTER:
-    directory = '/srv/glusterfs/vli/models/best/'
-else:
-    directory = '~/models/best/'
-    directory = os.path.expanduser(directory)
+parser = argparse.ArgumentParser(description='Save CNN Features')
+parser.add_argument('--sunrise_path', default='', type=str, metavar='PATH',
+                    help='path to sunrise model (default: none)')
+parser.add_argument('--sunset_path', default='', type=str, metavar='PATH',
+                    help='path to sunset model args (default: none)')
+args = parser.parse_args()
 
-sunrise_model = directory + 'sunrise_model_best1.pth.tar'
-sunset_model = directory + 'sunset_model_best2.pth.tar'
-sunrise_pkl = directory + 'sunrise_model_structure1.pkl'
-sunset_pkl = directory + 'sunset_model_structure2.pkl'
+if args.sunrise_path:
+    sunrise_dir = args.sunrise_path
+    sunrise_output_dir = args.sunrise_path + '/features/'
+else:
+    print('No sunrise path given.')
+    sys.exit(1)
+
+if args.sunset_path:
+    sunset_dir = args.sunset_path
+    sunset_output_dir = args.sunset_path + '/features/'
+else:
+    print('No sunset path given.')
+    sys.exit(1)
+
+sunrise_model = sunrise_dir + 'sunrise_model_best1.pth.tar'
+sunset_model = sunset_dir + 'sunset_model_best2.pth.tar'
+sunrise_pkl = sunrise_dir + 'sunrise_model_structure1.pkl'
+sunset_pkl = sunset_dir + 'sunset_model_structure2.pkl'
 
 sunrise_checkpt = torch.load(sunrise_model)
 sunset_checkpt = torch.load(sunset_model)
@@ -83,11 +98,6 @@ for batch_idx, (input, target) in enumerate(train_loader):
 
     sunrise_features = sunrise_model.forward_features(input)
 
-    #if batch_idx == 0:
-    #    print(sunrise_features.size())
-    #    print(target.size())
-    #    sys.stdout.flush()
-
     end = min(len(train_loader.dataset), (batch_idx + 1) * constants.BATCH_SIZE)
     train_sunrise_input[batch_idx * constants.BATCH_SIZE:end, :] = sunrise_features.cpu().data.numpy()
     train_sunrise_output[batch_idx * constants.BATCH_SIZE:end] = target.numpy()
@@ -118,18 +128,13 @@ sys.stdout.flush()
 
 # Pickle training features, output
 
-if constants.CLUSTER:
-    dir = '/srv/glusterfs/vli/features/'
-else:
-    dir = '/home/vli/features/'
-
-with open(dir + str(constants.DAYS_PER_MONTH) + '_sunrise_train_input.pkl', 'wb') as f:
+with open(sunrise_output_dir + 'sunrise_train_input.pkl', 'wb') as f:
     pickle.dump(train_sunrise_input, f)
-with open(dir + str(constants.DAYS_PER_MONTH) + '_sunrise_train_output.pkl', 'wb') as f:
+with open(sunrise_output_dir + 'sunrise_train_output.pkl', 'wb') as f:
     pickle.dump(train_sunrise_output, f)
-with open(dir + str(constants.DAYS_PER_MONTH) + '_sunset_train_input.pkl', 'wb') as f:
+with open(sunset_output_dir + 'sunset_train_input.pkl', 'wb') as f:
     pickle.dump(train_sunset_input, f)
-with open(dir + str(constants.DAYS_PER_MONTH) + '_sunset_train_output.pkl', 'wb') as f:
+with open(sunset_output_dir + 'sunset_train_output.pkl', 'wb') as f:
     pickle.dump(train_sunset_output, f)
 
 del train_sunrise_input
@@ -151,11 +156,6 @@ for batch_idx, (input, target) in enumerate(test_loader):
         input = input.cuda()
 
     sunrise_features = sunrise_model.forward_features(input)
-
-    #if batch_idx == 0:
-    #    print(sunrise_features.size())
-    #    print(target.size())
-    #    sys.stdout.flush()
 
     end = min(len(test_loader.dataset), (batch_idx + 1) * constants.BATCH_SIZE)
     test_sunrise_input[batch_idx * constants.BATCH_SIZE:end, :] = sunrise_features.cpu().data.numpy()
@@ -187,18 +187,13 @@ sys.stdout.flush()
 
 # Pickle testing features, output
 
-if constants.CLUSTER:
-    dir = '/srv/glusterfs/vli/features/'
-else:
-    dir = '/home/vli/features/'
-
-with open(dir + str(constants.DAYS_PER_MONTH) + '_sunrise_test_input.pkl', 'wb') as f:
+with open(sunrise_output_dir + 'sunrise_test_input.pkl', 'wb') as f:
     pickle.dump(test_sunrise_input, f)
-with open(dir + str(constants.DAYS_PER_MONTH) + '_sunrise_test_output.pkl', 'wb') as f:
+with open(sunrise_output_dir + 'sunrise_test_output.pkl', 'wb') as f:
     pickle.dump(test_sunrise_output, f)
-with open(dir + str(constants.DAYS_PER_MONTH) + '_sunset_test_input.pkl', 'wb') as f:
+with open(sunset_output_dir + 'sunset_test_input.pkl', 'wb') as f:
     pickle.dump(test_sunset_input, f)
-with open(dir + str(constants.DAYS_PER_MONTH) + '_sunset_test_output.pkl', 'wb') as f:
+with open(sunset_output_dir + 'sunset_test_output.pkl', 'wb') as f:
     pickle.dump(test_sunset_output, f)
 
 del test_sunrise_input
