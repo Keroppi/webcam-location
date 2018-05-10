@@ -141,4 +141,67 @@ del train_sunset_output
 
 # sunrise
 
-# TO DO # VLI
+test_sunrise_input = np.zeros((len(test_loader.dataset), sunrise_model.first_fc_layer_size))
+test_sunrise_output = np.zeros((len(test_loader.dataset),))
+sunrise_predict_t0 = time.time()
+for batch_idx, (input, target) in enumerate(test_loader):
+    input = Variable(input, volatile=True)
+
+    if torch.cuda.is_available():
+        input = input.cuda()
+
+    sunrise_features = sunrise_model.forward_features(input)
+
+    #if batch_idx == 0:
+    #    print(sunrise_features.size())
+    #    print(target.size())
+    #    sys.stdout.flush()
+
+    end = min(len(test_loader.dataset), (batch_idx + 1) * constants.BATCH_SIZE)
+    test_sunrise_input[batch_idx * constants.BATCH_SIZE:end, :] = sunrise_features.cpu().data.numpy()
+    test_sunrise_output[batch_idx * constants.BATCH_SIZE:end] = target.numpy()
+
+sunrise_predict_t1 = time.time()
+print('Sunrise testing prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
+sys.stdout.flush()
+
+# sunset
+
+test_sunset_input = np.zeros((len(test_loader.dataset), sunset_model.first_fc_layer_size))
+test_sunset_output = np.zeros((len(test_loader.dataset),))
+sunset_predict_t0 = time.time()
+for batch_idx, (input, target) in enumerate(test_loader):
+    input = Variable(input, volatile=True)
+
+    if torch.cuda.is_available():
+        input = input.cuda()
+
+    sunset_features = sunset_model.forward_features(input)
+    end = min(len(test_loader.dataset), (batch_idx + 1) * constants.BATCH_SIZE)
+    test_sunset_input[batch_idx * constants.BATCH_SIZE:end, :] = sunset_features.cpu().data.numpy()
+    test_sunset_output[batch_idx * constants.BATCH_SIZE:end] = target.numpy()
+
+sunset_predict_t1 = time.time()
+print('Sunset testing prediction time (min): {:.2f}'.format((sunset_predict_t1 - sunset_predict_t0) / 60))
+sys.stdout.flush()
+
+# Pickle testing features, output
+
+if constants.CLUSTER:
+    dir = '/srv/glusterfs/vli/features/'
+else:
+    dir = '/home/vli/features/'
+
+with open(dir + str(constants.DAYS_PER_MONTH) + '_sunrise_test_input.pkl', 'wb') as f:
+    pickle.dump(test_sunrise_input, f)
+with open(dir + str(constants.DAYS_PER_MONTH) + '_sunrise_test_output.pkl', 'wb') as f:
+    pickle.dump(test_sunrise_output, f)
+with open(dir + str(constants.DAYS_PER_MONTH) + '_sunset_test_input.pkl', 'wb') as f:
+    pickle.dump(test_sunset_input, f)
+with open(dir + str(constants.DAYS_PER_MONTH) + '_sunset_test_output.pkl', 'wb') as f:
+    pickle.dump(test_sunset_output, f)
+
+del test_sunrise_input
+del test_sunrise_output
+del test_sunset_input
+del test_sunset_output
