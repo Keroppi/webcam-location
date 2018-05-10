@@ -61,14 +61,19 @@ sunset_scaler.fit(sunset_train_input)
 scaled_sunset_train_input = sunset_scaler.transform(sunset_train_input)
 scaled_sunset_test_input = sunset_scaler.transform(sunset_test_input)
 
+iterations = 0
 while True: # Keep training until job is killed.
+    if iterations % 20 == 0:
+        print('Iterations: {}'.format(iterations))
+        sys.stdout.flush()
+
     ### Dimension Reduction ###
     sunrise_pca = PCA()
     sunrise_pca.fit(scaled_sunrise_train_input)
     sunset_pca = PCA()
     sunset_pca.fit(scaled_sunset_train_input)
 
-    explained_variances = list(np.arange(0.6, 1, 0.05)) # % of variance explained determines how many components to keep
+    explained_variances = list(np.arange(0.6, 1, 0.025)) # % of variance explained determines how many components to keep
     pca_idx = random.randint(0, len(explained_variances) - 1)
     explained_variance = explained_variances[pca_idx]
 
@@ -101,9 +106,10 @@ while True: # Keep training until job is killed.
 
     ### Regression ###
 
-    alphas = list(np.arange(1e-5, 5, 1e-3))
+    alphas = list(np.arange(1e-5, 5, 1e-4))
     alpha_idx = random.randint(0, len(alphas))
-    sunrise_ridge = Ridge(alpha=alphas[alpha_idx])
+    alpha = alphas[alpha_idx]
+    sunrise_ridge = Ridge(alpha=alpha)
     sunrise_ridge.fit(reduced_sunrise_train_input, sunrise_train_output)
     sunrise_ridge_y = sunrise_ridge.predict(reduced_sunrise_test_input)
     sunrise_ridge_err = mean_squared_error(sunrise_test_output, sunrise_ridge_y)
@@ -113,22 +119,39 @@ while True: # Keep training until job is killed.
     sunset_ridge_y = sunset_ridge.predict(reduced_sunset_test_input)
     sunset_ridge_err = mean_squared_error(sunset_test_output, sunset_ridge_y)
 
-    with open(sunrise_dir + '/ridge/best_params.txt') as sunrise_ridge_f:
-        sunrise_ridge_lines = sunrise_ridge_f.read().splitlines()
-        sunrise_ridge_best_err = float(sunrise_ridge_lines[-1])
+    if os.path.isfile(sunrise_dir + '/ridge/sunrise_best_params.txt'):
+        with open(sunrise_dir + '/ridge/sunrise_best_params.txt', 'r') as sunrise_ridge_f:
+            sunrise_ridge_lines = sunrise_ridge_f.read().splitlines()
+            sunrise_ridge_best_err = float(sunrise_ridge_lines[-1].split()[1])
 
-    with open(sunset_dir + '/ridge/best_params.txt') as sunset_ridge_f:
-        sunset_ridge_lines = sunset_ridge_f.read().splitlines()
-        sunset_ridge_best_err = float(sunset_ridge_lines[-1])
+    if os.path.isfile(sunset_dir + '/ridge/sunset_best_params.txt'):
+        with open(sunset_dir + '/ridge/sunset_best_params.txt', 'r') as sunset_ridge_f:
+            sunset_ridge_lines = sunset_ridge_f.read().splitlines()
+            sunset_ridge_best_err = float(sunset_ridge_lines[-1].split()[1])
 
     # Better test error, save these parameters and model.
-    if sunrise_ridge_err < sunrise_ridge_best_err:
-        pass
+    if not os.path.isfile(sunrise_dir + '/ridge/sunrise_best_params.txt') or sunrise_ridge_err < sunrise_ridge_best_err:
+        with open(sunrise_dir + '/ridge/sunrise_best_params.txt', 'w') as sunrise_ridge_params_f:
+            sunrise_ridge_params_f.write('PCA: {:.6f} {}\n'.format(explained_variance, sunrise_pca_dims))
+            sunrise_ridge_params_f.write('alpha: {}\n'.format(alpha))
+            sunrise_ridge_params_f.write('MSE: {:.6f}'.format(sunrise_ridge_err))
 
-    if sunset_ridge_err < sunset_ridge_best_err:
-        pass
+        with open(sunrise_dir + '/ridge/sunrise_ridge_mdl.pkl', 'wb') as sunrise_ridge_mdl_f:
+            pickle.dump(sunrise_ridge, sunrise_ridge_mdl_f)
 
 
+    if not os.path.isfile(sunset_dir + '/ridge/sunset_best_params.txt') or sunset_ridge_err < sunset_ridge_best_err:
+        with open(sunset_dir + '/ridge/sunset_best_params.txt', 'w') as sunset_ridge_params_f:
+            sunset_ridge_params_f.write('PCA: {:.6f} {}\n'.format(explained_variance, sunset_pca_dims))
+            sunset_ridge_params_f.write('alpha: {}\n'.format(alpha))
+            sunset_ridge_params_f.write('MSE: {:.6f}'.format(sunset_ridge_err))
+
+        with open(sunset_dir + '/ridge/sunset_ridge_mdl.pkl', 'wb') as sunset_ridge_mdl_f:
+            pickle.dump(sunset_ridge, sunset_ridge_mdl_f)
+
+
+
+    iterations += 1
 
 
 
