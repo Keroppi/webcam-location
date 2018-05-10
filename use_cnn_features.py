@@ -33,21 +33,21 @@ else:
     print('No sunset path given.')
     sys.exit(1)
 
-with open(sunrise_dir + '/features/sunrise_train_input.pkl') as sunrise_train_input_f:
+with open(sunrise_dir + '/features/sunrise_train_input.pkl', 'rb') as sunrise_train_input_f:
     sunrise_train_input = pickle.load(sunrise_train_input_f)
-with open(sunrise_dir + '/features/sunrise_train_output.pkl') as sunrise_train_output_f:
+with open(sunrise_dir + '/features/sunrise_train_output.pkl', 'rb') as sunrise_train_output_f:
     sunrise_train_output = pickle.load(sunrise_train_output_f)
-with open(sunset_dir + '/features/sunset_train_input.pkl') as sunset_train_input_f:
+with open(sunset_dir + '/features/sunset_train_input.pkl', 'rb') as sunset_train_input_f:
     sunset_train_input = pickle.load(sunset_train_input_f)
-with open(sunset_dir + '/features/sunset_train_output.pkl') as sunset_train_output_f:
+with open(sunset_dir + '/features/sunset_train_output.pkl', 'rb') as sunset_train_output_f:
     sunset_train_output = pickle.load(sunset_train_output_f)
-with open(sunrise_dir + '/features/sunrise_test_input.pkl') as sunrise_test_input_f:
+with open(sunrise_dir + '/features/sunrise_test_input.pkl', 'rb') as sunrise_test_input_f:
     sunrise_test_input = pickle.load(sunrise_test_input_f)
-with open(sunrise_dir + '/features/sunrise_test_output.pkl') as sunrise_test_output_f:
+with open(sunrise_dir + '/features/sunrise_test_output.pkl', 'rb') as sunrise_test_output_f:
     sunrise_test_output = pickle.load(sunrise_test_output_f)
-with open(sunset_dir + '/features/sunset_test_input.pkl') as sunset_test_input_f:
+with open(sunset_dir + '/features/sunset_test_input.pkl', 'rb') as sunset_test_input_f:
     sunset_test_input = pickle.load(sunset_test_input_f)
-with open(sunset_dir + '/features/sunset_test_output.pkl') as sunset_test_output_f:
+with open(sunset_dir + '/features/sunset_test_output.pkl', 'rb') as sunset_test_output_f:
     sunset_test_output = pickle.load(sunset_test_output_f)
 
 ### Scale data to mean 0, unit variance. ###
