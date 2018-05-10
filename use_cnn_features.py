@@ -95,11 +95,11 @@ while True: # Keep training until job is killed.
         if total_explained >= explained_variance:
             break
 
-    sunrise_pca = PCA(pca_dims=sunrise_pca_dims)
+    sunrise_pca = PCA(n_components=sunrise_pca_dims)
     sunrise_pca.fit(scaled_sunrise_train_input)
     reduced_sunrise_train_input = sunrise_pca.transform(scaled_sunrise_train_input)
     reduced_sunrise_test_input = sunrise_pca.transform(scaled_sunrise_test_input)
-    sunset_pca = PCA(pca_dims=sunset_pca_dims)
+    sunset_pca = PCA(n_components=sunset_pca_dims)
     sunset_pca.fit(scaled_sunset_train_input)
     reduced_sunset_train_input = sunset_pca.transform(scaled_sunset_train_input)
     reduced_sunset_test_input = sunset_pca.transform(scaled_sunset_test_input)
