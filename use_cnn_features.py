@@ -68,6 +68,7 @@ while True: # Keep training until job is killed.
         sys.stdout.flush()
 
     ### Dimension Reduction ###
+    pca_t0 = time.time()
     sunrise_pca = PCA()
     sunrise_pca.fit(scaled_sunrise_train_input)
     sunset_pca = PCA()
@@ -103,9 +104,12 @@ while True: # Keep training until job is killed.
     sunset_pca.fit(scaled_sunset_train_input)
     reduced_sunset_train_input = sunset_pca.transform(scaled_sunset_train_input)
     reduced_sunset_test_input = sunset_pca.transform(scaled_sunset_test_input)
+    pca_t1 = time.time()
+    print('PCA Time (min): {:.6f}'.format((pca_t1 - pca_t0) / 60))
 
     ### Regression ###
 
+    ridge_t0 = time.time()
     alphas = list(np.arange(1e-5, 5, 1e-4))
     alpha_idx = random.randint(0, len(alphas))
     alpha = alphas[alpha_idx]
@@ -154,6 +158,9 @@ while True: # Keep training until job is killed.
 
         with open(sunset_dir + '/ridge/sunset_ridge_pred.pkl', 'wb') as sunset_ridge_pred_f:
             pickle.dump(sunset_ridge_y, sunset_ridge_pred_f)
+
+    ridge_t1 = time.time()
+    print('Ridge Time (min): {:.6f}'.format((ridge_t1 - ridge_t0) / 60))
 
     iterations += 1
 
