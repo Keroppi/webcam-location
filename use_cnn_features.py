@@ -139,6 +139,9 @@ while True: # Keep training until job is killed.
         with open(sunrise_dir + '/ridge/sunrise_ridge_mdl.pkl', 'wb') as sunrise_ridge_mdl_f:
             pickle.dump(sunrise_ridge, sunrise_ridge_mdl_f)
 
+        with open(sunrise_dir + '/ridge/sunrise_ridge_pred.pkl', 'wb') as sunrise_ridge_pred_f:
+            pickle.dump(sunrise_ridge_y, sunrise_ridge_pred_f)
+
 
     if not os.path.isfile(sunset_dir + '/ridge/sunset_best_params.txt') or sunset_ridge_err < sunset_ridge_best_err:
         with open(sunset_dir + '/ridge/sunset_best_params.txt', 'w') as sunset_ridge_params_f:
@@ -149,7 +152,8 @@ while True: # Keep training until job is killed.
         with open(sunset_dir + '/ridge/sunset_ridge_mdl.pkl', 'wb') as sunset_ridge_mdl_f:
             pickle.dump(sunset_ridge, sunset_ridge_mdl_f)
 
-
+        with open(sunset_dir + '/ridge/sunset_ridge_pred.pkl', 'wb') as sunset_ridge_pred_f:
+            pickle.dump(sunset_ridge_y, sunset_ridge_pred_f)
 
     iterations += 1
 
