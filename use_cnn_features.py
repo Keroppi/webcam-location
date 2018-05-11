@@ -61,26 +61,26 @@ sunset_scaler.fit(sunset_train_input)
 scaled_sunset_train_input = sunset_scaler.transform(sunset_train_input)
 scaled_sunset_test_input = sunset_scaler.transform(sunset_test_input)
 
+all_dims_sunrise_pca = PCA()
+all_dims_sunrise_pca.fit(scaled_sunrise_train_input)
+all_dims_sunset_pca = PCA()
+all_dims_sunset_pca.fit(scaled_sunset_train_input)
+
 iterations = 0
 while True: # Keep training until job is killed.
-    if iterations % 20 == 0:
+    if iterations % 5 == 0:
         print('Iterations: {}'.format(iterations))
         sys.stdout.flush()
 
     ### Dimension Reduction ###
     pca_t0 = time.time()
-    sunrise_pca = PCA()
-    sunrise_pca.fit(scaled_sunrise_train_input)
-    sunset_pca = PCA()
-    sunset_pca.fit(scaled_sunset_train_input)
-
     explained_variances = list(np.arange(0.6, 1, 0.025)) # % of variance explained determines how many components to keep
     pca_idx = random.randint(0, len(explained_variances) - 1)
     explained_variance = explained_variances[pca_idx]
 
     sunrise_pca_dims = 0
     total_explained = 0
-    for component in sunrise_pca.explained_variance_ratio_:
+    for component in all_dims_sunrise_pca.explained_variance_ratio_:
         total_explained += component
         sunrise_pca_dims += 1
 
@@ -89,7 +89,7 @@ while True: # Keep training until job is killed.
 
     sunset_pca_dims = 0
     total_explained = 0
-    for component in sunset_pca.explained_variance_ratio_:
+    for component in all_dims_sunset_pca.explained_variance_ratio_:
         total_explained += component
         sunset_pca_dims += 1
 
