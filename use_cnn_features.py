@@ -1,6 +1,7 @@
 #!/srv/glusterfs/vli/.pyenv/shims/python
 
 import torch, torchvision, argparse, os, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, scipy, pickle
+from multiprocessing import Process
 
 sys.path.append('/home/vli/webcam-location') # For importing .py files in the same directory on the cluster.
 import constants
@@ -13,6 +14,7 @@ from sklearn.linear_model import Ridge
 from sklearn.neural_network import MLPRegressor
 from sklearn.svm import SVR
 from sklearn.metrics import mean_squared_error
+from sklearn.feature_selection import f_regression
 
 parser = argparse.ArgumentParser(description='Use CNN Features')
 parser.add_argument('--sunrise_path', default='', type=str, metavar='PATH',
@@ -66,103 +68,141 @@ all_dims_sunrise_pca.fit(scaled_sunrise_train_input)
 all_dims_sunset_pca = PCA()
 all_dims_sunset_pca.fit(scaled_sunset_train_input)
 
-iterations = 0
-while True: # Keep training until job is killed.
-    if iterations % 5 == 0:
-        print('Iterations: {}'.format(iterations))
-        sys.stdout.flush()
+def dim_reduction(train_input, test_input, train_output, mode='sunrise'):
+    pca_or_kbest = random.randint(0, 1)
 
-    ### Dimension Reduction ###
-    pca_t0 = time.time()
-    explained_variances = list(np.arange(0.6, 1, 0.025)) # % of variance explained determines how many components to keep
-    pca_idx = random.randint(0, len(explained_variances) - 1)
-    explained_variance = explained_variances[pca_idx]
+    if pca_or_kbest == 0 or train_output is None: # PCA
+        #pca_t0 = time.time()
+        explained_variances = list(np.arange(0.5, 1, 0.01))  # % of variance explained determines how many components to keep
+        pca_idx = random.randint(0, len(explained_variances) - 1)
+        explained_variance = explained_variances[pca_idx]
 
-    sunrise_pca_dims = 0
-    total_explained = 0
-    for component in all_dims_sunrise_pca.explained_variance_ratio_:
-        total_explained += component
-        sunrise_pca_dims += 1
+        if mode == 'sunrise':
+            pca_dims = 0
+            total_explained = 0
+            for component in all_dims_sunrise_pca.explained_variance_ratio_:
+                total_explained += component
+                pca_dims += 1
 
-        if total_explained >= explained_variance:
-            break
+                if total_explained >= explained_variance:
+                    break
+        else:
+            pca_dims = 0
+            total_explained = 0
+            for component in all_dims_sunset_pca.explained_variance_ratio_:
+                total_explained += component
+                pca_dims += 1
 
-    sunset_pca_dims = 0
-    total_explained = 0
-    for component in all_dims_sunset_pca.explained_variance_ratio_:
-        total_explained += component
-        sunset_pca_dims += 1
+                if total_explained >= explained_variance:
+                    break
 
-        if total_explained >= explained_variance:
-            break
+        new_pca = PCA(n_components=pca_dims)
+        new_pca.fit(train_input)
+        reduced_train_input = new_pca.transform(train_input)
+        reduced_test_input = new_pca.transform(test_input)
 
-    sunrise_pca = PCA(n_components=sunrise_pca_dims)
-    sunrise_pca.fit(scaled_sunrise_train_input)
-    reduced_sunrise_train_input = sunrise_pca.transform(scaled_sunrise_train_input)
-    reduced_sunrise_test_input = sunrise_pca.transform(scaled_sunrise_test_input)
-    sunset_pca = PCA(n_components=sunset_pca_dims)
-    sunset_pca.fit(scaled_sunset_train_input)
-    reduced_sunset_train_input = sunset_pca.transform(scaled_sunset_train_input)
-    reduced_sunset_test_input = sunset_pca.transform(scaled_sunset_test_input)
-    pca_t1 = time.time()
-    print('PCA Time (min): {:.6f}'.format((pca_t1 - pca_t0) / 60))
+        #pca_t1 = time.time()
+        #print('PCA Time (min): {:.6f}'.format((pca_t1 - pca_t0) / 60))
 
-    ### Regression ###
+        return (reduced_train_input, reduced_test_input, 'pca', explained_variance, pca_dims)
 
-    ridge_t0 = time.time()
+    else: # SelectKBest
+        dims = train_input.shape[1]
+        k = random.randint(math.ceil(dims / 2), dims)
+
+        kbest = SelectKBest(score_func=f_regression, k=k)
+        kbest.fit(train_input, train_output)
+        reduced_train_input = kbest.transform(train_input)
+        reduced_test_input = kbest.transform(test_input)
+
+        return (reduced_train_input, reduced_test_input, 'kbest', k)
+
+def ridge(train_input, test_input, train_output, test_output, dim_red_mode='pca', explained_var=None, mode='sunrise'):
+    # ridge_t0 = time.time()
+
     alphas = list(np.arange(1e-5, 5, 1e-4))
     alpha_idx = random.randint(0, len(alphas))
     alpha = alphas[alpha_idx]
-    sunrise_ridge = Ridge(alpha=alpha)
-    sunrise_ridge.fit(reduced_sunrise_train_input, sunrise_train_output)
-    sunrise_ridge_y = sunrise_ridge.predict(reduced_sunrise_test_input)
-    sunrise_ridge_err = mean_squared_error(sunrise_test_output, sunrise_ridge_y)
 
-    sunset_ridge = Ridge(alpha=alphas[alpha_idx])
-    sunset_ridge.fit(reduced_sunset_train_input, sunset_train_output)
-    sunset_ridge_y = sunset_ridge.predict(reduced_sunset_test_input)
-    sunset_ridge_err = mean_squared_error(sunset_test_output, sunset_ridge_y)
+    dims = train_input.shape[1]
 
-    if os.path.isfile(sunrise_dir + '/ridge/sunrise_best_params.txt'):
-        with open(sunrise_dir + '/ridge/sunrise_best_params.txt', 'r') as sunrise_ridge_f:
-            sunrise_ridge_lines = sunrise_ridge_f.read().splitlines()
-            sunrise_ridge_best_err = float(sunrise_ridge_lines[-1].split()[1])
+    model = Ridge(alpha=alpha)
+    model.fit(train_input, train_output)
+    y = model.predict(test_input)
+    mean_err = mean_squared_error(test_output, y)
 
-    if os.path.isfile(sunset_dir + '/ridge/sunset_best_params.txt'):
-        with open(sunset_dir + '/ridge/sunset_best_params.txt', 'r') as sunset_ridge_f:
-            sunset_ridge_lines = sunset_ridge_f.read().splitlines()
-            sunset_ridge_best_err = float(sunset_ridge_lines[-1].split()[1])
+    if mode == 'sunrise':
+       dir = sunrise_dir + '/ridge/'
+    else:
+       dir = sunset_dir + '/ridge/'
 
-    # Better test error, save these parameters and model.
-    if not os.path.isfile(sunrise_dir + '/ridge/sunrise_best_params.txt') or sunrise_ridge_err < sunrise_ridge_best_err:
-        with open(sunrise_dir + '/ridge/sunrise_best_params.txt', 'w') as sunrise_ridge_params_f:
-            sunrise_ridge_params_f.write('PCA: {:.6f} {}\n'.format(explained_variance, sunrise_pca_dims))
-            sunrise_ridge_params_f.write('alpha: {}\n'.format(alpha))
-            sunrise_ridge_params_f.write('MSE: {:.6f}'.format(sunrise_ridge_err))
+    if os.path.isfile(dir + mode + '_best_params.txt'):
+        with open(dir + mode + '_best_params.txt', 'r') as params_f:
+            lines = params_f.read().splitlines()
+            best_err = float(lines[-1].split()[1])
+    else:
+        best_err = float('inf')
 
-        with open(sunrise_dir + '/ridge/sunrise_ridge_mdl.pkl', 'wb') as sunrise_ridge_mdl_f:
-            pickle.dump(sunrise_ridge, sunrise_ridge_mdl_f)
+    # Better test error, save these parameters, model, and predictions.
+    if mean_err < best_err:
+        with open(dir + mode + '_best_params.txt', 'w') as params_f:
+            if dim_red_mode == 'pca':
+                params_f.write('PCA: {:.6f} {}\n'.format(explained_var, dims))
+            else: # SelectKBest
+                params_f.write('SelectKBest: {}\n'.format(dims))
+            params_f.write('alpha: {}\n'.format(alpha))
+            params_f.write('MSE: {:.6f}'.format(mean_err))
 
-        with open(sunrise_dir + '/ridge/sunrise_ridge_pred.pkl', 'wb') as sunrise_ridge_pred_f:
-            pickle.dump(sunrise_ridge_y, sunrise_ridge_pred_f)
+        with open(sunrise_dir + mode + '_mdl.pkl', 'wb') as mdl_f:
+            pickle.dump(model, mdl_f)
+
+        with open(sunrise_dir + mode + '_pred.pkl', 'wb') as pred_f:
+            pickle.dump(y, pred_f)
+
+    #ridge_t1 = time.time()
+    #print('Ridge Time (min): {:.6f}'.format((ridge_t1 - ridge_t0) / 60))
+
+def train_model(model_name, mode='sunrise'):
+    while True:
+        if mode == 'sunrise':
+            reduced = dim_reduction(scaled_sunrise_train_input,
+                                    scaled_sunrise_test_input,
+                                    sunrise_train_output,
+                                    'sunrise')
+            train_output = sunrise_train_output
+            test_output = sunrise_test_output
+        else:
+            reduced = dim_reduction(scaled_sunset_train_input,
+                                    scaled_sunset_test_input,
+                                    sunset_train_output,
+                                    'sunset')
+            train_output = sunset_train_output
+            test_output = sunset_test_output
+
+        if model_name == 'ridge':
+            ridge(reduced[0],
+                  reduced[1],
+                  train_output,
+                  test_output,
+                  reduced[2],
+                  reduced[3],
+                  mode)
+        elif model_name == 'lasso':
+            pass
+        elif model_name == 'nn':
+            pass
+        elif model_name == 'svr':
+            pass
+
+sunrise_ridge_p = Process(target=train_model, args=('ridge', 'sunrise'))
+sunset_ridge_p = Process(target=train_model, args=('ridge', 'sunset'))
+sunrise_ridge_p.start()
+sunset_ridge_p.start()
 
 
-    if not os.path.isfile(sunset_dir + '/ridge/sunset_best_params.txt') or sunset_ridge_err < sunset_ridge_best_err:
-        with open(sunset_dir + '/ridge/sunset_best_params.txt', 'w') as sunset_ridge_params_f:
-            sunset_ridge_params_f.write('PCA: {:.6f} {}\n'.format(explained_variance, sunset_pca_dims))
-            sunset_ridge_params_f.write('alpha: {}\n'.format(alpha))
-            sunset_ridge_params_f.write('MSE: {:.6f}'.format(sunset_ridge_err))
 
-        with open(sunset_dir + '/ridge/sunset_ridge_mdl.pkl', 'wb') as sunset_ridge_mdl_f:
-            pickle.dump(sunset_ridge, sunset_ridge_mdl_f)
 
-        with open(sunset_dir + '/ridge/sunset_ridge_pred.pkl', 'wb') as sunset_ridge_pred_f:
-            pickle.dump(sunset_ridge_y, sunset_ridge_pred_f)
 
-    ridge_t1 = time.time()
-    print('Ridge Time (min): {:.6f}'.format((ridge_t1 - ridge_t0) / 60))
-
-    iterations += 1
 
 
 
