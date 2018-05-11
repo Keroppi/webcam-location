@@ -35,6 +35,7 @@ else:
     print('No sunset path given.')
     sys.exit(1)
 
+load_t0 = time.time()
 with open(sunrise_dir + '/features/sunrise_train_input.pkl', 'rb') as sunrise_train_input_f:
     sunrise_train_input = pickle.load(sunrise_train_input_f)
 with open(sunrise_dir + '/features/sunrise_train_output.pkl', 'rb') as sunrise_train_output_f:
@@ -51,6 +52,9 @@ with open(sunset_dir + '/features/sunset_test_input.pkl', 'rb') as sunset_test_i
     sunset_test_input = pickle.load(sunset_test_input_f)
 with open(sunset_dir + '/features/sunset_test_output.pkl', 'rb') as sunset_test_output_f:
     sunset_test_output = pickle.load(sunset_test_output_f)
+load_t1 = time.time()
+print('Load Time (min): {:.6f}'.format((load_t1 - load_t0) / 60))
+sys.stdout.flush()
 
 ### Scale data to mean 0, unit variance. ###
 sunrise_scaler = StandardScaler()
