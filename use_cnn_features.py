@@ -132,24 +132,29 @@ def dim_reduction(train_input, test_input, train_output, mode='sunrise'):
 
         return (reduced_train_input, reduced_test_input, 'kbest', k)
 
-def ridge(train_input, test_input, train_output, test_output, dim_red_mode='pca', explained_var=None, mode='sunrise'):
-    ridge_t0 = time.time()
-
-    alphas = list(np.arange(1e-5, 5, 1e-4))
-    alpha_idx = random.randint(0, len(alphas) - 1)
-    alpha = alphas[alpha_idx]
+def model(model_name, model, model_params,
+          train_input, test_input, train_output, test_output,
+          dim_red_mode='pca', explained_var=None, mode='sunrise'):
+    model_t0 = time.time()
 
     dims = train_input.shape[1]
 
-    model = Ridge(alpha=alpha)
+    if type(model_params) is tuple:
+        model = model(*model_params)
+    elif type(model_params) is dict:
+        model = model(**model_params)
+
     model.fit(train_input, train_output)
     y = model.predict(test_input)
     mean_err = mean_squared_error(test_output, y)
 
     if mode == 'sunrise':
-       dir = sunrise_dir + '/ridge/'
+       dir = sunrise_dir + '/' + model_name + '/'
     else:
-       dir = sunset_dir + '/ridge/'
+       dir = sunset_dir + '/' + model_name + '/'
+
+    if not os.path.isdir(dir):
+        os.mkdir(dir)
 
     if os.path.isfile(dir + mode + '_best_params.txt'):
         with open(dir + mode + '_best_params.txt', 'r') as params_f:
@@ -165,7 +170,7 @@ def ridge(train_input, test_input, train_output, test_output, dim_red_mode='pca'
                 params_f.write('PCA: {:.6f} {}\n'.format(explained_var, dims))
             else: # SelectKBest
                 params_f.write('SelectKBest: {}\n'.format(dims))
-            params_f.write('alpha: {}\n'.format(alpha))
+            params_f.write('Params: {}\n'.format(model_params))
             params_f.write('MSE: {:.6f}'.format(mean_err))
 
         with open(dir + mode + '_mdl.pkl', 'wb') as mdl_f:
@@ -174,13 +179,102 @@ def ridge(train_input, test_input, train_output, test_output, dim_red_mode='pca'
         with open(dir + mode + '_pred.pkl', 'wb') as pred_f:
             pickle.dump(y, pred_f)
 
-    del alphas
     del y
     del model
 
-    ridge_t1 = time.time()
-    print('Ridge Time (min): {:.6f}'.format((ridge_t1 - ridge_t0) / 60))
+    model_t1 = time.time()
+    print(model_name + ' time (min): {:.6f}'.format((model_t1 - model_t0) / 60))
     sys.stdout.flush()
+
+def ridge(train_input, test_input, train_output, test_output,
+          dim_red_mode='pca', explained_var=None, mode='sunrise'):
+    alphas = list(np.arange(1e-5, 5, 1e-4))
+    alpha = random.choice(alphas)
+
+    del alphas
+
+    model('ridge', Ridge, {'alpha':alpha},
+          train_input, test_input, train_output, test_output,
+          dim_red_mode, explained_var, mode)
+
+
+def lasso(train_input, test_input, train_output, test_output,
+          dim_red_mode='pca', explained_var=None, mode='sunrise'):
+    alphas = list(np.arange(1e-5, 5, 1e-4))
+    alpha = random.choice(alphas)
+
+    del alphas
+
+    model('lasso', Lasso, {'alpha':alpha},
+          train_input, test_input, train_output, test_output,
+          dim_red_mode, explained_var, mode)
+
+
+def nn(train_input, test_input, train_output, test_output,
+       dim_red_mode='pca', explained_var=None, mode='sunrise'):
+
+    dims = train_input.shape[1]
+    num_hidden_layers = random.randint(2, 10)
+
+    hidden_layer_sizes = []
+    for i in range(num_hidden_layers):
+        min_width = max(math.ceil(dims / 20), 20)
+        max_width = 2 * dims
+
+        layer_size = random.randint(min_width, max_width)
+        hidden_layer_sizes.append(layer_size)
+    hidden_layer_sizes = tuple(hidden_layer_sizes)
+
+    activations = ['identity', 'logistic', 'tanh', 'relu']
+    activation_idx = random.randint(0, len(activations) - 1)
+    activation = activations[activation_idx]
+
+    alphas = list(np.arange(1e-5, 0.1, 1e-4))
+    alpha = random.choice(alphas)
+
+    params = {'hidden_layer_sizes':hidden_layer_sizes,
+              'activation':activation,
+              'alpha':alpha,
+              'learning_rate':'adaptive',
+              'max_iter':300}
+
+    del alphas
+
+    model('nn', MLPRegressor, params,
+          train_input, test_input, train_output, test_output,
+          dim_red_mode, explained_var, mode)
+
+
+def svr(train_input, test_input, train_output, test_output,
+       dim_red_mode='pca', explained_var=None, mode='sunrise'):
+
+    Cs = list(np.arange(1e-3, 10, 1e-2))
+    C = random.choice(Cs)
+
+    kernels = ['poly', 'rbf', 'sigmoid'] # Omit linear since we have 2 types of linear regression already.
+    kernel = random.choice(kernels)
+
+    epsilons = list(np.arange(1e-5, 0.01, 1e-4))
+    epsilon = random.choice(epsilons)
+
+    degrees = list(range(2, 6))
+    degree = random.choice(degrees)
+
+    tols = list(np.arange(1e-5, 1e-1, 1e-4))
+    tol = random.choice(tols)
+
+    params = {'C':C,
+              'epsilon':epsilon,
+              'kernel':kernel,
+              'degree':degree,
+              'tol':tol}
+
+    del epsilons
+    del tols
+
+    model('svr', SVR, params,
+          train_input, test_input, train_output, test_output,
+          dim_red_mode, explained_var, mode)
 
 def train_model(model_name, mode='sunrise'):
     while True:

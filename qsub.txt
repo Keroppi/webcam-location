@@ -14,6 +14,9 @@ qsub -l gpu -l h_vmem=30G -q gpu.long.q@biwirender* -R y -j y -t 1 -o /srv/glust
 resume learning:
 qsub -l gpu -l h_vmem=25G -q gpu.middle.q@biwirender* -R y -j y -t 2 -o /srv/glusterfs/vli/job_logs ~/sunset_resume_gpu.sh
 
+save cnn features:
+qsub -l gpu -l h_vmem=30G -q gpu.middle.q@biwirender* -R y -j y -t 3 -o /srv/glusterfs/vli/job_logs ~/save_features.sh
+
 learn from cnn features:
 qsub -l h_vmem=45G -q long.q@* -R y -j y -t 3 -pe multicore 8 -o /srv/glusterfs/vli/job_logs ~/use_cnn_features.sh
 
