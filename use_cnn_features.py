@@ -168,10 +168,10 @@ def ridge(train_input, test_input, train_output, test_output, dim_red_mode='pca'
             params_f.write('alpha: {}\n'.format(alpha))
             params_f.write('MSE: {:.6f}'.format(mean_err))
 
-        with open(sunrise_dir + mode + '_mdl.pkl', 'wb') as mdl_f:
+        with open(dir + mode + '_mdl.pkl', 'wb') as mdl_f:
             pickle.dump(model, mdl_f)
 
-        with open(sunrise_dir + mode + '_pred.pkl', 'wb') as pred_f:
+        with open(dir + mode + '_pred.pkl', 'wb') as pred_f:
             pickle.dump(y, pred_f)
 
     del alphas
