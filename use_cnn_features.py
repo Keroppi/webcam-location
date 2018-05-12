@@ -76,7 +76,7 @@ def dim_reduction(train_input, test_input, train_output, mode='sunrise'):
     pca_or_kbest = random.randint(0, 1)
 
     if pca_or_kbest == 0 or train_output is None: # PCA
-        #pca_t0 = time.time()
+        pca_t0 = time.time()
         explained_variances = list(np.arange(0.5, 1, 0.01))  # % of variance explained determines how many components to keep
         pca_idx = random.randint(0, len(explained_variances) - 1)
         explained_variance = explained_variances[pca_idx]
@@ -105,12 +105,14 @@ def dim_reduction(train_input, test_input, train_output, mode='sunrise'):
         reduced_train_input = new_pca.transform(train_input)
         reduced_test_input = new_pca.transform(test_input)
 
-        #pca_t1 = time.time()
-        #print('PCA Time (min): {:.6f}'.format((pca_t1 - pca_t0) / 60))
+        pca_t1 = time.time()
+        print('PCA Time (min): {:.6f}'.format((pca_t1 - pca_t0) / 60))
+        sys.stdout.flush()
 
         return (reduced_train_input, reduced_test_input, 'pca', explained_variance, pca_dims)
 
     else: # SelectKBest
+        kbest_t0 = time.time()
         dims = train_input.shape[1]
         k = random.randint(math.ceil(dims / 2), dims)
 
@@ -119,10 +121,14 @@ def dim_reduction(train_input, test_input, train_output, mode='sunrise'):
         reduced_train_input = kbest.transform(train_input)
         reduced_test_input = kbest.transform(test_input)
 
+        kbest_t1 = time.time()
+        print('KBest Time (min): {:.6f}'.format((kbest_t1 - kbest_t0) / 60))
+        sys.stdout.flush()
+
         return (reduced_train_input, reduced_test_input, 'kbest', k)
 
 def ridge(train_input, test_input, train_output, test_output, dim_red_mode='pca', explained_var=None, mode='sunrise'):
-    # ridge_t0 = time.time()
+    ridge_t0 = time.time()
 
     alphas = list(np.arange(1e-5, 5, 1e-4))
     alpha_idx = random.randint(0, len(alphas))
@@ -163,8 +169,13 @@ def ridge(train_input, test_input, train_output, test_output, dim_red_mode='pca'
         with open(sunrise_dir + mode + '_pred.pkl', 'wb') as pred_f:
             pickle.dump(y, pred_f)
 
-    #ridge_t1 = time.time()
-    #print('Ridge Time (min): {:.6f}'.format((ridge_t1 - ridge_t0) / 60))
+    del alphas
+    del y
+    del model
+
+    ridge_t1 = time.time()
+    print('Ridge Time (min): {:.6f}'.format((ridge_t1 - ridge_t0) / 60))
+    sys.stdout.flush()
 
 def train_model(model_name, mode='sunrise'):
     while True:
@@ -197,6 +208,8 @@ def train_model(model_name, mode='sunrise'):
             pass
         elif model_name == 'svr':
             pass
+
+        del reduced
 
 sunrise_ridge_p = Process(target=train_model, args=('ridge', 'sunrise'))
 sunset_ridge_p = Process(target=train_model, args=('ridge', 'sunset'))
