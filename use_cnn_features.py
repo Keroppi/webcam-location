@@ -191,9 +191,13 @@ def ridge(train_input, test_input, train_output, test_output,
     alphas = list(np.arange(1e-5, 5, 1e-4))
     alpha = random.choice(alphas)
 
-    del alphas
+    tols = list(np.arange(1e-5, 1e-2, 1e-4))
+    tol = random.choice(tols)
 
-    model('ridge', Ridge, {'alpha':alpha},
+    del alphas
+    del tols
+
+    model('ridge', Ridge, {'alpha':alpha, 'tol':tol},
           train_input, test_input, train_output, test_output,
           dim_red_mode, explained_var, mode)
 
@@ -203,9 +207,13 @@ def lasso(train_input, test_input, train_output, test_output,
     alphas = list(np.arange(1e-5, 5, 1e-4))
     alpha = random.choice(alphas)
 
-    del alphas
+    tols = list(np.arange(1e-5, 1e-2, 1e-4))
+    tol = random.choice(tols)
 
-    model('lasso', Lasso, {'alpha':alpha},
+    del alphas
+    del tols
+
+    model('lasso', Lasso, {'alpha':alpha, 'tol':tol},
           train_input, test_input, train_output, test_output,
           dim_red_mode, explained_var, mode)
 
@@ -232,13 +240,18 @@ def nn(train_input, test_input, train_output, test_output,
     alphas = list(np.arange(1e-5, 0.1, 1e-4))
     alpha = random.choice(alphas)
 
+    tols = list(np.arange(1e-5, 1e-2, 1e-4))
+    tol = random.choice(tols)
+
     params = {'hidden_layer_sizes':hidden_layer_sizes,
               'activation':activation,
               'alpha':alpha,
               'learning_rate':'adaptive',
-              'max_iter':300}
+              'max_iter':300,
+              'tol':tol}
 
     del alphas
+    del tols
 
     model('nn', MLPRegressor, params,
           train_input, test_input, train_output, test_output,
@@ -260,7 +273,7 @@ def svr(train_input, test_input, train_output, test_output,
     degrees = list(range(2, 6))
     degree = random.choice(degrees)
 
-    tols = list(np.arange(1e-5, 1e-1, 1e-4))
+    tols = list(np.arange(1e-5, 1e-2, 1e-4))
     tol = random.choice(tols)
 
     params = {'C':C,
@@ -269,6 +282,7 @@ def svr(train_input, test_input, train_output, test_output,
               'degree':degree,
               'tol':tol}
 
+    del Cs
     del epsilons
     del tols
 
