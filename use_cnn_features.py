@@ -316,20 +316,49 @@ def train_model(model_name, mode='sunrise'):
                   reduced[3],
                   mode)
         elif model_name == 'lasso':
-            pass
+            lasso(reduced[0],
+                  reduced[1],
+                  train_output,
+                  test_output,
+                  reduced[2],
+                  reduced[3],
+                  mode)
         elif model_name == 'nn':
-            pass
+            nn(reduced[0],
+               reduced[1],
+               train_output,
+               test_output,
+               reduced[2],
+               reduced[3],
+               mode)
         elif model_name == 'svr':
-            pass
+            svr(reduced[0],
+                reduced[1],
+                train_output,
+                test_output,
+                reduced[2],
+                reduced[3],
+                mode)
 
         del reduced
 
 sunrise_ridge_p = Process(target=train_model, args=('ridge', 'sunrise'))
 sunset_ridge_p = Process(target=train_model, args=('ridge', 'sunset'))
+sunrise_lasso_p = Process(target=train_model, args=('lasso', 'sunrise'))
+sunset_lasso_p = Process(target=train_model, args=('lasso', 'sunset'))
+sunrise_nn_p = Process(target=train_model, args=('nn', 'sunrise'))
+sunset_nn_p = Process(target=train_model, args=('nn', 'sunset'))
+sunrise_svr_p = Process(target=train_model, args=('svr', 'sunrise'))
+sunset_svr_p = Process(target=train_model, args=('svr', 'sunset'))
+
 sunrise_ridge_p.start()
 sunset_ridge_p.start()
-
-
+sunrise_lasso_p.start()
+sunset_lasso_p.start()
+sunrise_nn_p.start()
+sunset_nn_p.start()
+sunrise_svr_p.start()
+sunset_svr_p.start()
 
 
 
