@@ -1,6 +1,6 @@
 #!/srv/glusterfs/vli/.pyenv/shims/python
 
-import torch, torchvision, os, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, scipy, pickle
+import torch, torchvision, os, argparse, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, scipy, pickle
 from sklearn.neighbors.kde import KernelDensity
 
 sys.path.append('/home/vli/webcam-location') # For importing .py files in the same directory on the cluster.
@@ -10,6 +10,18 @@ from webcam_dataset import Test
 from custom_transforms import Resize, RandomPatch, Center, ToTensor
 from custom_model import WebcamLocation
 from torch.autograd import Variable
+
+parser = argparse.ArgumentParser(description='Predict Location')
+parser.add_argument('--sunrise_model', default='', type=str, metavar='PATH',
+                    help='path to sunrise model (default: none)')
+parser.add_argument('--sunset_model', default='', type=str, metavar='PATH',
+                    help='path to sunset model (default: none)')
+parser.add_argument('--sunrise_pred', default='', type=str, metavar='PATH',
+                    help='pickled numpy predictions for sunrise test data (default: none)')
+parser.add_argument('--sunset_pred', default='', type=str, metavar='PATH',
+                    help='pickled numpy predictions for sunset test data (default: none)')
+args = parser.parse_args()
+
 
 if constants.CLUSTER:
     directory = '/srv/glusterfs/vli/models/best/'
