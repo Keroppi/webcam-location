@@ -261,6 +261,11 @@ class Train(Dataset):
         self.sunset_label = np.asarray([x.sunset_idx for x in self.data])
         self.transforms = transforms
 
+        if constants.LEARNING_SUNRISE:
+            self.mode = 'sunrise'
+        else:
+            self.mode = 'sunset'
+
     def __getitem__(self, index):
         # Return image and the label
         #width = self.data[index].width
@@ -294,10 +299,13 @@ class Train(Dataset):
         #print('Transform Time (s): {:.3f}'.format(transform_t1 - transform_t0))
         #sys.stdout.flush()
 
-        if constants.LEARNING_SUNRISE:
+        if self.mode == 'sunrise':
             return (img_stack, self.sunrise_label[index])
         else:
             return (img_stack, self.sunset_label[index])
+
+    def set_mode(self, mode='sunrise'):
+        self.mode = mode
 
     def __len__(self):
         return len(self.data)
@@ -309,6 +317,7 @@ class Test(Dataset):
         self.sunrise_label = np.asarray([x.sunrise_idx for x in self.data])
         self.sunset_label = np.asarray([x.sunset_idx for x in self.data])
         self.transforms = transforms
+        self.mode = 'sunrise'
 
     def __getitem__(self, index):
         # Return image and the label
@@ -325,15 +334,16 @@ class Test(Dataset):
             img_stack[i] = img
         #img_stack = np.stack(img_stack, axis=0)
 
-
-
         if self.transforms is not None:
             img_stack = self.transforms(img_stack)
 
-        if constants.LEARNING_SUNRISE:
+        if self.mode == 'sunrise':
             return (img_stack, self.sunrise_label[index])
         else:
             return (img_stack, self.sunset_label[index])
+
+    def set_mode(self, mode='sunrise'):
+        self.mode = mode
 
     def __len__(self):
         return len(self.data)
@@ -346,6 +356,7 @@ class Validation(Dataset):
         self.sunrise_label = np.asarray([x.sunrise_idx for x in self.data])
         self.sunset_label = np.asarray([x.sunset_idx for x in self.data])
         self.transforms = transforms
+        self.mode = 'sunrise'
 
     def __getitem__(self, index):
         # Return image and the label
@@ -365,10 +376,13 @@ class Validation(Dataset):
         if self.transforms is not None:
             img_stack = self.transforms(img_stack)
 
-        if constants.LEARNING_SUNRISE:
+        if self.mode == 'sunrise':
             return (img_stack, self.sunrise_label[index])
         else:
             return (img_stack, self.sunset_label[index])
+
+    def set_mode(self, mode='sunrise'):
+        self.mode = mode
 
     def __len__(self):
         return len(self.data)
