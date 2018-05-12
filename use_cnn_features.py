@@ -247,15 +247,18 @@ def nn(train_input, test_input, train_output, test_output,
               'activation':activation,
               'alpha':alpha,
               'learning_rate':'adaptive',
-              'max_iter':300,
+              'max_iter':200,
               'tol':tol}
 
     del alphas
     del tols
 
-    model('nn', MLPRegressor, params,
-          train_input, test_input, train_output, test_output,
-          dim_red_mode, explained_var, mode)
+    try:
+        model('nn', MLPRegressor, params,
+              train_input, test_input, train_output, test_output,
+              dim_red_mode, explained_var, mode)
+    except MemoryError as e:
+        pass # Doesn't matter, let's just try again.
 
 
 def svr(train_input, test_input, train_output, test_output,
