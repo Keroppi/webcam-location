@@ -75,7 +75,7 @@ all_dims_sunset_pca.fit(scaled_sunset_train_input)
 def dim_reduction(train_input, test_input, train_output, mode='sunrise'):
     pca_or_kbest = random.randint(0, 1)
 
-    if pca_or_kbest == 0 or train_output is None: # PCA
+    if pca_or_kbest == 0: # PCA
         pca_t0 = time.time()
         explained_variances = list(np.arange(0.5, 1, 0.01))  # % of variance explained determines how many components to keep
         pca_idx = random.randint(0, len(explained_variances) - 1)
@@ -109,7 +109,10 @@ def dim_reduction(train_input, test_input, train_output, mode='sunrise'):
         print('PCA Time (min): {:.6f}'.format((pca_t1 - pca_t0) / 60))
         sys.stdout.flush()
 
-        return (reduced_train_input, reduced_test_input, 'pca', explained_variance, pca_dims)
+        del explained_variances
+        del new_pca
+
+        return (reduced_train_input, reduced_test_input, 'pca', total_explained, pca_dims)
 
     else: # SelectKBest
         kbest_t0 = time.time()
@@ -125,13 +128,15 @@ def dim_reduction(train_input, test_input, train_output, mode='sunrise'):
         print('KBest Time (min): {:.6f}'.format((kbest_t1 - kbest_t0) / 60))
         sys.stdout.flush()
 
+        del kbest
+
         return (reduced_train_input, reduced_test_input, 'kbest', k)
 
 def ridge(train_input, test_input, train_output, test_output, dim_red_mode='pca', explained_var=None, mode='sunrise'):
     ridge_t0 = time.time()
 
     alphas = list(np.arange(1e-5, 5, 1e-4))
-    alpha_idx = random.randint(0, len(alphas))
+    alpha_idx = random.randint(0, len(alphas) - 1)
     alpha = alphas[alpha_idx]
 
     dims = train_input.shape[1]
