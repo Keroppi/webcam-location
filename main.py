@@ -237,6 +237,7 @@ def save_checkpoint(state, is_best, filename='checkpoint' + SGE_TASK_ID + '.pth.
             best_params.write('Using ' + str(state['epoch']) + ' epochs.\n')
             best_params.write('Using batch size of ' + str(constants.BATCH_SIZE) + '.\n')
             best_params.write('Model memory size (MB): ' + str(model_memory_mb) + '.\n')
+            best_params.write('Data centered: ' + str(constants.CENTER) + '\n')
             best_params.write(str(state['best_prec1']))
 
 
