@@ -105,7 +105,7 @@ def dim_reduction(train_input, test_input, train_output, mode='sunrise'):
     else: # SelectKBest
         kbest_t0 = time.time()
         dims = train_input.shape[1]
-        k = random.randint(math.ceil(dims / 20), math.ceil(dims / 2))
+        k = random.randint(5, 750)
 
         print('KBest used with {} features.'.format(k))
         sys.stdout.flush()
