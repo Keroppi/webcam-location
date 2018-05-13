@@ -56,26 +56,6 @@ load_t1 = time.time()
 print('Load Time (min): {:.6f}'.format((load_t1 - load_t0) / 60))
 sys.stdout.flush()
 
-### Scale data to mean 0, unit variance. ###
-scale_pca_t0 = time.time()
-sunrise_scaler = StandardScaler()
-sunrise_scaler.fit(sunrise_train_input)
-scaled_sunrise_train_input = sunrise_scaler.transform(sunrise_train_input)
-scaled_sunrise_test_input = sunrise_scaler.transform(sunrise_test_input)
-
-sunset_scaler = StandardScaler()
-sunset_scaler.fit(sunset_train_input)
-scaled_sunset_train_input = sunset_scaler.transform(sunset_train_input)
-scaled_sunset_test_input = sunset_scaler.transform(sunset_test_input)
-
-all_dims_sunrise_pca = PCA()
-all_dims_sunrise_pca.fit(scaled_sunrise_train_input)
-all_dims_sunset_pca = PCA()
-all_dims_sunset_pca.fit(scaled_sunset_train_input)
-scale_pca_t1 = time.time()
-print('Scale data and initial PCA time (min): {:.6f}'.format((scale_pca_t1 - scale_pca_t0) / 60))
-sys.stdout.flush()
-
 def dim_reduction(train_input, test_input, train_output, mode='sunrise'):
     pca_or_kbest = random.randint(0, 1)
 
@@ -135,6 +115,37 @@ def dim_reduction(train_input, test_input, train_output, mode='sunrise'):
         del kbest
 
         return (reduced_train_input, reduced_test_input, 'kbest', k)
+
+### Scale data to mean 0, unit variance. ###
+scale_pca_t0 = time.time()
+sunrise_scaler = StandardScaler()
+sunrise_scaler.fit(sunrise_train_input)
+scaled_sunrise_train_input = sunrise_scaler.transform(sunrise_train_input)
+scaled_sunrise_test_input = sunrise_scaler.transform(sunrise_test_input)
+
+sunset_scaler = StandardScaler()
+sunset_scaler.fit(sunset_train_input)
+scaled_sunset_train_input = sunset_scaler.transform(sunset_train_input)
+scaled_sunset_test_input = sunset_scaler.transform(sunset_test_input)
+
+all_dims_sunrise_pca = PCA()
+all_dims_sunrise_pca.fit(scaled_sunrise_train_input)
+all_dims_sunset_pca = PCA()
+all_dims_sunset_pca.fit(scaled_sunset_train_input)
+
+# Only try one configuration of dimension reduction to save memory.
+sunrise_reduced = dim_reduction(scaled_sunrise_train_input,
+                                scaled_sunrise_test_input,
+                                sunrise_train_output,
+                                'sunrise')
+sunset_reduced = dim_reduction(scaled_sunset_train_input,
+                               scaled_sunset_test_input,
+                               sunset_train_output,
+                               'sunset')
+
+scale_pca_t1 = time.time()
+print('Scale data and initial PCA time (min): {:.6f}'.format((scale_pca_t1 - scale_pca_t0) / 60))
+sys.stdout.flush()
 
 def model(model_name, model, model_params,
           train_input, test_input, train_output, test_output,
@@ -280,14 +291,15 @@ def svr(train_input, test_input, train_output, test_output,
     degrees = list(range(2, 6))
     degree = random.choice(degrees)
 
-    tols = list(np.arange(1e-5, 1e-2, 1e-4))
+    tols = list(np.arange(1e-4, 1e-2, 1e-3))
     tol = random.choice(tols)
 
     params = {'C':C,
               'epsilon':epsilon,
               'kernel':kernel,
               'degree':degree,
-              'tol':tol}
+              'tol':tol,
+              'cache_size':5000}
 
     del Cs
     del epsilons
@@ -300,17 +312,11 @@ def svr(train_input, test_input, train_output, test_output,
 def train_model(model_name, mode='sunrise'):
     while True:
         if mode == 'sunrise':
-            reduced = dim_reduction(scaled_sunrise_train_input,
-                                    scaled_sunrise_test_input,
-                                    sunrise_train_output,
-                                    'sunrise')
+            reduced = sunrise_reduced
             train_output = sunrise_train_output
             test_output = sunrise_test_output
         else:
-            reduced = dim_reduction(scaled_sunset_train_input,
-                                    scaled_sunset_test_input,
-                                    sunset_train_output,
-                                    'sunset')
+            reduced = sunset_reduced
             train_output = sunset_train_output
             test_output = sunset_test_output
 
