@@ -110,10 +110,7 @@ sys.stdout.flush()
 # sunset
 
 train_dataset.set_mode('sunset')
-instantiate_loader_t0 = time.time() # VLI DELETE THIS TIMING
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=constants.BATCH_SIZE, num_workers=constants.NUM_LOADER_WORKERS, pin_memory=pin_memory)
-instantiate_loader_t1 = time.time()
-print('Instantiate loader time (min): {:.2f}'.format((instantiate_loader_t1 - instantiate_loader_t0) / 60))
 sys.stdout.flush()
 
 train_sunset_input = np.zeros((len(train_loader.dataset), sunset_model.first_fc_layer_size))
