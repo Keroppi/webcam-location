@@ -79,9 +79,6 @@ sys.stdout.flush()
 def dim_reduction(train_input, test_input, train_output, mode='sunrise'):
     pca_or_kbest = random.randint(0, 1)
 
-    print('Start dimension reduction.') # VLI DELETE
-    sys.stdout.flush()
-
     if pca_or_kbest == 0: # PCA
         pca_t0 = time.time()
         explained_variances = list(np.arange(0.5, 1, 0.01))  # % of variance explained determines how many components to keep
