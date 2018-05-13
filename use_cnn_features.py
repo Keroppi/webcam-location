@@ -85,6 +85,9 @@ def dim_reduction(train_input, test_input, train_output, mode='sunrise'):
                 if total_explained >= explained_variance:
                     break
 
+        print('PCA used with {} features.'.format(pca_dims))
+        sys.stdout.flush()
+
         new_pca = PCA(n_components=pca_dims)
         new_pca.fit(train_input)
         reduced_train_input = new_pca.transform(train_input)
@@ -102,7 +105,10 @@ def dim_reduction(train_input, test_input, train_output, mode='sunrise'):
     else: # SelectKBest
         kbest_t0 = time.time()
         dims = train_input.shape[1]
-        k = random.randint(math.ceil(dims / 2), dims)
+        k = random.randint(math.ceil(dims / 20), math.ceil(dims / 2))
+
+        print('KBest used with {} features.'.format(k))
+        sys.stdout.flush()
 
         kbest = SelectKBest(score_func=mutual_info_regression, k=k)
         kbest.fit(train_input, train_output)
