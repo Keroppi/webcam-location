@@ -271,7 +271,7 @@ def svr(train_input, test_input, train_output, test_output,
     Cs = list(np.arange(1e-4, 10, 1e-3))
     C = random.choice(Cs)
 
-    kernels = ['poly', 'rbf', 'sigmoid'] # Omit linear since we have 2 types of linear regression already.
+    kernels = ['linear', 'poly', 'rbf', 'sigmoid']
     kernel = random.choice(kernels)
 
     epsilons = list(np.arange(1e-5, 0.01, 1e-4))

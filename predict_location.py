@@ -12,40 +12,141 @@ from custom_model import WebcamLocation
 from torch.autograd import Variable
 
 parser = argparse.ArgumentParser(description='Predict Location')
+parser.add_argument('--sunrise_model', default='', type=str, metavar='PATH',
+                    help='path to sunrise model (default: none)')
+parser.add_argument('--sunset_model', default='', type=str, metavar='PATH',
+                    help='path to sunset model (default: none)')
 parser.add_argument('--sunrise_pred', default='', type=str, metavar='PATH',
                     help='pickled numpy predictions for sunrise test data (default: none)')
 parser.add_argument('--sunset_pred', default='', type=str, metavar='PATH',
                     help='pickled numpy predictions for sunset test data (default: none)')
 args = parser.parse_args()
 
-if args.sunrise_pred:
+if args.sunrise_model and args.sunset_model:
+    sunrise_directory = args.sunrise_model
+    sunset_directory = args.sunset_model
+    from_model = True
+elif args.sunrise_pred and args.sunset_pred:
     sunrise_directory = args.sunrise_pred
-if args.sunset_pred:
     sunset_directory = args.sunset_pred
-
-sunrise_pred_pkl = sunrise_directory + 'sunrise_pred.pkl'
-sunset_pred_pkl = sunset_directory + 'sunset_pred.pkl'
-
-with open(sunrise_pred_pkl, 'rb') as sunrise_pkl_f:
-    sunrise_pred = pickle.load(sunrise_pkl_f)
-
-with open(sunset_pred_pkl, 'rb') as sunset_pkl_f:
-    sunset_pred = pickle.load(sunset_pkl_f)
+    from_model = False
+else:
+    print('Wrong arguments.')
+    sys.stdout.flush()
+    sys.exit(1)
 
 data = WebcamData()
 days = data.days
 
-num_test_days = data.types['test']
+if from_model: # Use the trained model to generate predictions.
+    sunrise_model = sunrise_directory + 'sunrise_model_best1.pth.tar'
+    sunset_model = sunset_directory + 'sunset_model_best2.pth.tar'
+    sunrise_pkl = sunrise_directory + 'sunrise_model_structure1.pkl'
+    sunset_pkl = sunset_directory + 'sunset_model_structure2.pkl'
 
-sunrises = []
-for d_idx, day in enumerate(days[:num_test_days]):
-    local_sunrise = day.get_local_time(sunrise_pred[d_idx])
-    sunrises.append(local_sunrise)
+    sunrise_checkpt = torch.load(sunrise_model)
+    sunset_checkpt = torch.load(sunset_model)
 
-sunsets = []
-for d_idx, day in enumerate(days[:num_test_days]):
-    local_sunset = day.get_local_time(sunset_pred[d_idx])
-    sunsets.append(local_sunset)
+    with open(sunrise_pkl, 'rb') as sunrise_pkl_f:
+        sunrise_model_args = pickle.load(sunrise_pkl_f)
+        sunrise_model = WebcamLocation(*sunrise_model_args)
+
+    with open(sunset_pkl, 'rb') as sunset_pkl_f:
+        sunset_model_args = pickle.load(sunset_pkl_f)
+        sunset_model = WebcamLocation(*sunset_model_args)
+
+    sunrise_model.load_state_dict(sunrise_checkpt['state_dict'])
+    sunset_model.load_state_dict(sunset_checkpt['state_dict'])
+
+    if torch.cuda.is_available():
+        if torch.cuda.device_count() > 1:
+            sunrise_model = torch.nn.DataParallel(sunrise_model)
+            sunset_model = torch.nn.DataParallel(sunset_model)
+
+        sunrise_model.cuda()
+        sunset_model.cuda()
+
+    sunrise_model.eval()
+    sunset_model.eval()
+
+    if constants.CENTER:
+        test_transformations = torchvision.transforms.Compose([Resize(), RandomPatch(constants.PATCH_SIZE), Center(), ToTensor()])
+    else:
+        test_transformations = torchvision.transforms.Compose([Resize(), RandomPatch(constants.PATCH_SIZE), ToTensor()])
+    test_dataset = Test(data, test_transformations)
+
+    if torch.cuda.is_available():
+        pin_memory = True
+        num_workers = 0
+    else:
+        print('WARNING - Not using GPU.')
+        pin_memory = False
+        num_workers = constants.NUM_LOADER_WORKERS
+
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=constants.BATCH_SIZE, num_workers=num_workers, pin_memory=pin_memory)
+
+    sunrise_predict_t0 = time.time()
+    sunrises = []
+    for batch_idx, (input, _) in enumerate(test_loader):
+        input = Variable(input, volatile=True)
+
+        if torch.cuda.is_available():
+            input = input.cuda()
+
+        sunrise_idx = sunrise_model(input)
+
+        # Convert sunrise_idx into a local time.
+        batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunrise_idx.size()[0]]
+
+        for d_idx, day in enumerate(batch_days):
+            local_sunrise = day.get_local_time(sunrise_idx[d_idx, 0].data[0])
+            #utc_sunrise = local_sunrise - datetime.timedelta(seconds=day.time_offset)
+            sunrises.append(local_sunrise)
+    sunrise_predict_t1 = time.time()
+    print('Sunrise prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
+    sys.stdout.flush()
+
+    sunset_predict_t0 = time.time()
+    sunsets = []
+    for batch_idx, (input, _) in enumerate(test_loader):
+        input = Variable(input, volatile=True)
+
+        if torch.cuda.is_available():
+            input = input.cuda()
+
+        sunset_idx = sunset_model(input)
+
+        # Convert sunset_idx into a local time.
+        batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunset_idx.size()[0]]
+
+        for d_idx, day in enumerate(batch_days):
+            local_sunset = day.get_local_time(sunset_idx[d_idx, 0].data[0])
+            #utc_sunset = local_sunset - datetime.timedelta(seconds=day.time_offset)
+            sunsets.append(local_sunset)
+    sunset_predict_t1 = time.time()
+    print('Sunset prediction time (min): {:.2f}'.format((sunset_predict_t1 - sunset_predict_t0) / 60))
+    sys.stdout.flush()
+else: # Predictions already stored in a pickled numpy obj.
+    sunrise_pred_pkl = sunrise_directory + 'sunrise_pred.pkl'
+    sunset_pred_pkl = sunset_directory + 'sunset_pred.pkl'
+
+    with open(sunrise_pred_pkl, 'rb') as sunrise_pkl_f:
+        sunrise_pred = pickle.load(sunrise_pkl_f)
+
+    with open(sunset_pred_pkl, 'rb') as sunset_pkl_f:
+        sunset_pred = pickle.load(sunset_pkl_f)
+
+    num_test_days = data.types['test']
+
+    sunrises = []
+    for d_idx, day in enumerate(days[:num_test_days]):
+        local_sunrise = day.get_local_time(sunrise_pred[d_idx])
+        sunrises.append(local_sunrise)
+
+    sunsets = []
+    for d_idx, day in enumerate(days[:num_test_days]):
+        local_sunset = day.get_local_time(sunset_pred[d_idx])
+        sunsets.append(local_sunset)
 
 # Compute solar noon and day length.
 solar_noons = []
