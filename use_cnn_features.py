@@ -15,6 +15,7 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.svm import SVR
 from sklearn.metrics import mean_squared_error
 from sklearn.feature_selection import f_regression
+from sklearn.feature_selection import mutual_info_regression
 
 parser = argparse.ArgumentParser(description='Use CNN Features')
 parser.add_argument('--sunrise_path', default='', type=str, metavar='PATH',
@@ -103,7 +104,7 @@ def dim_reduction(train_input, test_input, train_output, mode='sunrise'):
         dims = train_input.shape[1]
         k = random.randint(math.ceil(dims / 2), dims)
 
-        kbest = SelectKBest(score_func=f_regression, k=k)
+        kbest = SelectKBest(score_func=mutual_info_regression, k=k)
         kbest.fit(train_input, train_output)
         reduced_train_input = kbest.transform(train_input)
         reduced_test_input = kbest.transform(test_input)
