@@ -143,8 +143,15 @@ sunset_reduced = dim_reduction(scaled_sunset_train_input,
                                sunset_train_output,
                                'sunset')
 
+del scaled_sunrise_train_input
+del scaled_sunrise_test_input
+del scaled_sunset_train_input
+del scaled_sunset_test_input
+del sunrise_scaler
+del sunset_scaler
+
 scale_pca_t1 = time.time()
-print('Scale data and initial PCA time (min): {:.6f}'.format((scale_pca_t1 - scale_pca_t0) / 60))
+print('Scale data, initial PCA, and dimension red. time (min): {:.6f}'.format((scale_pca_t1 - scale_pca_t0) / 60))
 sys.stdout.flush()
 
 def model(model_name, model, model_params,
