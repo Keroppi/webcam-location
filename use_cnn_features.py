@@ -57,6 +57,7 @@ print('Load Time (min): {:.6f}'.format((load_t1 - load_t0) / 60))
 sys.stdout.flush()
 
 ### Scale data to mean 0, unit variance. ###
+scale_pca_t0 = time.time()
 sunrise_scaler = StandardScaler()
 sunrise_scaler.fit(sunrise_train_input)
 scaled_sunrise_train_input = sunrise_scaler.transform(sunrise_train_input)
@@ -71,9 +72,15 @@ all_dims_sunrise_pca = PCA()
 all_dims_sunrise_pca.fit(scaled_sunrise_train_input)
 all_dims_sunset_pca = PCA()
 all_dims_sunset_pca.fit(scaled_sunset_train_input)
+scale_pca_t1 = time.time()
+print('Scale data and initial PCA time (min): {:.6f}'.format((scale_pca_t1 - scale_pca_t0) / 60))
+sys.stdout.flush()
 
 def dim_reduction(train_input, test_input, train_output, mode='sunrise'):
     pca_or_kbest = random.randint(0, 1)
+
+    print('Start dimension reduction.') # VLI DELETE
+    sys.stdout.flush()
 
     if pca_or_kbest == 0: # PCA
         pca_t0 = time.time()
@@ -264,7 +271,7 @@ def nn(train_input, test_input, train_output, test_output,
 def svr(train_input, test_input, train_output, test_output,
        dim_red_mode='pca', explained_var=None, mode='sunrise'):
 
-    Cs = list(np.arange(1e-3, 10, 1e-2))
+    Cs = list(np.arange(1e-4, 10, 1e-3))
     C = random.choice(Cs)
 
     kernels = ['poly', 'rbf', 'sigmoid'] # Omit linear since we have 2 types of linear regression already.
@@ -345,6 +352,9 @@ def train_model(model_name, mode='sunrise'):
 
         del reduced
 
+print('Creating threads.')
+sys.stdout.flush()
+
 sunrise_ridge_p = Process(target=train_model, args=('ridge', 'sunrise'))
 sunset_ridge_p = Process(target=train_model, args=('ridge', 'sunset'))
 sunrise_lasso_p = Process(target=train_model, args=('lasso', 'sunrise'))
@@ -353,6 +363,9 @@ sunrise_nn_p = Process(target=train_model, args=('nn', 'sunrise'))
 sunset_nn_p = Process(target=train_model, args=('nn', 'sunset'))
 sunrise_svr_p = Process(target=train_model, args=('svr', 'sunrise'))
 sunset_svr_p = Process(target=train_model, args=('svr', 'sunset'))
+
+print('Starting threads.')
+sys.stdout.flush()
 
 sunrise_ridge_p.start()
 sunset_ridge_p.start()
