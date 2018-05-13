@@ -230,8 +230,8 @@ def nn(train_input, test_input, train_output, test_output,
 
     hidden_layer_sizes = []
     for i in range(num_hidden_layers):
-        min_width = max(math.ceil(dims / 20), 20)
-        max_width = 2 * dims
+        min_width = max(math.ceil(dims / 20), 2) # at least 2
+        max_width = 3 * dims # at least 3
 
         layer_size = random.randint(min_width, max_width)
         hidden_layer_sizes.append(layer_size)
