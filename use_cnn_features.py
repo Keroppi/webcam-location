@@ -244,12 +244,12 @@ def nn(train_input, test_input, train_output, test_output,
        dim_red_mode='pca', explained_var=None, mode='sunrise'):
 
     dims = train_input.shape[1]
-    num_hidden_layers = random.randint(2, 10)
+    num_hidden_layers = random.randint(2, 8)
 
     hidden_layer_sizes = []
     for i in range(num_hidden_layers):
         min_width = max(math.ceil(dims / 20), 2) # at least 2
-        max_width = 3 * dims # at least 3
+        max_width = 2 * dims # at least 2
 
         layer_size = random.randint(min_width, max_width)
         hidden_layer_sizes.append(layer_size)
@@ -262,7 +262,7 @@ def nn(train_input, test_input, train_output, test_output,
     alphas = list(np.arange(1e-5, 0.1, 1e-4))
     alpha = random.choice(alphas)
 
-    tols = list(np.arange(1e-5, 1e-2, 1e-4))
+    tols = list(np.arange(1e-4, 1e-2, 1e-3))
     tol = random.choice(tols)
 
     params = {'hidden_layer_sizes':hidden_layer_sizes,
@@ -280,6 +280,8 @@ def nn(train_input, test_input, train_output, test_output,
               train_input, test_input, train_output, test_output,
               dim_red_mode, explained_var, mode)
     except MemoryError as e:
+        print('MemoryError caused by neural network.')
+        sys.stdout.flush()
         pass # Doesn't matter, let's just try again.
 
 
@@ -317,16 +319,16 @@ def svr(train_input, test_input, train_output, test_output,
           dim_red_mode, explained_var, mode)
 
 def train_model(model_name, mode='sunrise'):
-    while True:
-        if mode == 'sunrise':
-            reduced = sunrise_reduced
-            train_output = sunrise_train_output
-            test_output = sunrise_test_output
-        else:
-            reduced = sunset_reduced
-            train_output = sunset_train_output
-            test_output = sunset_test_output
+    if mode == 'sunrise':
+        reduced = sunrise_reduced
+        train_output = sunrise_train_output
+        test_output = sunrise_test_output
+    else:
+        reduced = sunset_reduced
+        train_output = sunset_train_output
+        test_output = sunset_test_output
 
+    while True:
         if model_name == 'ridge':
             ridge(reduced[0],
                   reduced[1],
@@ -360,31 +362,29 @@ def train_model(model_name, mode='sunrise'):
                 reduced[3],
                 mode)
 
-        del reduced
-
 print('Creating threads.')
 sys.stdout.flush()
 
-sunrise_ridge_p = Process(target=train_model, args=('ridge', 'sunrise'))
-sunset_ridge_p = Process(target=train_model, args=('ridge', 'sunset'))
-sunrise_lasso_p = Process(target=train_model, args=('lasso', 'sunrise'))
-sunset_lasso_p = Process(target=train_model, args=('lasso', 'sunset'))
+#sunrise_ridge_p = Process(target=train_model, args=('ridge', 'sunrise'))
+#sunset_ridge_p = Process(target=train_model, args=('ridge', 'sunset'))
+#sunrise_lasso_p = Process(target=train_model, args=('lasso', 'sunrise'))
+#sunset_lasso_p = Process(target=train_model, args=('lasso', 'sunset'))
 sunrise_nn_p = Process(target=train_model, args=('nn', 'sunrise'))
 sunset_nn_p = Process(target=train_model, args=('nn', 'sunset'))
-sunrise_svr_p = Process(target=train_model, args=('svr', 'sunrise'))
-sunset_svr_p = Process(target=train_model, args=('svr', 'sunset'))
+#sunrise_svr_p = Process(target=train_model, args=('svr', 'sunrise'))
+#sunset_svr_p = Process(target=train_model, args=('svr', 'sunset'))
 
 print('Starting threads.')
 sys.stdout.flush()
 
-sunrise_ridge_p.start()
-sunset_ridge_p.start()
-sunrise_lasso_p.start()
-sunset_lasso_p.start()
+#sunrise_ridge_p.start()
+#sunset_ridge_p.start()
+#sunrise_lasso_p.start()
+#sunset_lasso_p.start()
 sunrise_nn_p.start()
 sunset_nn_p.start()
-sunrise_svr_p.start()
-sunset_svr_p.start()
+#sunrise_svr_p.start()
+#sunset_svr_p.start()
 
 
 
