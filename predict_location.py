@@ -332,7 +332,14 @@ for key in lats:
 
     bnds = ((min_lat, max_lat), (min_lng, max_lng))
     res = minimize(kde_func_to_minimize, np.asarray(median_locations[key]), args=(kernel,), method='BFGS', bounds=bnds)
-    density_locations[key] = (res.x[0], res.x[1])
+
+    if res.success:
+        density_locations[key] = (res.x[0], res.x[1])
+    else:
+        print('WARNING - scipy minimize function failed on location ' + key)
+        sys.stdout.flush()
+        density_locations[key] = median_locations[key] # Use median if it fails.
+
 kernel_t1 = time.time()
 print('Calculating density time (h): ' + str((kernel_t1 - kernel_t0) / 3600))
 sys.stdout.flush()
