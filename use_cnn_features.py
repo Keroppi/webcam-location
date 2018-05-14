@@ -314,7 +314,7 @@ def svr(train_input, test_input, train_output, test_output,
               'degree':degree,
               'tol':tol,
               'cache_size':6000,
-              'max_iter':1000}
+              'max_iter':5000}
 
     del Cs
     del epsilons
@@ -383,12 +383,12 @@ sunset_svr_p = Process(target=train_model, args=('svr', 'sunset'))
 print('Starting threads.')
 sys.stdout.flush()
 
-#sunrise_ridge_p.start()
-#sunset_ridge_p.start()
-#sunrise_lasso_p.start()
-#sunset_lasso_p.start()
-#sunrise_nn_p.start()
-#sunset_nn_p.start()
+sunrise_ridge_p.start()
+sunset_ridge_p.start()
+sunrise_lasso_p.start()
+sunset_lasso_p.start()
+sunrise_nn_p.start()
+sunset_nn_p.start()
 sunrise_svr_p.start()
 sunset_svr_p.start()
 
