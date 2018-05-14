@@ -100,6 +100,16 @@ class Day():
         self.sunset = sunset
         self.sunrise_idx, self.sunset_idx = self.get_sun_idx(times, sunrise, sunset)
 
+        if self.sunrise_idx >= 0 and self.sunrise_idx <= constants.IMAGES_PER_DAY - 1:
+            self.sunrise_in_frames = True
+        else:
+            self.sunrise_in_frames = False
+
+        if self.sunset_idx >= 0 and self.sunset_idx <= constants.IMAGES_PER_DAY - 1:
+            self.sunset_in_frames = True
+        else:
+            self.sunset_in_frames = False
+
 
 
 
