@@ -2,6 +2,7 @@
 
 import torch, torchvision, os, argparse, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, scipy, pickle
 from sklearn.neighbors.kde import KernelDensity
+from scipy.optimize import minimize
 
 sys.path.append('/home/vli/webcam-location') # For importing .py files in the same directory on the cluster.
 import constants
@@ -300,12 +301,43 @@ for key in lats:
     mean_locations[key] = (statistics.mean(lats[key]), statistics.mean(lngs[key]))
     median_locations[key] = (statistics.median(lats[key]), statistics.median(lngs[key]))
 
-# Kernel density estimation to guess location.
-density_locations = {}
-# Note, this uses around 2.6 GB memory.
-#latitude_search = np.linspace(-90, 90, num=18001)  # 0.01 step size
-#longitude_search = np.linspace(-180, 180, num=18001)  # 0.02 step size
+def kde_func_to_minimize(x, kernel):
+    x = x.reshape(1, 2)
+    density = kernel.score_samples(x)
+    return -density[0] # Trying to minimize
 
+# Kernel density estimation to guess location.
+
+density_locations = {}
+
+kernel_t0 = time.time()
+for key in lats:
+    if len(lats[key]) == 1:
+        density_locations[key] = (lats[key][0], lngs[key][0])
+        continue
+    elif len(lats[key]) == 2: # Points are colinear, results in singular matrix
+        density_locations[key] = (statistics.mean(lats[key]), statistics.mean(lngs[key]))
+        continue
+
+    np_lats = np.array([math.radians(x) for x in lats[key]])
+    np_lngs = np.array([math.radians(x) for x in lngs[key]])
+    possible_points = np.vstack((np_lats, np_lngs))
+
+    kernel = KernelDensity(kernel='gaussian', bandwidth=constants.BANDWIDTH, metric='haversine').fit(possible_points.T)
+
+    min_lat = min(np_lats)
+    max_lat = max(np_lats)
+    min_lng = min(np_lngs)
+    max_lng = max(np_lngs)
+
+    bnds = ((min_lat, max_lat), (min_lng, max_lng))
+    res = minimize(kde_func_to_minimize, np.asarray(median_locations[key]), args=(kernel,), method='BFGS', bounds=bnds)
+    density_locations[key] = (res.x[0], res.x[1])
+kernel_t1 = time.time()
+print('Calculating density time (h): ' + str((kernel_t1 - kernel_t0) / 3600))
+sys.stdout.flush()
+
+'''
 kernel_t0 = time.time()
 for key in lats:
     if len(lats[key]) == 1:
@@ -372,7 +404,7 @@ for key in lats:
 kernel_t1 = time.time()
 print('Calculating density time (h): ' + str((kernel_t1 - kernel_t0) / 3600))
 sys.stdout.flush()
-
+'''
 
 def compute_distance(lat1, lng1, lat2, lng2): # kilometers
     # Haversine formula for computing distance.
