@@ -211,8 +211,10 @@ def model(model_name, model, model_params,
     del model
 
     model_t1 = time.time()
-    print(model_name + ' time (min): {:.6f}'.format((model_t1 - model_t0) / 60))
-    sys.stdout.flush()
+
+    if model_name == 'svr' or model_name == 'nn':
+        print(model_name + ' time (min): {:.6f}'.format((model_t1 - model_t0) / 60))
+        sys.stdout.flush()
 
 def ridge(train_input, test_input, train_output, test_output,
           dim_red_mode='pca', explained_var=None, mode='sunrise'):
