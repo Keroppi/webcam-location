@@ -288,7 +288,6 @@ def nn(train_input, test_input, train_output, test_output,
     except MemoryError as e:
         print('MemoryError caused by neural network.')
         sys.stdout.flush()
-        pass # Doesn't matter, let's just try again.
 
 
 def svr(train_input, test_input, train_output, test_output,
@@ -314,7 +313,8 @@ def svr(train_input, test_input, train_output, test_output,
               'kernel':kernel,
               'degree':degree,
               'tol':tol,
-              'cache_size':5000}
+              'cache_size':6000,
+              'max_iter':1000}
 
     del Cs
     del epsilons

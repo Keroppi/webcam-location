@@ -4,10 +4,6 @@ qsub -l h_vmem=10G -q long.q@* -j y -o /srv/glusterfs/vli/job_logs -t 4:12 -R y 
 qsub command for getting sunrise/sunset:
 qsub -l h_vmem=8G -q long.q@* -j y -o /srv/glusterfs/vli/job_logs -t 4:12 ~/rs_sun.py
 
-Inside gpu.sh:
-CUDA_VISIBLE_DEVICES=$SGE_GPU ~/webcam-location/main.py
-# Possibly add --load_model_args=/srv/glusterfs/vli/pickle/model_structure.pkl
-
 deep learning:
 qsub -l gpu -l h_vmem=30G -q gpu.long.q@biwirender* -R y -j y -t 1 -o /srv/glusterfs/vli/job_logs ~/gpu.sh
 
@@ -20,6 +16,8 @@ qsub -l gpu -l h_vmem=30G -q gpu.middle.q@biwirender* -R y -j y -t 3 -o /srv/glu
 
 learn from cnn features:
 qsub -l h_vmem=45G -q long.q@* -R y -j y -t 3 -pe multicore 8 -o /srv/glusterfs/vli/job_logs ~/use_cnn_features.sh
-qsub -l gpu=0 -l h_vmem=45G -q gpu.middle.q@biwirender* -R y -j y -t 3 -pe multicore 8 -o /srv/glusterfs/vli/job_logs ~/use_cnn_features.sh
+
+predict location (from pred):
+qsub -l h_vmem=12G -q long.q@* -R y -j y -t 4 -o /srv/glusterfs/vli/job_logs ~/predict_location_from_pred.sh
 
 Note: Try not to use biwirender02 - only 5 GB GPUs
