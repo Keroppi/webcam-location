@@ -104,8 +104,7 @@ def dim_reduction(train_input, test_input, train_output, mode='sunrise'):
 
     else: # SelectKBest
         kbest_t0 = time.time()
-        dims = train_input.shape[1]
-        k = random.randint(5, 750)
+        k = random.randint(5, 600)
 
         print('KBest used with {} features.'.format(k))
         sys.stdout.flush()
@@ -372,26 +371,26 @@ def train_model(model_name, mode='sunrise'):
 print('Creating threads.')
 sys.stdout.flush()
 
-#sunrise_ridge_p = Process(target=train_model, args=('ridge', 'sunrise'))
-#sunset_ridge_p = Process(target=train_model, args=('ridge', 'sunset'))
-#sunrise_lasso_p = Process(target=train_model, args=('lasso', 'sunrise'))
-#sunset_lasso_p = Process(target=train_model, args=('lasso', 'sunset'))
+sunrise_ridge_p = Process(target=train_model, args=('ridge', 'sunrise'))
+sunset_ridge_p = Process(target=train_model, args=('ridge', 'sunset'))
+sunrise_lasso_p = Process(target=train_model, args=('lasso', 'sunrise'))
+sunset_lasso_p = Process(target=train_model, args=('lasso', 'sunset'))
 sunrise_nn_p = Process(target=train_model, args=('nn', 'sunrise'))
 sunset_nn_p = Process(target=train_model, args=('nn', 'sunset'))
-#sunrise_svr_p = Process(target=train_model, args=('svr', 'sunrise'))
-#sunset_svr_p = Process(target=train_model, args=('svr', 'sunset'))
+sunrise_svr_p = Process(target=train_model, args=('svr', 'sunrise'))
+sunset_svr_p = Process(target=train_model, args=('svr', 'sunset'))
 
 print('Starting threads.')
 sys.stdout.flush()
 
-#sunrise_ridge_p.start()
-#sunset_ridge_p.start()
-#sunrise_lasso_p.start()
-#sunset_lasso_p.start()
+sunrise_ridge_p.start()
+sunset_ridge_p.start()
+sunrise_lasso_p.start()
+sunset_lasso_p.start()
 sunrise_nn_p.start()
 sunset_nn_p.start()
-#sunrise_svr_p.start()
-#sunset_svr_p.start()
+sunrise_svr_p.start()
+sunset_svr_p.start()
 
 
 
