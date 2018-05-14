@@ -1,5 +1,5 @@
 CLUSTER = True
-LEARNING_SUNRISE = True # True for sunrise, False for sunset
+LEARNING_SUNRISE = False # True for sunrise, False for sunset
 DAYS_PER_MONTH = 'MAX' # 'MAX'
 SIZE = ['small'] # 'large'
 #DATA_SOURCES = ['roundshot'] # 'panomax'
