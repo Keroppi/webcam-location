@@ -161,8 +161,14 @@ class WebcamData():
                             if os.path.getsize(image_dir + 'list_of_files.txt') == 0: # No images here.
                                 continue
 
-                            with open(image_dir + 'list_of_files.txt', 'r') as list_of_files_f:
-                                images = list_of_files_f.read().splitlines()
+                            try:
+                                with open(image_dir + 'list_of_files.txt', 'r') as list_of_files_f:
+                                    images = list_of_files_f.read().splitlines()
+                            except PermissionError:
+                                os.chmod(image_dir + 'list_of_files.txt', 0o664)
+
+                                with open(image_dir + 'list_of_files.txt', 'r') as list_of_files_f:
+                                    images = list_of_files_f.read().splitlines()
 
                         # Check for malformed images of size 0.
                         # Unnecessary since they've all been checked now.
