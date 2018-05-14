@@ -8,8 +8,8 @@ deep learning:
 qsub -l gpu -l h_vmem=30G -q gpu.long.q@biwirender* -R y -j y -t 1 -o /srv/glusterfs/vli/job_logs ~/gpu.sh
 
 resume learning:
-qsub -l gpu -l h_vmem=25G -q gpu.middle.q@biwirender* -R y -j y -t 1 -o /srv/glusterfs/vli/job_logs ~/sunrise_resume_gpu.sh
-qsub -l gpu -l h_vmem=25G -q gpu.middle.q@biwirender* -R y -j y -t 2 -o /srv/glusterfs/vli/job_logs ~/sunset_resume_gpu.sh
+qsub -l gpu -l h_vmem=40G -q gpu.long.q@biwirender* -R y -j y -t 1 -o /srv/glusterfs/vli/job_logs ~/sunrise_resume_gpu.sh
+qsub -l gpu -l h_vmem=40G -q gpu.middle.q@biwirender* -R y -j y -t 2 -o /srv/glusterfs/vli/job_logs ~/sunset_resume_gpu.sh
 
 save cnn features:
 qsub -l gpu -l h_vmem=30G -q gpu.middle.q@biwirender* -R y -j y -t 3 -o /srv/glusterfs/vli/job_logs ~/save_features.sh
