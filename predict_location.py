@@ -229,10 +229,12 @@ for d_idx, solar_noon in enumerate(solar_noons):
     if lng < -180:
         lng += 360
         print('WARNING - lng below -180')
+        print(days[d_idx].place)
         sys.stdout.flush()
     elif lng > 180:
         lng -= 360
         print('WARNING - lng over 180')
+        print(days[d_idx].place)
         sys.stdout.flush()
 
     '''
@@ -331,7 +333,7 @@ for key in lats:
     max_lng = max(np_lngs)
 
     bnds = ((min_lat, max_lat), (min_lng, max_lng))
-    res = minimize(kde_func_to_minimize, np.asarray(median_locations[key]), args=(kernel,), method='BFGS', bounds=bnds)
+    res = minimize(kde_func_to_minimize, np.asarray(median_locations[key]), args=(kernel,), method='L-BFGS-B', bounds=bnds)
 
     if res.success:
         density_locations[key] = (res.x[0], res.x[1])
