@@ -333,7 +333,7 @@ for key in lats:
     max_lng = max(np_lngs)
 
     bnds = ((min_lat, max_lat), (min_lng, max_lng))
-    res = minimize(kde_func_to_minimize, np.asarray(median_locations[key]), args=(kernel,), method='TNC', bounds=bnds)
+    res = minimize(kde_func_to_minimize, np.asarray(median_locations[key]), args=(kernel,), method='SLSQP', bounds=bnds)
 
     if res.success:
         density_locations[key] = (res.x[0], res.x[1])
