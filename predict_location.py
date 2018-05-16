@@ -447,6 +447,7 @@ for i in range(data.types['test']):
         color = 'k'
         label = 'sunrise and sunset not in frames'
 
+    plt.figure(figsize=(24,12))
     map = Basemap(projection='cyl', # This projection is equidistant.
                   llcrnrlat=min_lat, urcrnrlat=max_lat,
                   llcrnrlon=min_lng, urcrnrlon=max_lng,
@@ -458,8 +459,8 @@ for i in range(data.types['test']):
     x,y = map(lngs, lats)
     x_actual,y_actual = map([days[i].lng], [days[i].lat])
     x_mean,y_mean = map([mean_locations[place][1]], [mean_locations[place][0]])
-    x_median, y_median = map([median_locations[place][1]], [median_locations[place][0]])
-    x_density, y_density = map([density_locations[place][1]], [density_locations[place][0]])
+    x_median,y_median = map([median_locations[place][1]], [median_locations[place][0]])
+    x_density,y_density = map([density_locations[place][1]], [density_locations[place][0]])
     guesses, = map.plot(x, y, color + 'o', markersize=8, label=label)
     actual, = map.plot(x_actual, y_actual, 'w*', markersize=10, label='actual location')
     mean_guess, = map.plot(x_mean, y_mean, 'm^', markersize=8, label='mean')
@@ -487,7 +488,7 @@ def compute_distance(lat1, lng1, lat2, lng2): # kilometers
 
     return distance
 
-
+days_used = []
 finished_places = []
 mean_distances = []
 median_distances = []
@@ -500,6 +501,8 @@ for i in range(data.types['test']):
         continue
     else:
         finished_places.append(place)
+
+    days_used.append(len(lats[place]))
 
     actual_lat = days[i].lat
     actual_lng = days[i].lng
@@ -522,10 +525,10 @@ for i in range(data.types['test']):
     density_distance = compute_distance(actual_lat, actual_lng, density_pred_lat, density_pred_lng)
     density_distances.append(density_distance)
 
-    if random.randint(1, 100) < 20: # VLI
+    if random.randint(1, 100) < 101: # VLI
         print('Distance')
         print(place)
-        print('# Days Used: ' + str(len(lats[place])))
+        print('# Days Used: ' + str(days_used[-1]))
         print('Using mean: ' + str(mean_distance))
         print('Using median: ' + str(median_distance))
         print('Using density: ' + str(density_distance))
@@ -533,14 +536,27 @@ for i in range(data.types['test']):
         print(str(actual_lat) + ', ' + str(actual_lng))
         print(str(mean_pred_lat) + ', ' + str(mean_pred_lng))
         print(str(median_pred_lat) + ', ' + str(median_pred_lng))
-
-        #if density_locations[place] is not None:
         print(str(density_pred_lat) + ', ' + str(density_pred_lng))
 
         print('')
         sys.stdout.flush()
 
     #print(distance)
+
+
+# Plot Error vs Days Used
+plt.figure(figsize=(24,12))
+mean_days_err, = plt.plot(days_used, mean_distances, 'mo', markersize=8, label='mean')
+median_days_err, = plt.plot(days_used, median_distances, 'co', markersize=8, label='median')
+density_days_err, = plt.plot(days_used, density_distances, 'bo', markersize=8, label='gaussian kde')
+plt.legend(handles=[mean_days_err, median_days_err, density_days_err])
+plt.xlabel('# Days Used')
+plt.ylabel('Avg. Mean Squared Error')
+#plt.xlim(xmin=0)
+#plt.ylim(ymin=0)
+plt.title('Mean Squared Error vs. # Days Used')
+plt.savefig('/srv/glusterfs/vli/maps/days_used.png')
+plt.show()
 
 #average_dist /= len(finished_places)
 print('Means Avg. Distance Error: {:.6f}'.format(statistics.mean(mean_distances)))
