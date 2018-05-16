@@ -436,14 +436,18 @@ for i in range(data.types['test']):
 
     if days[i].sunrise_in_frames and days[i].sunset_in_frames:
         color = 'g'
+        label = 'sunrise and sunset in frames'
     elif not days[i].sunrise_in_frames and days[i].sunset_in_frames:
         color = 'r'
+        label = 'sunrise not in frames'
     elif not days[i].sunset_in_frames and days[i].sunrise_in_frames:
         color = 'y'
+        label = 'sunset not in frames'
     else: # not days[i].sunrise_in_frames and not days[i].sunset_in_frames:
         color = 'k'
+        label = 'sunrise and sunset not in frames'
 
-    map = Basemap(projection='gall',
+    map = Basemap(projection='cyl', # This projection is equidistant.
                   llcrnrlat=min_lat, urcrnrlat=max_lat,
                   llcrnrlon=min_lng, urcrnrlon=max_lng,
                   resolution='h')
@@ -456,11 +460,11 @@ for i in range(data.types['test']):
     x_mean,y_mean = map([mean_locations[place][1]], [mean_locations[place][0]])
     x_median, y_median = map([median_locations[place][1]], [median_locations[place][0]])
     x_density, y_density = map([median_locations[place][1]], [median_locations[place][0]])
-    guesses, = map.plot(x, y, color + 'o', markersize=8, label='possible location')
+    guesses, = map.plot(x, y, color + 'o', markersize=8, label=label)
     actual, = map.plot(x_actual, y_actual, 'w*', markersize=10, label='actual location')
-    mean_guess, = map.plot(x_actual, y_actual, 'm^', markersize=8, label='mean')
-    median_guess, = map.plot(x_actual, y_actual, 'c^', markersize=8, label='median')
-    density_guess, = map.plot(x_actual, y_actual, 'b^', markersize=8, label='gaussian kde')
+    mean_guess, = map.plot(x_mean, y_mean, 'm^', markersize=8, label='mean')
+    median_guess, = map.plot(x_median, y_median, 'c^', markersize=8, label='median')
+    density_guess, = map.plot(x_density, y_density, 'b^', markersize=8, label='gaussian kde')
 
     plt.legend(handles=[guesses, actual, mean_guess, median_guess, density_guess])
     plt.title(place)
