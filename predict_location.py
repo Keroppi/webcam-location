@@ -459,7 +459,7 @@ for i in range(data.types['test']):
     x_actual,y_actual = map([days[i].lng], [days[i].lat])
     x_mean,y_mean = map([mean_locations[place][1]], [mean_locations[place][0]])
     x_median, y_median = map([median_locations[place][1]], [median_locations[place][0]])
-    x_density, y_density = map([median_locations[place][1]], [median_locations[place][0]])
+    x_density, y_density = map([density_locations[place][1]], [density_locations[place][0]])
     guesses, = map.plot(x, y, color + 'o', markersize=8, label=label)
     actual, = map.plot(x_actual, y_actual, 'w*', markersize=10, label='actual location')
     mean_guess, = map.plot(x_mean, y_mean, 'm^', markersize=8, label='mean')
