@@ -12,6 +12,10 @@ from custom_transforms import Resize, RandomPatch, Center, ToTensor
 from custom_model import WebcamLocation
 from torch.autograd import Variable
 
+from mpl_toolkits.basemap import Basemap
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+
 parser = argparse.ArgumentParser(description='Predict Location')
 parser.add_argument('--sunrise_model', default='', type=str, metavar='PATH',
                     help='path to sunrise model (default: none)')
@@ -414,6 +418,54 @@ kernel_t1 = time.time()
 print('Calculating density time (h): ' + str((kernel_t1 - kernel_t0) / 3600))
 sys.stdout.flush()
 '''
+
+# Plot locations on a map.
+for i in range(data.types['test']):
+    place = days[i].place
+
+    if len(lats[place]) < 100: # Need at least 100 points.
+        continue
+
+    min_lat = max(min(lats[place]) - 1, -90)
+    max_lat = min(max(lats[place]) + 1, 90)
+    min_lng = max(min(lngs[place]) - 1, -180)
+    max_lng = min(max(lngs[place]) + 1, 180)
+
+    pred_lngs = [mean_locations[place][1], median_locations[place][1], density_locations[place[1]]]
+    pred_lngs = [mean_locations[place][1], median_locations[place][1], density_locations[place[1]]]
+
+    if days[i].sunrise_in_frames and days[i].sunset_in_frames:
+        color = 'g'
+    elif not days[i].sunrise_in_frames and days[i].sunset_in_frames:
+        color = 'r'
+    elif not days[i].sunset_in_frames and days[i].sunrise_in_frames:
+        color = 'y'
+    else: # not days[i].sunrise_in_frames and not days[i].sunset_in_frames:
+        color = 'k'
+
+    map = Basemap(projection='gall',
+                  llcrnrlat=min_lat, urcrnrlat=max_lat,
+                  llcrnrlon=min_lng, urcrnrlon=max_lng,
+                  resolution='h')
+    map.drawcoastlines()
+    map.fillcontinents(color='coral',lake_color='aqua')
+    map.drawmapboundary(fill_color='aqua')
+
+    x,y = map(lngs, lats)
+    x_actual,y_actual = map([days[i].lng], [days[i].lat])
+    x_mean,y_mean = map([mean_locations[place][1]], [mean_locations[place][0]])
+    x_median, y_median = map([median_locations[place][1]], [median_locations[place][0]])
+    x_density, y_density = map([median_locations[place][1]], [median_locations[place][0]])
+    guesses, = map.plot(x, y, color + 'o', markersize=8, label='possible location')
+    actual, = map.plot(x_actual, y_actual, 'w*', markersize=10, label='actual location')
+    mean_guess, = map.plot(x_actual, y_actual, 'm^', markersize=8, label='mean')
+    median_guess, = map.plot(x_actual, y_actual, 'c^', markersize=8, label='median')
+    density_guess, = map.plot(x_actual, y_actual, 'b^', markersize=8, label='gaussian kde')
+
+    plt.legend(handles=[guesses, actual, mean_guess, median_guess, density_guess])
+    plt.title(place)
+    plt.savefig('/srv/glusterfs/vli/maps/' + place + '.png')
+
 
 def compute_distance(lat1, lng1, lat2, lng2): # kilometers
     # Haversine formula for computing distance.
