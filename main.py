@@ -22,6 +22,7 @@ if constants.CLUSTER:
 else:
     SGE_TASK_ID = ''
 
+print('Learning sunrise: {}'.format(constants.LEARNING_SUNRISE))
 #print('Current Device(s): ' + str(torch.cuda.current_device()))
 print('Device Count: ' + str(torch.cuda.device_count()))
 sys.stdout.flush()
