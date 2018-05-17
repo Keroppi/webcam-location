@@ -344,10 +344,42 @@ for key in lats:
     else:
         print('WARNING - scipy minimize function failed on location ' + key)
         sys.stdout.flush()
-        density_locations[key] = median_locations[key] # Use median if it fails.
+
+        # Grid search for maximum density.
+
+        # density_locations[key] = median_locations[key] # Use median if it fails.
+        best_score = -float('inf')
+        best_longitude = -181
+        best_latitude = -91
+
+        latitude_search = np.linspace(min_lat, max_lat,
+                                      num=4001)  # Worst case pi/4000 radians (0.045 degrees) step size.
+        longitude_search = np.linspace(min_lng, max_lng, num=8001)  # Worst case pi/4000 radians step size.
+
+        for i in range(latitude_search.shape[0]):
+            curr_lat = np.array([latitude_search[i]] * longitude_search.shape[0])
+            search_space = np.vstack((curr_lat, longitude_search))
+
+            density = kernel.score_samples(search_space.T)
+
+            ind = np.argmax(density, axis=None)
+
+            if best_score < density[ind]:
+                best_score = density[ind]
+                best_longitude = math.degrees(longitude_search[ind])
+                best_latitude = math.degrees(latitude_search[i])
+
+            del curr_lat
+            del search_space
+            del density
+
+        del latitude_search
+        del longitude_search
+
+        density_locations[key] = (best_latitude, best_longitude)
 
 kernel_t1 = time.time()
-print('Calculating density time (h): ' + str((kernel_t1 - kernel_t0) / 3600))
+print('Calculating density time (m): ' + str((kernel_t1 - kernel_t0) / 60))
 sys.stdout.flush()
 
 '''
@@ -431,8 +463,8 @@ for i in range(data.types['test']):
     min_lng = max(min(lngs[place]) - 1, -180)
     max_lng = min(max(lngs[place]) + 1, 180)
 
-    pred_lngs = [mean_locations[place][1], median_locations[place][1], density_locations[place[1]]]
-    pred_lngs = [mean_locations[place][1], median_locations[place][1], density_locations[place[1]]]
+    pred_lngs = [mean_locations[place][1], median_locations[place][1], density_locations[place][1]]
+    pred_lngs = [mean_locations[place][1], median_locations[place][1], density_locations[place][1]]
 
     if days[i].sunrise_in_frames and days[i].sunset_in_frames:
         color = 'g'
