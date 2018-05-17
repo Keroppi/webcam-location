@@ -323,7 +323,11 @@ class Test(Dataset):
         self.sunrise_label = np.asarray([x.sunrise_idx for x in self.data])
         self.sunset_label = np.asarray([x.sunset_idx for x in self.data])
         self.transforms = transforms
-        self.mode = 'sunrise'
+
+        if constants.LEARNING_SUNRISE:
+            self.mode = 'sunrise'
+        else:
+            self.mode = 'sunset'
 
     def __getitem__(self, index):
         # Return image and the label
@@ -362,7 +366,11 @@ class Validation(Dataset):
         self.sunrise_label = np.asarray([x.sunrise_idx for x in self.data])
         self.sunset_label = np.asarray([x.sunset_idx for x in self.data])
         self.transforms = transforms
-        self.mode = 'sunrise'
+
+        if constants.LEARNING_SUNRISE:
+            self.mode = 'sunrise'
+        else:
+            self.mode = 'sunset'
 
     def __getitem__(self, index):
         # Return image and the label
