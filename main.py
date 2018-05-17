@@ -137,10 +137,6 @@ if args.resume:  # Continue training a model - requires using --load_model_args 
         # model = checkpoint['model']
         start_epoch = checkpoint['epoch']
         best_error = checkpoint['best_prec1']
-
-        start_epoch = 0  # VLI
-        best_error = float('inf')
-
         model.load_state_dict(checkpoint['state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer'])
 
