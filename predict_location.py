@@ -1,5 +1,8 @@
 #!/srv/glusterfs/vli/.pyenv/shims/python
 
+import matplotlib
+matplotlib.use('agg')
+
 import torch, torchvision, os, argparse, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, scipy, pickle
 from sklearn.neighbors.kde import KernelDensity
 from scipy.optimize import minimize
