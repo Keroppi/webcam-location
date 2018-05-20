@@ -491,7 +491,7 @@ for i in range(data.types['test']):
     map.fillcontinents(color='coral',lake_color='aqua')
     map.drawmapboundary(fill_color='aqua')
 
-    x,y = map(lngs, lats)
+    x,y = map(lngs[place], lats[place])
     x_actual,y_actual = map([days[i].lng], [days[i].lat])
     x_mean,y_mean = map([mean_locations[place][1]], [mean_locations[place][0]])
     x_median,y_median = map([median_locations[place][1]], [median_locations[place][0]])
