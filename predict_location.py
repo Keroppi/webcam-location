@@ -17,7 +17,7 @@ from torch.autograd import Variable
 
 from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
+from matplotlib import colors as mcolors
 
 parser = argparse.ArgumentParser(description='Predict Location')
 parser.add_argument('--sunrise_model', default='', type=str, metavar='PATH',
@@ -455,10 +455,8 @@ sys.stdout.flush()
 '''
 
 # Plot locations on a map.
-for i in range(data.types['test']):
-    place = days[i].place
-
-    if len(lats[place]) < 100: # Need at least 100 points.
+for place in lats:
+    if len(lats[place]) < 10: # Need at least 100 points. # VLI
         continue
 
     min_lat = max(min(lats[place]) - 1, -90)
@@ -466,21 +464,26 @@ for i in range(data.types['test']):
     min_lng = max(min(lngs[place]) - 1, -180)
     max_lng = min(max(lngs[place]) + 1, 180)
 
-    pred_lngs = [mean_locations[place][1], median_locations[place][1], density_locations[place][1]]
-    pred_lngs = [mean_locations[place][1], median_locations[place][1], density_locations[place][1]]
+    colors = []
 
-    if days[i].sunrise_in_frames and days[i].sunset_in_frames:
-        color = 'g'
-        label = 'sunrise and sunset in frames'
-    elif not days[i].sunrise_in_frames and days[i].sunset_in_frames:
-        color = 'r'
-        label = 'sunrise not in frames'
-    elif not days[i].sunset_in_frames and days[i].sunrise_in_frames:
-        color = 'y'
-        label = 'sunset not in frames'
-    else: # not days[i].sunrise_in_frames and not days[i].sunset_in_frames:
-        color = 'k'
-        label = 'sunrise and sunset not in frames'
+    actual_lng = float('inf')
+    actual_lat = float('inf')
+
+    for i in range(data.types['test']):
+        if days[i].place != place:
+            continue
+
+        actual_lng = days[i].lng
+        actual_lat = days[i].lat
+
+        if days[i].sunrise_in_frames and days[i].sunset_in_frames:
+            colors.append('g')
+        elif not days[i].sunrise_in_frames and days[i].sunset_in_frames:
+            colors.append('r')
+        elif not days[i].sunset_in_frames and days[i].sunrise_in_frames:
+            colors.append(mcolors.CSS4_COLORS['crimson'])
+        else: # not days[i].sunrise_in_frames and not days[i].sunset_in_frames:
+            colors.append('k')
 
     plt.figure(figsize=(24,12))
     map = Basemap(projection='cyl', # This projection is equidistant.
@@ -491,18 +494,25 @@ for i in range(data.types['test']):
     map.fillcontinents(color='coral',lake_color='aqua')
     map.drawmapboundary(fill_color='aqua')
 
-    x,y = map(lngs[place], lats[place])
-    x_actual,y_actual = map([days[i].lng], [days[i].lat])
-    x_mean,y_mean = map([mean_locations[place][1]], [mean_locations[place][0]])
-    x_median,y_median = map([median_locations[place][1]], [median_locations[place][0]])
-    x_density,y_density = map([density_locations[place][1]], [density_locations[place][0]])
-    guesses, = map.plot(x, y, color + 'o', markersize=8, label=label)
-    actual, = map.plot(x_actual, y_actual, 'w*', markersize=10, label='actual location')
-    mean_guess, = map.plot(x_mean, y_mean, 'm^', markersize=8, label='mean')
-    median_guess, = map.plot(x_median, y_median, 'c^', markersize=8, label='median')
-    density_guess, = map.plot(x_density, y_density, 'b^', markersize=8, label='gaussian kde')
+    #x,y = map(lngs[place], lats[place])
+    #x_actual,y_actual = map([actual_lng], [actual_lat])
+    #x_mean,y_mean = map([mean_locations[place][1]], [mean_locations[place][0]])
+    #x_median,y_median = map([median_locations[place][1]], [median_locations[place][0]])
+    #x_density,y_density = map([density_locations[place][1]], [density_locations[place][0]])
 
-    plt.legend(handles=[guesses, actual, mean_guess, median_guess, density_guess])
+    all_lngs = lngs[place] + [actual_lng] + [mean_locations[place][1]] + [median_locations[place][1]] + [density_locations[place][1]]
+    all_lats = lats[place] + [actual_lat] + [mean_locations[place][0]] + [median_locations[place][0]] + [density_locations[place][0]]
+    colors = colors + ['w', 'm', 'c', mcolors.CSS4_COLORS['fuchsia']]
+
+    points = map.scatter(all_lngs, all_lats, s=100, c=colors, latlon=True, zorder=10)
+
+    #plt.legend(handles=[guesses, actual, mean_guess, median_guess, density_guess])
+    legend_colors = ['g', 'r', mcolors.CSS4_COLORS['crimson'], 'k', 'w', 'm', 'c', mcolors.CSS4_COLORS['fuchsia']]
+    legend_labels = ['sunrise and sunset in frames', 'sunrise not in frames', 'sunset not in frames', 'sunrise and sunset not in frames', 'actual location', 'mean', 'median', 'gaussian kde']
+
+    handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in legend_colors]
+    plt.legend(handlelist, legend_labels)
+
     plt.title(place)
     plt.savefig('/srv/glusterfs/vli/maps/' + place + '.png')
 
