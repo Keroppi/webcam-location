@@ -456,7 +456,7 @@ sys.stdout.flush()
 
 # Plot locations on a map.
 for place in lats:
-    if len(lats[place]) < 10: # Need at least 100 points. # VLI
+    if len(lats[place]) < 10: # Need at least 100 points.
         continue
 
     min_lat = max(min(lats[place]) - 1, -90)
@@ -504,7 +504,7 @@ for place in lats:
     all_lats = lats[place] + [actual_lat] + [mean_locations[place][0]] + [median_locations[place][0]] + [density_locations[place][0]]
     colors = colors + ['w', 'm', 'c', mcolors.CSS4_COLORS['fuchsia']]
 
-    points = map.scatter(all_lngs, all_lats, s=100, c=colors, latlon=True, zorder=10)
+    points = map.scatter(all_lngs, all_lats, s=80, c=colors, latlon=True, zorder=10)
 
     #plt.legend(handles=[guesses, actual, mean_guess, median_guess, density_guess])
     legend_colors = ['g', 'r', mcolors.CSS4_COLORS['crimson'], 'k', 'w', 'm', 'c', mcolors.CSS4_COLORS['fuchsia']]
@@ -515,6 +515,7 @@ for place in lats:
 
     plt.title(place)
     plt.savefig('/srv/glusterfs/vli/maps/' + place + '.png')
+    plt.close()
 
 
 def compute_distance(lat1, lng1, lat2, lng2): # kilometers
@@ -591,9 +592,9 @@ for i in range(data.types['test']):
 
 # Plot Error vs Days Used
 plt.figure(figsize=(24,12))
-mean_days_err, = plt.plot(days_used, mean_distances, 'mo', markersize=8, label='mean')
-median_days_err, = plt.plot(days_used, median_distances, 'co', markersize=8, label='median')
-density_days_err, = plt.plot(days_used, density_distances, 'bo', markersize=8, label='gaussian kde')
+mean_days_err, = plt.plot(days_used, mean_distances, 'mo', markersize=5, label='mean')
+median_days_err, = plt.plot(days_used, median_distances, 'co', markersize=5, label='median')
+density_days_err, = plt.plot(days_used, density_distances, color=mcolors.CSS4_COLORS['fuchsia'], marker='o', markersize=5, label='gaussian kde')
 plt.legend(handles=[mean_days_err, median_days_err, density_days_err])
 plt.xlabel('# Days Used')
 plt.ylabel('Avg. Mean Squared Error')
@@ -601,7 +602,7 @@ plt.ylabel('Avg. Mean Squared Error')
 #plt.ylim(ymin=0)
 plt.title('Mean Squared Error vs. # Days Used')
 plt.savefig('/srv/glusterfs/vli/maps/days_used.png')
-plt.show()
+plt.close()
 
 #average_dist /= len(finished_places)
 print('Means Avg. Distance Error: {:.6f}'.format(statistics.mean(mean_distances)))
