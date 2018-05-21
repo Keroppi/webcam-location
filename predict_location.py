@@ -456,7 +456,7 @@ sys.stdout.flush()
 
 # Plot locations on a map.
 for place in lats:
-    if len(lats[place]) < 10: # Need at least 100 points.
+    if len(lats[place]) < 100: # Need at least 100 points.
         continue
 
     min_lat = max(min(lats[place]) - 1, -90)
@@ -594,12 +594,12 @@ for i in range(data.types['test']):
 
 # Plot Error vs Days Used
 plt.figure(figsize=(24,12))
-mean_days_err, = plt.plot(days_used, mean_distances, 'mo', markersize=5, label='mean')
-median_days_err, = plt.plot(days_used, median_distances, 'co', markersize=5, label='median')
-density_days_err, = plt.plot(days_used, density_distances, color=mcolors.CSS4_COLORS['fuchsia'], marker='o', markersize=5, label='gaussian kde')
+mean_days_err, = plt.plot(days_used, mean_distances, 'mo', markersize=3, label='mean')
+median_days_err, = plt.plot(days_used, median_distances, 'co', markersize=3, label='median')
+density_days_err, = plt.plot(days_used, density_distances, color=mcolors.CSS4_COLORS['fuchsia'], linestyle='None', marker='o', markersize=3, label='gaussian kde')
 plt.legend(handles=[mean_days_err, median_days_err, density_days_err])
 plt.xlabel('# Days Used')
-plt.ylabel('Avg. Mean Squared Error')
+plt.ylabel('Avg. Error (km)')
 #plt.xlim(xmin=0)
 #plt.ylim(ymin=0)
 plt.title('Mean Squared Error vs. # Days Used')
