@@ -500,17 +500,19 @@ for place in lats:
     #x_median,y_median = map([median_locations[place][1]], [median_locations[place][0]])
     #x_density,y_density = map([density_locations[place][1]], [density_locations[place][0]])
 
-    all_lngs = lngs[place] + [actual_lng] + [mean_locations[place][1]] + [median_locations[place][1]] + [density_locations[place][1]]
-    all_lats = lats[place] + [actual_lat] + [mean_locations[place][0]] + [median_locations[place][0]] + [density_locations[place][0]]
-    colors = colors + ['w', 'm', 'c', mcolors.CSS4_COLORS['fuchsia']]
+    actual_and_pred_lngs = [actual_lng] + [mean_locations[place][1]] + [median_locations[place][1]] + [density_locations[place][1]]
+    actual_and_pred_lats = [actual_lat] + [mean_locations[place][0]] + [median_locations[place][0]] + [density_locations[place][0]]
+    actual_and_pred_colors = ['w', 'm', 'c', mcolors.CSS4_COLORS['fuchsia']]
 
-    points = map.scatter(all_lngs, all_lats, s=80, c=colors, latlon=True, zorder=10)
+    guesses = map.scatter(lngs[place], lats[place], s=70, c=colors, latlon=True, zorder=10)
+    actual_and_pred = map.scatter(actual_and_pred_lngs, actual_and_pred_lats, s=70, c=actual_and_pred_colors, latlon=True, zorder=10, marker='^')
 
     #plt.legend(handles=[guesses, actual, mean_guess, median_guess, density_guess])
-    legend_colors = ['g', 'r', mcolors.CSS4_COLORS['crimson'], 'k', 'w', 'm', 'c', mcolors.CSS4_COLORS['fuchsia']]
+    guess_colors = ['g', 'r', mcolors.CSS4_COLORS['crimson'], 'k']
     legend_labels = ['sunrise and sunset in frames', 'sunrise not in frames', 'sunset not in frames', 'sunrise and sunset not in frames', 'actual location', 'mean', 'median', 'gaussian kde']
 
-    handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in legend_colors]
+    handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in guess_colors] + \
+                 [plt.plot([], marker="^", ls="", color=color)[0] for color in actual_and_pred_colors]
     plt.legend(handlelist, legend_labels)
 
     plt.title(place)
