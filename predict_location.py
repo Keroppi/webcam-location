@@ -504,8 +504,8 @@ for place in lats:
     actual_and_pred_lats = [actual_lat] + [mean_locations[place][0]] + [median_locations[place][0]] + [density_locations[place][0]]
     actual_and_pred_colors = ['w', 'm', 'c', mcolors.CSS4_COLORS['fuchsia']]
 
-    guesses = map.scatter(lngs[place], lats[place], s=70, c=colors, latlon=True, zorder=10)
-    actual_and_pred = map.scatter(actual_and_pred_lngs, actual_and_pred_lats, s=70, c=actual_and_pred_colors, latlon=True, zorder=10, marker='^')
+    guesses = map.scatter(lngs[place], lats[place], s=40, c=colors, latlon=True, zorder=10)
+    actual_and_pred = map.scatter(actual_and_pred_lngs, actual_and_pred_lats, s=40, c=actual_and_pred_colors, latlon=True, zorder=10, marker='^')
 
     #plt.legend(handles=[guesses, actual, mean_guess, median_guess, density_guess])
     guess_colors = ['g', 'r', mcolors.CSS4_COLORS['crimson'], 'k']
@@ -595,15 +595,33 @@ for i in range(data.types['test']):
 # Plot Error vs Days Used
 plt.figure(figsize=(24,12))
 mean_days_err, = plt.plot(days_used, mean_distances, 'mo', markersize=3, label='mean')
+plt.legend(handles=[mean_days_err])
+plt.xlabel('# Days Used')
+plt.ylabel('Avg. Error (km)')
+plt.title('Avg. Error (km) Using Mean vs. # Days Used')
+plt.savefig('/srv/glusterfs/vli/maps/mean_days_used.png')
+plt.close()
+
+plt.figure(figsize=(24,12))
 median_days_err, = plt.plot(days_used, median_distances, 'co', markersize=3, label='median')
-density_days_err, = plt.plot(days_used, density_distances, color=mcolors.CSS4_COLORS['fuchsia'], linestyle='None', marker='o', markersize=3, label='gaussian kde')
-plt.legend(handles=[mean_days_err, median_days_err, density_days_err])
+plt.legend(handles=[median_days_err])
 plt.xlabel('# Days Used')
 plt.ylabel('Avg. Error (km)')
 #plt.xlim(xmin=0)
 #plt.ylim(ymin=0)
-plt.title('Mean Squared Error vs. # Days Used')
-plt.savefig('/srv/glusterfs/vli/maps/days_used.png')
+plt.title('Avg. Error (km) Using Median vs. # Days Used')
+plt.savefig('/srv/glusterfs/vli/maps/median_days_used.png')
+plt.close()
+
+plt.figure(figsize=(24,12))
+density_days_err, = plt.plot(days_used, density_distances, color=mcolors.CSS4_COLORS['fuchsia'], linestyle='None', marker='o', markersize=3, label='gaussian kde')
+plt.legend(handles=[density_days_err])
+plt.xlabel('# Days Used')
+plt.ylabel('Avg. Error (km)')
+#plt.xlim(xmin=0)
+#plt.ylim(ymin=0)
+plt.title('Avg. Error (km) Using Gaussian KDE vs. # Days Used')
+plt.savefig('/srv/glusterfs/vli/maps/kde_days_used.png')
 plt.close()
 
 #average_dist /= len(finished_places)
