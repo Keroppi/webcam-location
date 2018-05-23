@@ -120,9 +120,6 @@ train_loss_fn = torch.nn.MSELoss()
 test_loss_fn = torch.nn.MSELoss(size_average=False)
 
 if torch.cuda.is_available():
-    if torch.cuda.device_count() > 1:
-        model = torch.nn.DataParallel(model)
-
     #model = model.cuda()
     model.cuda()
     train_loss_fn = train_loss_fn.cuda()
@@ -150,6 +147,12 @@ if args.resume:  # Continue training a model - requires using --load_model_args 
 else:
     start_epoch = 0
     best_error = float('inf')
+
+if torch.cuda.is_available():
+    if torch.cuda.device_count() > 1: # Load state dict before wrapping in DataParallel
+        model = torch.nn.DataParallel(model)
+
+    model.cuda()
 
 def train_epoch(epoch, model, data_loader, optimizer):
     model.train()
