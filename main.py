@@ -263,7 +263,7 @@ for epoch in range(start_epoch, constants.EPOCHS):
     save_checkpoint({
         'model': model,
         'epoch': epoch + 1,
-        'state_dict': model.state_dict(),
+        'state_dict': {k.partition('model.')[2]: v for k,v in model.state_dict()}, #model.state_dict(),
         'best_prec1': best_error,
         'optimizer': optimizer.state_dict(),
     }, is_best)
