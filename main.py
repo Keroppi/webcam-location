@@ -263,10 +263,16 @@ for epoch in range(start_epoch, constants.EPOCHS):
 
     is_best = test_error < best_error
     best_error = min(test_error, best_error)
+
+    if torch.cuda.device_count() > 1:
+        state_dict = {k.partition('model.')[2]: v for k,v in model.state_dict()}
+    else:
+        state_dict = model.state_dict()
+
     save_checkpoint({
         'model': model,
         'epoch': epoch + 1,
-        'state_dict': {k.partition('model.')[2]: v for k,v in model.state_dict()}, #model.state_dict(),
+        'state_dict': state_dict,
         'best_prec1': best_error,
         'optimizer': optimizer.state_dict(),
     }, is_best)
