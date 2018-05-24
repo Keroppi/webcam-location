@@ -490,7 +490,7 @@ for place in lats:
                   llcrnrlat=min_lat, urcrnrlat=max_lat,
                   llcrnrlon=min_lng, urcrnrlon=max_lng,
                   resolution='h')
-    map.drawcoastlines()
+    #map.drawcoastlines()
     map.fillcontinents(color='coral',lake_color='aqua')
     map.drawmapboundary(fill_color='aqua')
 

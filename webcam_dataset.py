@@ -205,6 +205,10 @@ class WebcamData():
 
                         day_obj = Day(place, subset_times, subset_images, sunrise, sunset,
                                       train_test_valid, lat, lng, time_offset, mali_solar_noon) # One training / test example.
+
+                        if not (day_obj.sunrise_in_frames and day_obj.sunset_in_frames): # VLI
+                            continue # VLI
+
                         data.append(day_obj)
                         self.types[train_test_valid] += 1
 
