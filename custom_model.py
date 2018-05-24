@@ -186,6 +186,7 @@ class WebcamLocation(nn.Module):
 
         return self.regressor(x)
 
+    '''
     def forward_features(self, x):
         # Convolutional layers.
         x = self.features(x)
@@ -194,7 +195,7 @@ class WebcamLocation(nn.Module):
         x = x.view(-1, self.first_fc_layer_size)
 
         return x
-
+    '''
 
     def num_flat_features(self, x):
         size = x.size()[1:]  # all dimensions except the batch dimension
