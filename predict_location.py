@@ -134,6 +134,11 @@ if from_model: # Use the trained model to generate predictions.
     sunset_predict_t1 = time.time()
     print('Sunset prediction time (min): {:.2f}'.format((sunset_predict_t1 - sunset_predict_t0) / 60))
     sys.stdout.flush()
+
+    # Run predictions again with frames closer to the model.
+
+
+
 else: # Predictions already stored in a pickled numpy obj.
     sunrise_pred_pkl = sunrise_directory + 'sunrise_pred.pkl'
     sunset_pred_pkl = sunset_directory + 'sunset_pred.pkl'

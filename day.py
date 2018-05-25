@@ -1,5 +1,5 @@
 import constants
-import numpy as np, sys, PIL, math, time, datetime
+import numpy as np, sys, PIL, math, time, datetime, random
 
 class Day():
     def get_local_time(self, idx):
@@ -80,15 +80,28 @@ class Day():
 
         return (sunrise_idx, sunset_idx)
 
+
+    def random_subset(all_times, all_img_paths):
+        # Randomly select IMAGES_PER_DAY images from times / images.
+        subset_idx = np.random.choice(len(all_times), constants.IMAGES_PER_DAY, replace=False)
+        subset_idx.sort()
+        times = [all_times[x] for x in subset_idx]
+        img_paths = [all_img_paths[x] for x in subset_idx]
+
+        return (times, img_paths)
+
     def __init__(self, place, times, img_paths, sunrise, sunset, train_test_valid, lat, lng, time_offset, mali_solar_noon):
-        self.times = times
+        self.all_times = times
+        self.all_img_paths = img_paths
+
+        self.times, self.img_paths = Day.select_subset(times, img_paths)
+
         self.train_test_valid = train_test_valid
         self.place = place
         self.date = times[0].date()
         self.lat = lat
         self.lng = lng
         self.mali_solar_noon = mali_solar_noon
-        self.img_paths = img_paths
         self.time_offset = time_offset # Time zone offset in seconds.
 
         # Determine height / width
@@ -109,6 +122,8 @@ class Day():
             self.sunset_in_frames = True
         else:
             self.sunset_in_frames = False
+
+        self.viable = self.sunrise_in_frames and self.sunset_in_frames
 
 
 

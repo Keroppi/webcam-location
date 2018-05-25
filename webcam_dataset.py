@@ -194,16 +194,18 @@ class WebcamData():
                         # Get the list of times associated with the images.
                         times = WebcamData.extract_times(images)
 
+                        '''
                         # Randomly select IMAGES_PER_DAY images from times / images.
                         subset_idx = np.random.choice(len(times), constants.IMAGES_PER_DAY, replace=False)
                         subset_idx.sort()
                         subset_times = [times[x] for x in subset_idx]
                         subset_images = [images[x] for x in subset_idx]
+                        '''
 
                         #test = PIL.Image.open(subset_images[5])
                         #test.save('/home/vli/patches/original' + place + '.jpg' )
 
-                        day_obj = Day(place, subset_times, subset_images, sunrise, sunset,
+                        day_obj = Day(place, times, images, sunrise, sunset,
                                       train_test_valid, lat, lng, time_offset, mali_solar_noon) # One training / test example.
 
                         if not (day_obj.sunrise_in_frames and day_obj.sunset_in_frames): # VLI
