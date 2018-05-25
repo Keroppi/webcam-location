@@ -276,5 +276,3 @@ for epoch in range(start_epoch, constants.EPOCHS):
         'best_prec1': best_error,
         'optimizer': optimizer.state_dict(),
     }, is_best)
-
-# Could use GPU to transform images...?  ToTensor first step - https://discuss.pytorch.org/t/preprocess-images-on-gpu/5096
