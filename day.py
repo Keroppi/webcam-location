@@ -94,7 +94,7 @@ class Day():
         self.all_times = times
         self.all_img_paths = img_paths
 
-        self.times, self.img_paths = Day.select_subset(times, img_paths)
+        self.times, self.img_paths = Day.random_subset(times, img_paths)
 
         self.train_test_valid = train_test_valid
         self.place = place
