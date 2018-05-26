@@ -90,21 +90,49 @@ class Day():
 
         return (times, img_paths)
 
-    def change_frames(self, center_frame):
+    def change_frames(self, center_frame): # Given a suggested frame idx, repick frames that are close to it.
         if center_frame < 0:
             start = 0
+            end = 1
         elif center_frame > constants.IMAGES_PER_DAY - 1:
-            start = constants.IMAGES_PER_DAY - 1
+            start = constants.IMAGES_PER_DAY - 2
+            end = constants.IMAGES_PER_DAY - 1
         else:
             start = math.floor(center_frame)
+            end = math.ceil(center_frame)
 
-        pivot_time = self.times[start]
+        start_pivot_time = self.times[start]
+        end_pivot_time = self.times[end]
 
         for t_idx, time in enumerate(self.all_times):
-            if time == pivot_time:
-                break
+            if time == start_pivot_time:
+                start_idx = t_idx
+            elif time == end_pivot_time:
+                end_idx = t_idx
 
+        important_frames = list(range(start_idx, end_idx + 1))
+        remaining = set(range(len(self.all_times))) - set(important_frames)
 
+        subset_idx = np.random.choice(len(remaining), constants.IMAGES_PER_DAY - len(important_frames), replace=False)
+        subset_idx.sort()
+        subset_idx = [remaining[x] for x in subset_idx]
+        subset_idx = subset_idx + important_frames
+        subset_idx.sort()
+
+        self.times = [self.all_times[x] for x in subset_idx]
+        self.img_paths = [self.all_img_paths[x] for x in subset_idx]
+
+        self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, self.sunrise, self.sunset)
+
+        if self.sunrise_idx >= 0 and self.sunrise_idx <= constants.IMAGES_PER_DAY - 1:
+            self.sunrise_in_frames = True
+        else:
+            self.sunrise_in_frames = False
+
+        if self.sunset_idx >= 0 and self.sunset_idx <= constants.IMAGES_PER_DAY - 1:
+            self.sunset_in_frames = True
+        else:
+            self.sunset_in_frames = False
 
     def __init__(self, place, times, img_paths, sunrise, sunset, train_test_valid, lat, lng, time_offset, mali_solar_noon):
         self.all_times = times
@@ -138,8 +166,6 @@ class Day():
             self.sunset_in_frames = True
         else:
             self.sunset_in_frames = False
-
-        self.viable = self.sunrise_in_frames and self.sunset_in_frames
 
 
 
