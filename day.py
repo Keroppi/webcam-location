@@ -94,7 +94,7 @@ class Day():
         if center_frame < 0:
             start = 0
             end = 1
-        elif center_frame > constants.IMAGES_PER_DAY - 1:
+        elif center_frame >= constants.IMAGES_PER_DAY - 1:
             start = constants.IMAGES_PER_DAY - 2
             end = constants.IMAGES_PER_DAY - 1
         else:
