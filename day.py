@@ -115,7 +115,7 @@ class Day():
 
         subset_idx = np.random.choice(len(remaining), constants.IMAGES_PER_DAY - len(important_frames), replace=False)
         subset_idx.sort()
-        subset_idx = [remaining[x] for x in subset_idx]
+        subset_idx = [list(remaining)[x] for x in subset_idx]
         subset_idx = subset_idx + important_frames
         subset_idx.sort()
 
