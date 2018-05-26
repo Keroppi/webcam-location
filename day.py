@@ -90,6 +90,22 @@ class Day():
 
         return (times, img_paths)
 
+    def change_frames(self, center_frame):
+        if center_frame < 0:
+            start = 0
+        elif center_frame > constants.IMAGES_PER_DAY - 1:
+            start = constants.IMAGES_PER_DAY - 1
+        else:
+            start = math.floor(center_frame)
+
+        pivot_time = self.times[start]
+
+        for t_idx, time in enumerate(self.all_times):
+            if time == pivot_time:
+                break
+
+
+
     def __init__(self, place, times, img_paths, sunrise, sunset, train_test_valid, lat, lng, time_offset, mali_solar_noon):
         self.all_times = times
         self.all_img_paths = img_paths
@@ -111,7 +127,7 @@ class Day():
 
         self.sunrise = sunrise
         self.sunset = sunset
-        self.sunrise_idx, self.sunset_idx = self.get_sun_idx(times, sunrise, sunset)
+        self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, sunrise, sunset)
 
         if self.sunrise_idx >= 0 and self.sunrise_idx <= constants.IMAGES_PER_DAY - 1:
             self.sunrise_in_frames = True
