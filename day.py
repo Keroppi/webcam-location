@@ -106,9 +106,9 @@ class Day():
 
         for t_idx, time in enumerate(self.all_times):
             if time == start_pivot_time:
-                start_idx = t_idx
+                start_idx = max(t_idx - 1, 0)
             elif time == end_pivot_time:
-                end_idx = t_idx
+                end_idx = min(t_idx + 1, len(self.all_times) - 1)
 
         num_important_frames = end_idx - start_idx + 1
         if num_important_frames > constants.IMAGES_PER_DAY:
@@ -123,6 +123,7 @@ class Day():
         subset_idx = subset_idx + important_frames
         subset_idx.sort()
 
+        '''
         print(center_frame)
         print(self.times)
         print(self.all_times)
@@ -130,6 +131,7 @@ class Day():
         print(len(subset_idx))
         print('')
         sys.stdout.flush()
+        '''
 
         self.times = [self.all_times[x] for x in subset_idx]
         self.img_paths = [self.all_img_paths[x] for x in subset_idx]
