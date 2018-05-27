@@ -19,6 +19,8 @@ from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
 from matplotlib import colors as mcolors
 
+temp = torch.randn(100).cuda()
+
 parser = argparse.ArgumentParser(description='Predict Location')
 parser.add_argument('--sunrise_model', default='', type=str, metavar='PATH',
                     help='path to sunrise model (default: none)')
@@ -42,6 +44,8 @@ else:
     print('Wrong arguments.')
     sys.stdout.flush()
     sys.exit(1)
+
+
 
 data = WebcamData()
 days = data.days
