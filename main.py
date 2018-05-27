@@ -14,6 +14,8 @@ from custom_model import WebcamLocation
 from choose_args import RandomizeArgs, ManualArgs
 from torch.autograd import Variable
 
+temp = torch.randn(100).cuda()
+
 if constants.CLUSTER:
     d = dict(os.environ)
     print('SGE_GPU: ' + d['SGE_GPU'])
