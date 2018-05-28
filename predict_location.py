@@ -19,7 +19,7 @@ from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
 from matplotlib import colors as mcolors
 
-temp = torch.randn(100).cuda()
+temp = torch.randn(1).cuda()
 
 parser = argparse.ArgumentParser(description='Predict Location')
 parser.add_argument('--sunrise_model', default='', type=str, metavar='PATH',
@@ -573,6 +573,12 @@ finished_places = []
 mean_distances = []
 median_distances = []
 density_distances = []
+mean_longitude_err = []
+mean_latitude_err = []
+median_longitude_err = []
+median_latitude_err = []
+density_longitude_err = []
+density_latitude_err = []
 for i in range(data.types['test']):
     place = days[i].place
 
@@ -589,10 +595,10 @@ for i in range(data.types['test']):
 
     mean_pred_lat = mean_locations[place][0]
     mean_pred_lng = mean_locations[place][1]
+
     median_pred_lat = median_locations[place][0] #places_lat_lng[place][0]
     median_pred_lng = median_locations[place][1] #places_lat_lng[place][1]
 
-    #if density_locations[place] is not None:
     density_pred_lat = density_locations[place][0]
     density_pred_lng = density_locations[place][1]
 
@@ -600,10 +606,17 @@ for i in range(data.types['test']):
     mean_distances.append(mean_distance)
     median_distance = compute_distance(actual_lat, actual_lng, median_pred_lat, median_pred_lng)
     median_distances.append(median_distance)
-
-    #if density_locations[place] is not None:
     density_distance = compute_distance(actual_lat, actual_lng, density_pred_lat, density_pred_lng)
     density_distances.append(density_distance)
+
+    mean_latitude_err.append(abs(actual_lat - mean_pred_lat))
+    mean_longitude_err.append(abs(actual_lng - mean_pred_lng))
+
+    median_latitude_err.append(abs(actual_lat - median_pred_lat))
+    median_longitude_err.append(abs(actual_lng - median_pred_lng))
+
+    density_latitude_err.append(abs(actual_lat - density_pred_lat))
+    density_longitude_err.append(abs(actual_lng - density_pred_lng))
 
     if random.randint(1, 100) < 101: # VLI
         print('Distance')
@@ -669,4 +682,31 @@ print('Medians Max Distance Error: {:.6f}'.format(max(median_distances)))
 print('Medians Min Distance Error: {:.6f}'.format(min(median_distances)))
 print('Density Max Distance Error: {:.6f}'.format(max(density_distances)))
 print('Density Min Distance Error: {:.6f}'.format(min(density_distances)))
+print('')
+print('Means Avg. Longitude Error: {:.6f}'.format(statistics.mean(mean_longitude_err)))
+print('Medians Avg. Longitude Error: {:.6f}'.format(statistics.mean(median_longitude_err)))
+print('Density Avg. Longitude Error: {:.6f}'.format(statistics.mean(density_longitude_err)))
+print('Means Median Longitude Error: {:.6f}'.format(statistics.median(mean_longitude_err)))
+print('Medians Median Longitude Error: {:.6f}'.format(statistics.median(median_longitude_err)))
+print('Density Median Longitude Error: {:.6f}'.format(statistics.median(density_longitude_err)))
+print('Means Max Longitude Error: {:.6f}'.format(max(mean_longitude_err)))
+print('Means Min Longitude Error: {:.6f}'.format(min(mean_longitude_err)))
+print('Medians Max Longitude Error: {:.6f}'.format(max(median_longitude_err)))
+print('Medians Min Longitude Error: {:.6f}'.format(min(median_longitude_err)))
+print('Density Max Longitude Error: {:.6f}'.format(max(density_longitude_err)))
+print('Density Min Longitude Error: {:.6f}'.format(min(density_longitude_err)))
+print('')
+print('Means Avg. Latitude Error: {:.6f}'.format(statistics.mean(mean_latitude_err)))
+print('Medians Avg. Latitude Error: {:.6f}'.format(statistics.mean(median_latitude_err)))
+print('Density Avg. Latitude Error: {:.6f}'.format(statistics.mean(density_latitude_err)))
+print('Means Median Latitude Error: {:.6f}'.format(statistics.median(mean_latitude_err)))
+print('Medians Median Latitude Error: {:.6f}'.format(statistics.median(median_latitude_err)))
+print('Density Median Latitude Error: {:.6f}'.format(statistics.median(density_latitude_err)))
+print('Means Max Latitude Error: {:.6f}'.format(max(mean_latitude_err)))
+print('Means Min Latitude Error: {:.6f}'.format(min(mean_latitude_err)))
+print('Medians Max Latitude Error: {:.6f}'.format(max(median_latitude_err)))
+print('Medians Min Latitude Error: {:.6f}'.format(min(median_latitude_err)))
+print('Density Max Latitude Error: {:.6f}'.format(max(density_latitude_err)))
+print('Density Min Latitude Error: {:.6f}'.format(min(density_latitude_err)))
+print('')
 sys.stdout.flush()
