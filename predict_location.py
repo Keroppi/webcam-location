@@ -113,6 +113,10 @@ if from_model: # Use the trained model to generate predictions.
         for d_idx, day in enumerate(batch_days):
             day.change_frames(sunrise_idx[d_idx, 0].data[0])
 
+        if batch_idx % constants.LOG_INTERVAL == 0:
+            print('Batch Index: {}'.format(batch_idx))
+            sys.stdout.flush()
+
     sunrise_predict_t1 = time.time()
     print('Sunrise prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
     sys.stdout.flush()
@@ -136,6 +140,10 @@ if from_model: # Use the trained model to generate predictions.
             sunrises.append(local_sunrise)
             day.random_frames() # Reset the frames to be random instead of having a bias towards where sunrise is.
 
+        if batch_idx % constants.LOG_INTERVAL == 0:
+            print('Batch Index: {}'.format(batch_idx))
+            sys.stdout.flush()
+
     sunrise_predict_t1 = time.time()
     print('Sunrise prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
     sys.stdout.flush()
@@ -155,6 +163,10 @@ if from_model: # Use the trained model to generate predictions.
 
         for d_idx, day in enumerate(batch_days):
             day.change_frames(sunset_idx[d_idx, 0].data[0])
+
+        if batch_idx % constants.LOG_INTERVAL == 0:
+            print('Batch Index: {}'.format(batch_idx))
+            sys.stdout.flush()
 
     sunset_predict_t1 = time.time()
     print('Sunset prediction time (min): {:.2f}'.format((sunset_predict_t1 - sunset_predict_t0) / 60))
@@ -177,6 +189,10 @@ if from_model: # Use the trained model to generate predictions.
             local_sunset = day.get_local_time(sunset_idx[d_idx, 0].data[0])
             #utc_sunset = local_sunset - datetime.timedelta(seconds=day.time_offset)
             sunsets.append(local_sunset)
+
+        if batch_idx % constants.LOG_INTERVAL == 0:
+            print('Batch Index: {}'.format(batch_idx))
+            sys.stdout.flush()
 
     sunset_predict_t1 = time.time()
     print('Sunset prediction time (min): {:.2f}'.format((sunset_predict_t1 - sunset_predict_t0) / 60))
