@@ -97,6 +97,7 @@ if from_model: # Use the trained model to generate predictions.
 
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=constants.BATCH_SIZE, num_workers=num_workers, pin_memory=pin_memory)
 
+    '''
     sunrise_predict_t0 = time.time()
     #sunrises = []
     for batch_idx, (input, _) in enumerate(test_loader):
@@ -120,6 +121,7 @@ if from_model: # Use the trained model to generate predictions.
     sunrise_predict_t1 = time.time()
     print('Sunrise prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
     sys.stdout.flush()
+    '''
 
     sunrise_predict_t0 = time.time()
     sunrises = []
@@ -138,7 +140,18 @@ if from_model: # Use the trained model to generate predictions.
             local_sunrise = day.get_local_time(sunrise_idx[d_idx, 0].data[0])
             #utc_sunrise = local_sunrise - datetime.timedelta(seconds=day.time_offset)
             sunrises.append(local_sunrise)
-            day.random_frames() # Reset the frames to be random instead of having a bias towards where sunrise is.
+            #day.random_frames() # Reset the frames to be random instead of having a bias towards where sunrise is.
+            ################ VLI
+            #################
+            #
+            #
+            #
+            # UNCOMMMENT THE ABOVE LINE!!!!
+            #
+            #
+            #
+            #
+            #################
 
         if batch_idx % constants.LOG_INTERVAL == 0:
             print('Batch Index: {}'.format(batch_idx))
@@ -148,6 +161,7 @@ if from_model: # Use the trained model to generate predictions.
     print('Sunrise prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
     sys.stdout.flush()
 
+    '''
     sunset_predict_t0 = time.time()
     #sunsets = []
     for batch_idx, (input, _) in enumerate(test_loader):
@@ -171,6 +185,7 @@ if from_model: # Use the trained model to generate predictions.
     sunset_predict_t1 = time.time()
     print('Sunset prediction time (min): {:.2f}'.format((sunset_predict_t1 - sunset_predict_t0) / 60))
     sys.stdout.flush()
+    '''
 
     sunset_predict_t0 = time.time()
     sunsets = []
