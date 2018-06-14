@@ -110,7 +110,7 @@ class Day():
             elif time == end_pivot_time:
                 end_idx = t_idx # min(t_idx, len(self.all_times) - 1) # Inclusive
 
-        center_idx = math.round((start_idx + end_idx) / 2)
+        center_idx = round((start_idx + end_idx) / 2)
         start_idx = center_idx - math.floor((constants.IMAGES_PER_DAY - 1) / 2)
         end_idx = center_idx + math.ceil((constants.IMAGES_PER_DAY - 1) / 2)
 

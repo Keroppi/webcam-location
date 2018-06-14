@@ -614,6 +614,16 @@ for i in range(data.types['test']):
     density_distance = compute_distance(actual_lat, actual_lng, density_pred_lat, density_pred_lng)
     density_distances.append(density_distance)
 
+    if median_distance < 25 or density_distance < 25:
+        print('Under 25')
+        print(place)
+        print('{}, {}'.format(days[i].lat, days[i].lng))
+        print(mean_distance)
+        print(median_distance)
+        print(density_distance)
+        print(days[i].all_times)
+        sys.stdout.flush()
+
     mean_latitude_err.append(abs(actual_lat - mean_pred_lat))
     mean_longitude_err.append(abs(actual_lng - mean_pred_lng))
 
