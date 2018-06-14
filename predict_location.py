@@ -19,6 +19,9 @@ from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
 from matplotlib import colors as mcolors
 
+print('Starting predict location.')
+sys.stdout.flush()
+
 temp = torch.randn(1).cuda()
 
 parser = argparse.ArgumentParser(description='Predict Location')
@@ -44,8 +47,6 @@ else:
     print('Wrong arguments.')
     sys.stdout.flush()
     sys.exit(1)
-
-
 
 data = WebcamData()
 days = data.days
