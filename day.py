@@ -107,7 +107,7 @@ class Day():
         for t_idx, time in enumerate(self.all_times):
             if time == start_pivot_time:
                 start_idx = t_idx # max(t_idx, 0)
-            elif time == end_pivot_time:
+            if time == end_pivot_time:
                 end_idx = t_idx # min(t_idx, len(self.all_times) - 1) # Inclusive
 
         center_idx = round((start_idx + end_idx) / 2)
