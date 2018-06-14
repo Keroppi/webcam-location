@@ -93,9 +93,9 @@ class Day():
     def change_frames(self, center_frame): # Given a suggested frame idx, repick frames that are close to it.
         if center_frame < 0:
             start = 0
-            end = 1
+            end = 0
         elif center_frame >= constants.IMAGES_PER_DAY - 1:
-            start = constants.IMAGES_PER_DAY - 2
+            start = constants.IMAGES_PER_DAY - 1
             end = constants.IMAGES_PER_DAY - 1
         else:
             start = math.floor(center_frame)
@@ -106,22 +106,35 @@ class Day():
 
         for t_idx, time in enumerate(self.all_times):
             if time == start_pivot_time:
-                start_idx = max(t_idx - 1, 0)
+                start_idx = t_idx # max(t_idx, 0)
             elif time == end_pivot_time:
-                end_idx = min(t_idx + 1, len(self.all_times) - 1)
+                end_idx = t_idx # min(t_idx, len(self.all_times) - 1) # Inclusive
 
-        num_important_frames = end_idx - start_idx + 1
-        if num_important_frames > constants.IMAGES_PER_DAY:
-            end_idx = start_idx + constants.IMAGES_PER_DAY - 1
+        center_idx = math.round((start_idx + end_idx) / 2)
+        start_idx = center_idx - math.floor((constants.IMAGES_PER_DAY - 1) / 2)
+        end_idx = center_idx + math.ceil((constants.IMAGES_PER_DAY - 1) / 2)
 
-        important_frames = list(range(start_idx, end_idx + 1))
-        remaining = set(range(len(self.all_times))) - set(important_frames)
+        if start_idx < 0:
+            start_idx = 0
+            end_idx = constants.IMAGES_PER_DAY - 1
+        if end_idx > len(self.all_times) - 1:
+            start_idx = len(self.all_times) - 1 - (constants.IMAGES_PER_DAY - 1)
+            end_idx = len(self.all_times) - 1
 
-        subset_idx = np.random.choice(len(remaining), constants.IMAGES_PER_DAY - len(important_frames), replace=False)
-        subset_idx.sort()
-        subset_idx = [list(remaining)[x] for x in subset_idx]
-        subset_idx = subset_idx + important_frames
-        subset_idx.sort()
+        #num_important_frames = end_idx - start_idx + 1
+        #if num_important_frames > constants.IMAGES_PER_DAY:
+        #    end_idx = start_idx + constants.IMAGES_PER_DAY - 1
+
+        #important_frames = list(range(start_idx, end_idx + 1))
+        #remaining = set(range(len(self.all_times))) - set(important_frames)
+
+        #subset_idx = np.random.choice(len(remaining), constants.IMAGES_PER_DAY - len(important_frames), replace=False)
+        #subset_idx.sort()
+        #subset_idx = [list(remaining)[x] for x in subset_idx]
+        #subset_idx = subset_idx + important_frames
+        #subset_idx.sort()
+
+        subset_idx = list(range(start_idx, end_idx + 1))
 
         '''
         print(center_frame)
