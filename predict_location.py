@@ -738,7 +738,7 @@ y = sun_type_distances
 width = 0.35
 plt.bar(x, y, width, color='r')
 plt.xlabel('Avg. Distance Error (km)')
-plt.ylabel('Sunrise and sunset in frame')
+plt.ylabel('Sunrise and sunset in frame?')
 ax = plt.gca()
 ax.set_xticks(x)
 ax.set_xticklabels(sun_type_labels)
