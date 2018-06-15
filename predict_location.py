@@ -630,7 +630,7 @@ for i in range(data.types['test']):
     median_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, median_pred_lng))
 
     density_latitude_err.append(compute_distance(actual_lat, actual_lng, density_pred_lat, actual_lng))
-    density_longitude_err.append(compute_distance(actual_lat, actual_lng actual_lat, density_pred_lng))
+    density_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, density_pred_lng))
 
     if random.randint(1, 100) < 101: # VLI
         print('Distance')
