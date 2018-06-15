@@ -684,7 +684,7 @@ plt.savefig('/srv/glusterfs/vli/maps/kde_days_used.png')
 plt.close()
 
 # Plot average distance error vs. time interval.
-buckets = list(range(0, round(24 * 60 / constants.IMAGES_PER_DAY) + 5, 5))  # 5 minute intervals
+buckets = list(range(0, round(24 * 60 / constants.IMAGES_PER_DAY) + 5, 5)) # 5 minute intervals
 bucket_labels = [str(x) + '-' + str(x + 5) for x in buckets]
 for i in range(data.types['test']):
     bucket_distances = [[] for x in range(len(buckets))]
@@ -713,8 +713,39 @@ plt.title('Avg. Error (km) vs. Photo Interval (min)')
 plt.savefig('/srv/glusterfs/vli/maps/interval.png')
 plt.close()
 
+# Plot average distance error vs. sunrise, sunset available.
+sun_type_labels = ['Both', 'Sunrise Only', 'Sunset Only', 'Neither']
+for i in range(data.types['test']):
+    sun_type_distances = [[] for x in range(len(sun_type_labels))]
 
-#average_dist /= len(finished_places)
+    distance_err = compute_distance(days[i].lat, days[i].lng, latitudes[i], longitudes[i])
+
+    if days[i].sunrise_in_frames and days[i].sunset_in_frames:
+        sun_type_distances[0].append(distance_err)
+    elif days[i].sunrise_in_frames:
+        sun_type_distances[1].append(distance_err)
+    elif days[i].sunset_in_frames:
+        sun_type_distances[2].append(distance_err)
+    else:
+        sun_type_distances[3].append(distance_err)
+
+for sIdx, distance_errs in enumerate(sun_type_distances):
+    sun_type_distances[sIdx] = statistics.mean(distance_errs)
+
+plt.figure(figsize=(24,12))
+x = np.arange(len(sun_type_labels))
+y = sun_type_distances
+width = 0.35
+plt.bar(x, y, width, color='r')
+plt.xlabel('Avg. Distance Error (km)')
+plt.ylabel('Sunrise and sunset in frame')
+ax = plt.gca()
+ax.set_xticks(x)
+ax.set_xticklabels(sun_type_labels)
+plt.title('Avg. Error (km) vs. Sunrise / Sunset In Frame')
+plt.savefig('/srv/glusterfs/vli/maps/sun_in_frame.png')
+plt.close()
+
 print('Means Avg. Distance Error: {:.6f}'.format(statistics.mean(mean_distances)))
 print('Medians Avg. Distance Error: {:.6f}'.format(statistics.mean(median_distances)))
 print('Density Avg. Distance Error: {:.6f}'.format(statistics.mean(density_distances)))
