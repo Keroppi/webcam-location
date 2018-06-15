@@ -1,5 +1,5 @@
 import constants
-import numpy as np, sys, PIL, math, time, datetime, random
+import numpy as np, sys, PIL, math, time, datetime, random, statistics
 
 class Day():
     def get_local_time(self, idx):
@@ -208,6 +208,13 @@ class Day():
             self.sunset_in_frames = True
         else:
             self.sunset_in_frames = False
+
+        diff = [self.all_times[idx] - self.all_times[idx - 1] for idx, _ in enumerate(self.all_times) if idx > 0]
+        diff_sec = [x.total_seconds() / 60 for x in diff]
+        self.interval_min = statistics.mean(diff_sec)
+
+
+
 
 
 

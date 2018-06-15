@@ -556,7 +556,6 @@ for place in lats:
     plt.savefig('/srv/glusterfs/vli/maps/' + place + '.png')
     plt.close()
 
-
 def compute_distance(lat1, lng1, lat2, lng2): # kilometers
     # Haversine formula for computing distance.
     # https://www.movable-type.co.uk/scripts/latlong.html
@@ -624,14 +623,14 @@ for i in range(data.types['test']):
         print(days[i].all_times)
         sys.stdout.flush()
 
-    mean_latitude_err.append(abs(actual_lat - mean_pred_lat))
-    mean_longitude_err.append(abs(actual_lng - mean_pred_lng))
+    mean_latitude_err.append(compute_distance(actual_lat, actual_lng, mean_pred_lat, actual_lng))
+    mean_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, mean_pred_lng))
 
-    median_latitude_err.append(abs(actual_lat - median_pred_lat))
-    median_longitude_err.append(abs(actual_lng - median_pred_lng))
+    median_latitude_err.append(compute_distance(actual_lat, actual_lng, median_pred_lat, actual_lng))
+    median_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, median_pred_lng))
 
-    density_latitude_err.append(abs(actual_lat - density_pred_lat))
-    density_longitude_err.append(abs(actual_lng - density_pred_lng))
+    density_latitude_err.append(compute_distance(actual_lat, actual_lng, density_pred_lat, actual_lng))
+    density_longitude_err.append(compute_distance(actual_lat, actual_lng actual_lat, density_pred_lng))
 
     if random.randint(1, 100) < 101: # VLI
         print('Distance')
@@ -683,6 +682,37 @@ plt.ylabel('Avg. Error (km)')
 plt.title('Avg. Error (km) Using Gaussian KDE vs. # Days Used')
 plt.savefig('/srv/glusterfs/vli/maps/kde_days_used.png')
 plt.close()
+
+# Plot average distance error vs. time interval.
+buckets = list(range(0, round(24 * 60 / constants.IMAGES_PER_DAY) + 5, 5))  # 5 minute intervals
+bucket_labels = [str(x) + '-' + str(x + 5) for x in buckets]
+for i in range(data.types['test']):
+    bucket_distances = [[] for x in range(len(buckets))]
+
+    for bIdx, bucket in enumerate(buckets):
+        if days[i].interval_min < bucket + 5:
+            break
+
+    distance_err = compute_distance(days[i].lat, days[i].lng, latitudes[i], longitudes[i])
+    bucket_distances[bIdx].append(distance_err)
+
+for bdIdx, distance_errs in enumerate(bucket_distances):
+    bucket_distances[bdIdx] = statistics.mean(distance_errs)
+
+plt.figure(figsize=(24,12))
+x = np.arange(len(buckets))
+y = bucket_distances
+width = 0.35
+plt.bar(x, y, width, color='r')
+plt.xlabel('Avg. Distance Error (km)')
+plt.ylabel('Minutes Between Frames')
+ax = plt.gca()
+ax.set_xticks(x)
+ax.set_xticklabels(bucket_labels)
+plt.title('Avg. Error (km) vs. Photo Interval (min)')
+plt.savefig('/srv/glusterfs/vli/maps/interval.png')
+plt.close()
+
 
 #average_dist /= len(finished_places)
 print('Means Avg. Distance Error: {:.6f}'.format(statistics.mean(mean_distances)))
