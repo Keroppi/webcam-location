@@ -91,24 +91,34 @@ class Day():
         return (times, img_paths)
 
     def change_frames(self, center_frame): # Given a suggested frame idx, repick frames that are close to it.
-        if center_frame < 0:
-            start = 0
-            end = 0
-        elif center_frame >= constants.IMAGES_PER_DAY - 1:
-            start = constants.IMAGES_PER_DAY - 1
-            end = constants.IMAGES_PER_DAY - 1
-        else:
-            start = math.floor(center_frame)
-            end = math.ceil(center_frame)
+        suggested_time = self.get_local_time(center_frame)
 
-        start_pivot_time = self.times[start]
-        end_pivot_time = self.times[end]
-
+        start_idx = len(self.all_times) - 1
+        end_idx = len(self.all_times) - 1
         for t_idx, time in enumerate(self.all_times):
-            if time == start_pivot_time:
-                start_idx = t_idx # max(t_idx, 0)
-            if time == end_pivot_time:
-                end_idx = t_idx # min(t_idx, len(self.all_times) - 1) # Inclusive
+            if suggested_time < time:
+                start_idx = max(t_idx - 1, 0)
+                end_idx = t_idx
+                break
+
+        #if center_frame < 0:
+        #    start = 0
+        #    end = 0
+        #elif center_frame >= constants.IMAGES_PER_DAY - 1:
+        #    start = constants.IMAGES_PER_DAY - 1
+        #    end = constants.IMAGES_PER_DAY - 1
+        #else:
+        #    start = math.floor(center_frame)
+        #    end = math.ceil(center_frame)
+
+        #start_pivot_time = self.times[start]
+        #end_pivot_time = self.times[end]
+
+        #for t_idx, time in enumerate(self.all_times):
+        #    if time == start_pivot_time:
+        #        start_idx = t_idx # max(t_idx, 0)
+        #    if time == end_pivot_time:
+        #        end_idx = t_idx # min(t_idx, len(self.all_times) - 1) # Inclusive
 
         center_idx = round((start_idx + end_idx) / 2)
         start_idx = center_idx - math.floor((constants.IMAGES_PER_DAY - 1) / 2)
