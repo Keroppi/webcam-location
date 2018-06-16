@@ -81,6 +81,21 @@ class Day():
         return (sunrise_idx, sunset_idx)
 
 
+    def in_frames(self, times, sunrise, sunset):
+        all_sunrise_idx, all_sunset_idx = self.get_sun_idx(times, sunrise, sunset)
+
+        if all_sunrise_idx >= 0 and all_sunrise_idx < len(times):
+            sunrise_in_frames = True
+        else:
+            sunrise_in_frames = False
+
+        if all_sunset_idx >= 0 and all_sunset_idx < len(times):
+            sunset_in_frames = True
+        else:
+            sunset_in_frames = False
+
+        return (sunrise_in_frames, sunset_in_frames)
+
     def random_subset(all_times, all_img_paths):
         # Randomly select IMAGES_PER_DAY images from times / images.
         subset_idx = np.random.choice(len(all_times), constants.IMAGES_PER_DAY, replace=False)
@@ -161,30 +176,9 @@ class Day():
 
         self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, self.sunrise, self.sunset)
 
-        if self.sunrise_idx >= 0 and self.sunrise_idx <= constants.IMAGES_PER_DAY - 1:
-            self.sunrise_in_frames = True
-        else:
-            self.sunrise_in_frames = False
-
-        if self.sunset_idx >= 0 and self.sunset_idx <= constants.IMAGES_PER_DAY - 1:
-            self.sunset_in_frames = True
-        else:
-            self.sunset_in_frames = False
-
     def random_frames(self):
         self.times, self.img_paths = Day.random_subset(self.all_times, self.all_img_paths)
-
         self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, self.sunrise, self.sunset)
-
-        if self.sunrise_idx >= 0 and self.sunrise_idx <= constants.IMAGES_PER_DAY - 1:
-            self.sunrise_in_frames = True
-        else:
-            self.sunrise_in_frames = False
-
-        if self.sunset_idx >= 0 and self.sunset_idx <= constants.IMAGES_PER_DAY - 1:
-            self.sunset_in_frames = True
-        else:
-            self.sunset_in_frames = False
 
     def __init__(self, place, times, img_paths, sunrise, sunset, train_test_valid, lat, lng, time_offset, mali_solar_noon):
         self.all_times = times
@@ -209,20 +203,14 @@ class Day():
         self.sunset = sunset
         self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, sunrise, sunset)
 
-        if self.sunrise_idx >= 0 and self.sunrise_idx <= constants.IMAGES_PER_DAY - 1:
-            self.sunrise_in_frames = True
-        else:
-            self.sunrise_in_frames = False
-
-        if self.sunset_idx >= 0 and self.sunset_idx <= constants.IMAGES_PER_DAY - 1:
-            self.sunset_in_frames = True
-        else:
-            self.sunset_in_frames = False
+        self.sunrise_in_frames, self.sunset_in_frames = self.in_frames(self.all_times, self.sunrise, self.sunset)
 
         diff = [self.all_times[idx] - self.all_times[idx - 1] for idx, _ in enumerate(self.all_times) if idx > 0]
-        diff_sec = [x.total_seconds() / 60 for x in diff]
-        self.interval_min = statistics.mean(diff_sec)
+        diff_min = [x.total_seconds() / 60 for x in diff]
+        self.interval_min = statistics.mean(diff_min)
 
+        print(str(self.interval_min) + ' MINUTES INTERVAL') # VLI
+        sys.stdout.flush()
 
 
 
