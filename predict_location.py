@@ -620,7 +620,9 @@ for i in range(data.types['test']):
         print(mean_distance)
         print(median_distance)
         print(density_distance)
-        print(days[i].all_times)
+        print(days[i].interval_min)
+        print(days[i].sunrise_in_frames)
+        print(days[i].sunset_in_frames)
         sys.stdout.flush()
 
     mean_latitude_err.append(compute_distance(actual_lat, actual_lng, mean_pred_lat, actual_lng))
