@@ -139,11 +139,6 @@ class Day():
         start_idx = center_idx - math.floor((constants.IMAGES_PER_DAY - 1) / 2)
         end_idx = center_idx + math.ceil((constants.IMAGES_PER_DAY - 1) / 2)
 
-        print('SANITY') # VLI
-        print(suggested_time)
-        print(self.all_times[center_idx])
-        sys.stdout.flush()
-
         if start_idx < 0:
             start_idx = 0
             end_idx = constants.IMAGES_PER_DAY - 1
