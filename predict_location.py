@@ -697,7 +697,10 @@ for i in range(data.types['test']):
     bucket_distances[bIdx].append(distance_err)
 
 for bdIdx, distance_errs in enumerate(bucket_distances):
-    bucket_distances[bdIdx] = statistics.mean(distance_errs)
+    if len(distance_errs) > 0:
+        bucket_distances[bdIdx] = statistics.mean(distance_errs)
+    else:
+        bucket_distances[bdIdx] = 0
 
 plt.figure(figsize=(24,12))
 x = np.arange(len(buckets))
@@ -730,7 +733,10 @@ for i in range(data.types['test']):
         sun_type_distances[3].append(distance_err)
 
 for sIdx, distance_errs in enumerate(sun_type_distances):
-    sun_type_distances[sIdx] = statistics.mean(distance_errs)
+    if len(distance_errs) > 0:
+        sun_type_distances[sIdx] = statistics.mean(distance_errs)
+    else:
+        sun_type_distances[sIdx] = 0
 
 plt.figure(figsize=(24,12))
 x = np.arange(len(sun_type_labels))
