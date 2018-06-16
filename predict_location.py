@@ -688,9 +688,9 @@ plt.close()
 # Plot average distance error vs. time interval.
 buckets = list(range(0, round(24 * 60 / constants.IMAGES_PER_DAY) + 5, 5)) # 5 minute intervals
 bucket_labels = [str(x) + '-' + str(x + 5) for x in buckets]
-for i in range(data.types['test']):
-    bucket_distances = [[] for x in range(len(buckets))]
+bucket_distances = [[] for x in range(len(buckets))]
 
+for i in range(data.types['test']):
     for bIdx, bucket in enumerate(buckets):
         if days[i].interval_min < bucket + 5:
             break
@@ -720,9 +720,8 @@ plt.close()
 
 # Plot average distance error vs. sunrise, sunset available.
 sun_type_labels = ['Both', 'Sunrise Only', 'Sunset Only', 'Neither']
+sun_type_distances = [[] for x in range(len(sun_type_labels))]
 for i in range(data.types['test']):
-    sun_type_distances = [[] for x in range(len(sun_type_labels))]
-
     distance_err = compute_distance(days[i].lat, days[i].lng, latitudes[i], longitudes[i])
 
     if days[i].sunrise_in_frames and days[i].sunset_in_frames:

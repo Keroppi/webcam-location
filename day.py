@@ -214,10 +214,6 @@ class Day():
         diff_min = [x.total_seconds() / 60 for x in diff]
         self.interval_min = statistics.mean(diff_min)
 
-        print(str(self.interval_min) + ' MINUTES INTERVAL') # VLI
-        sys.stdout.flush()
-
-
 
 
 
