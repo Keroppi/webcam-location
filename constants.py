@@ -1,5 +1,5 @@
 CLUSTER = True
-LEARNING_SUNRISE = False # True for sunrise, False for sunset
+LEARNING_SUNRISE = True # True for sunrise, False for sunset
 DAYS_PER_MONTH = 'MAX'
 SIZE = ['small'] # 'large'
 #DATA_SOURCES = ['roundshot'] # 'panomax'
@@ -13,7 +13,7 @@ LOG_INTERVAL = 20
 SPLIT_TOTAL = 100
 SPLIT_TRAIN = 75 # 75% train
 SPLIT_TEST = 100 # 25% test, 0% validation
-BANDWIDTH = 0.1
+BANDWIDTH = 0.02
 CENTER = False
 LAMBDA = 1 # REGULARIZER
 

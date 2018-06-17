@@ -493,7 +493,7 @@ sys.stdout.flush()
 
 # Plot locations on a map.
 for place in lats:
-    if len(lats[place]) < 100: # Need at least 100 points.
+    if len(lats[place]) < 50: # Need at least 50 points.
         continue
 
     min_lat = max(min(lats[place]) - 1, -90)
@@ -621,8 +621,8 @@ for i in range(data.types['test']):
         print(median_distance)
         print(density_distance)
         print(days[i].interval_min)
-        print(days[i].sunrise_in_frames)
-        print(days[i].sunset_in_frames)
+        #print(days[i].sunrise_in_frames)
+        #print(days[i].sunset_in_frames)
         sys.stdout.flush()
 
     mean_latitude_err.append(compute_distance(actual_lat, actual_lng, mean_pred_lat, actual_lng))
