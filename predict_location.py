@@ -164,7 +164,7 @@ if from_model: # Use the trained model to generate predictions.
         batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunset_idx.size()[0]]
 
         for d_idx, day in enumerate(batch_days):
-            day.change_frames(sunset_idx[d_idx, 0].data[0])
+            day.change_frames(sunset_idx[d_idx, 0].data[0], mode='sunset') # VLI mode is only for print statements
 
         if batch_idx % constants.LOG_INTERVAL == 0:
             print('Batch Index: {}'.format(batch_idx))
@@ -778,19 +778,37 @@ scatter(days_used, cbm_mean_distances, 'mo', 'mean', cbm=True)
 scatter(days_used, cbm_median_distances, 'co', 'median', cbm=True)
 scatter(days_used, cbm_density_distances, None, 'gaussian kde', color=mcolors.CSS4_COLORS['fuchsia'], linestyle='None', marker='o', cbm=True)
 
+def bar(x, y, xlabel, ylabel, x_labels, title, filename):
+    plt.figure(figsize=(24, 12))
+    x = np.arange(len(x))
+    #y = bucket_distances
+    width = 0.35
+    plt.bar(x, y, width, color='r')
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    ax = plt.gca()
+    ax.set_xticks(x)
+    ax.set_xticklabels(x_labels)
+    plt.title(title)
+    plt.savefig('/srv/glusterfs/vli/maps/' + filename)
+    plt.close()
+
 # Plot average distance error vs. time interval OVER ALL DAYS.
 buckets = list(range(0, round(24 * 60 / constants.IMAGES_PER_DAY) + 5, 5)) # 5 minute intervals
 bucket_labels = [str(x) + '-' + str(x + 5) for x in buckets]
 bucket_labels[-1] = bucket_labels[-1] + '+'
 bucket_distances = [[] for x in range(len(buckets))]
-
+cbm_bucket_distances = [[] for x in range(len(buckets))]
 for i in range(data.types['test']):
     for bIdx, bucket in enumerate(buckets):
         if days[i].interval_min < bucket + 5:
             break
 
     distance_err = compute_distance(days[i].lat, days[i].lng, latitudes[i], longitudes[i])
+    cbm_distance_err = compute_distance(days[i].lat, days[i].lng, cbm_latitudes[i], longitudes[i])
+
     bucket_distances[bIdx].append(distance_err)
+    cbm_bucket_distances[bIdx].append(cbm_distance_err)
 
 for bdIdx, distance_errs in enumerate(bucket_distances):
     if len(distance_errs) > 0:
@@ -798,34 +816,35 @@ for bdIdx, distance_errs in enumerate(bucket_distances):
     else:
         bucket_distances[bdIdx] = 0
 
-plt.figure(figsize=(24,12))
-x = np.arange(len(buckets))
-y = bucket_distances
-width = 0.35
-plt.bar(x, y, width, color='r')
-plt.xlabel('Avg. Distance Error (km)')
-plt.ylabel('Minutes Between Frames')
-ax = plt.gca()
-ax.set_xticks(x)
-ax.set_xticklabels(bucket_labels)
-plt.title('Avg. Error (km) vs. Photo Interval (min)')
-plt.savefig('/srv/glusterfs/vli/maps/interval.png')
-plt.close()
+for bdIdx, distance_errs in enumerate(cbm_bucket_distances):
+    if len(distance_errs) > 0:
+        cbm_bucket_distances[bdIdx] = statistics.mean(distance_errs)
+    else:
+        cbm_bucket_distances[bdIdx] = 0
 
-# Plot average distance error vs. sunrise, sunset available.
+bar(buckets, bucket_distances, 'Avg. Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Avg. Error (km) vs. Photo Interval (min)', 'interval.png')
+bar(buckets, cbm_bucket_distances, 'Avg. Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Avg. Error (km) vs. Photo Interval (min)', 'cbm_interval.png')
+
+# Plot average distance error vs. sunrise, sunset available over ALL DAYS.
 sun_type_labels = ['Both', 'Sunrise Only', 'Sunset Only', 'Neither']
 sun_type_distances = [[] for x in range(len(sun_type_labels))]
+cbm_sun_type_distances = [[] for x in range(len(sun_type_labels))]
 for i in range(data.types['test']):
     distance_err = compute_distance(days[i].lat, days[i].lng, latitudes[i], longitudes[i])
+    cbm_distance_err = compute_distance(days[i].lat, days[i].lng, cbm_latitudes[i], longitudes[i])
 
     if days[i].sunrise_in_frames and days[i].sunset_in_frames:
         sun_type_distances[0].append(distance_err)
+        cbm_sun_type_distances[0].append(cbm_distance_err)
     elif days[i].sunrise_in_frames:
         sun_type_distances[1].append(distance_err)
+        cbm_sun_type_distances[1].append(cbm_distance_err)
     elif days[i].sunset_in_frames:
         sun_type_distances[2].append(distance_err)
+        cbm_sun_type_distances[2].append(cbm_distance_err)
     else:
         sun_type_distances[3].append(distance_err)
+        cbm_sun_type_distances[3].append(cbm_distance_err)
 
 for sIdx, distance_errs in enumerate(sun_type_distances):
     if len(distance_errs) > 0:
@@ -833,19 +852,50 @@ for sIdx, distance_errs in enumerate(sun_type_distances):
     else:
         sun_type_distances[sIdx] = 0
 
-plt.figure(figsize=(24,12))
-x = np.arange(len(sun_type_labels))
-y = sun_type_distances
-width = 0.35
-plt.bar(x, y, width, color='r')
-plt.xlabel('Avg. Distance Error (km)')
-plt.ylabel('Sunrise and sunset in frame?')
-ax = plt.gca()
-ax.set_xticks(x)
-ax.set_xticklabels(sun_type_labels)
-plt.title('Avg. Error (km) vs. Sunrise / Sunset In Frame')
-plt.savefig('/srv/glusterfs/vli/maps/sun_in_frame.png')
-plt.close()
+for sIdx, distance_errs in enumerate(cbm_sun_type_distances):
+    if len(distance_errs) > 0:
+        cbm_sun_type_distances[sIdx] = statistics.mean(distance_errs)
+    else:
+        cbm_sun_type_distances[sIdx] = 0
+
+bar(sun_type_labels, sun_type_distances, 'Avg. Distance Error (km)', 'Sunrise and sunset in frame?', sun_type_labels, 'Avg. Error (km) vs. Sunrise / Sunset In Frame', 'sun_in_frame.png')
+bar(sun_type_labels, cbm_sun_type_distances, 'Avg. Distance Error (km)', 'Sunrise and sunset in frame?', sun_type_labels, 'Avg. Error (km) vs. Sunrise / Sunset In Frame', 'cbm_sun_in_frame.png')
+
+# Plot average distance error vs. season over ALL DAYS.
+season_labels = ['Winter', 'Spring', 'Summer', 'Fall']
+season_distances = [[] for x in range(len(season_labels))]
+cbm_season_distances = [[] for x in range(len(season_labels))]
+for i in range(data.types['test']):
+    distance_err = compute_distance(days[i].lat, days[i].lng, latitudes[i], longitudes[i])
+    cbm_distance_err = compute_distance(days[i].lat, days[i].lng, cbm_latitudes[i], longitudes[i])
+
+    if days[i].season == 'winter':
+        season_distances[0].append(distance_err)
+        cbm_season_distances[0].append(cbm_distance_err)
+    elif days[i].season == 'spring':
+        season_distances[1].append(distance_err)
+        cbm_season_distances[1].append(cbm_distance_err)
+    elif days[i].season == 'summer':
+        season_distances[2].append(distance_err)
+        cbm_season_distances[2].append(cbm_distance_err)
+    else:
+        season_distances[3].append(distance_err)
+        cbm_season_distances[3].append(cbm_distance_err)
+
+for sIdx, distance_errs in enumerate(season_distances):
+    if len(distance_errs) > 0:
+        season_distances[sIdx] = statistics.mean(distance_errs)
+    else:
+        season_distances[sIdx] = 0
+
+for sIdx, distance_errs in enumerate(cbm_season_distances):
+    if len(distance_errs) > 0:
+        cbm_season_distances[sIdx] = statistics.mean(distance_errs)
+    else:
+        cbm_season_distances[sIdx] = 0
+
+bar(season_labels, season_distances, 'Avg. Distance Error (km)', 'Season', season_labels, 'Avg. Error (km) vs. Season', 'season.png')
+bar(season_labels, cbm_season_distances, 'Avg. Distance Error (km)', 'Season', season_labels, 'Avg. Error (km) vs. Season', 'cbm_season.png')
 
 print('Brock Means Avg. Distance Error: {:.6f}'.format(statistics.mean(mean_distances)))
 print('Brock Medians Avg. Distance Error: {:.6f}'.format(statistics.mean(median_distances)))

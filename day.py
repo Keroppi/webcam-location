@@ -105,7 +105,7 @@ class Day():
 
         return (times, img_paths)
 
-    def change_frames(self, center_frame): # Given a suggested frame idx, repick frames that are close to it.
+    def change_frames(self, center_frame, mode='sunrise'): # Given a suggested frame idx, repick frames that are close to it.
         suggested_time = self.get_local_time(center_frame)
 
         start_idx = len(self.all_times) - 1
@@ -175,6 +175,21 @@ class Day():
         self.img_paths = [self.all_img_paths[x] for x in subset_idx]
 
         self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, self.sunrise, self.sunset)
+
+        if mode == 'sunrise': # VLI remove mode as well from args - this is purely for debugging
+            if self.sunrise_in_frames:
+                if not (self.sunrise_idx >= 0 and self.sunrise_idx < constants.IMAGES_PER_DAY):
+                    print('CHANGE FRAMES DID NOT CAPTURE SUNRISE')
+                else:
+                    print(self.sunrise_idx)
+        else:
+            if self.sunset_in_frames:
+                if not (self.sunset_idx >= 0 and self.sunset_idx < constants.IMAGES_PER_DAY):
+                    print('CHANGE FRAMES DID NOT CAPTURE SUNSET')
+                else:
+                    print(self.sunset_idx)
+        sys.stdout.flush()
+
 
     def random_frames(self):
         self.times, self.img_paths = Day.random_subset(self.all_times, self.all_img_paths)
