@@ -210,6 +210,16 @@ class Day():
         self.interval_min = statistics.mean(diff_min)
 
 
+        if self.date.month >= 3 and self.date.month <= 5:
+            self.season = 'spring'
+        elif self.date.month >= 6 and self.date.month <= 8:
+            self.season = 'summer'
+        elif self.date.month >= 9 and self.date.month <= 11:
+            self.season = 'fall'
+        else:
+            self.season = 'winter'
+
+
 
 
 

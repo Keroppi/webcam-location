@@ -255,6 +255,10 @@ for d_idx, (sunrise, sunset) in enumerate(zip(sunrises, sunsets)):
     solar_noons.append(solar_noon)
     day_lengths.append((sunset - sunrise).total_seconds())
 
+    if day_lengths[-1] < 0:
+        print('WARNING - Negative day length!')
+        sys.stdout.flush()
+
 # Compute longitude.
 longitudes = []
 for d_idx, solar_noon in enumerate(solar_noons):
@@ -293,14 +297,21 @@ for d_idx, solar_noon in enumerate(solar_noons):
 
 # Compute latitude.
 latitudes = []
+cbm_latitudes = []
 for d_idx, day_length in enumerate(day_lengths):
     day_length_hours = day_length / 3600
 
     ts = pd.Series(pd.to_datetime([str(days[d_idx].date)]))
-    day_of_year = int(ts.dt.dayofyear) # Brock model, day_of_year from 1 to 365, inclusive
+    day_of_year = int(ts.dt.dayofyear) # day_of_year from 1 to 365, inclusive
 
-    declination = math.radians(23.45) * math.sin(math.radians(360 * (283 + day_of_year) / 365))
+    # Brock Model
+    declination = math.radians(23.45) * math.sin(math.radians(360 * (284 + day_of_year) / 365))
     lat = math.degrees(math.atan(-math.cos(math.radians(15 * day_length_hours / 2)) / math.tan(declination)))
+
+    # CBM Model
+    theta = 0.2163108 + 2 * math.atan(0.9671396 * math.tan(0.00860 * (day_of_year - 186)))
+    phi = math.asin(0.39795 * math.cos(theta))
+    cbm_lat = 180 / math.pi * math.atan(math.cos(phi) / math.sin(phi) * math.cos(-math.pi / 24 * (day_length_hours - 24)))
 
     '''
     if random.randint(1, 100) < 5: # VLI
@@ -311,9 +322,11 @@ for d_idx, day_length in enumerate(day_lengths):
     '''
 
     latitudes.append(lat) # Only one day to predict latitude - could average across many days.
+    cbm_latitudes.append(cbm_lat)  # Only one day to predict latitude - could average across many days.
 
 # Get mean and median of all lat/longs of same places.
 #places = {}
+cbm_lats = {}
 lats = {}
 lngs = {}
 for i in range(data.types['test']):
@@ -331,9 +344,44 @@ for i in range(data.types['test']):
         lats[days[i].place] = []
     lats[days[i].place].append(latitudes[i])
 
+    if cbm_lats.get(days[i].place) is None:
+        cbm_lats[days[i].place] = []
+    cbm_lats[days[i].place].append(cbm_latitudes[i])
+
     if lngs.get(days[i].place) is None:
         lngs[days[i].place] = []
     lngs[days[i].place].append(longitudes[i])
+
+# Collect intervals of each place.
+intervals = {}
+for i in range(data.types['test']):
+    if intervals.get(days[i].place) is None:
+        intervals[days[i].place] = []
+    intervals[days[i].place].append(days[i].interval_min)
+
+# Average intervals for each place.
+for key in intervals:
+    intervals[key] = statistics.mean(intervals[key])
+
+# Collect breakdown of sunrise / sunset visible.
+sun_visibles = {}
+for i in range(data.types['test']):
+    if sun_visibles.get(days[i].place) is None:
+        sun_visibles[days[i].place] = [0, 0, 0, 0]
+
+    if days[i].sunrise_in_frames and days[i].sunset_in_frames:
+        sun_visibles[days[i].place][0] += 1
+    elif days[i].sunrise_in_frames and not days[i].sunset_in_frames:
+        sun_visibles[days[i].place][1] += 1
+    elif not days[i].sunrise_in_frames and days[i].sunset_in_frames:
+        sun_visibles[days[i].place][2] += 1
+    else:
+        sun_visibles[days[i].place][3] += 1
+
+# Turn into percentages for each place.
+for key in sun_visibles:
+    normalized = [x / sum(sun_visibles[key]) for x in sun_visibles[key]]
+    sun_visibles[key] = normalized
 
 '''
 places_lat_lng = {}
@@ -343,9 +391,16 @@ for key in places:
 
 mean_locations = {}
 median_locations = {}
+
+cbm_mean_locations = {}
+cbm_median_locations = {}
+
 for key in lats:
     mean_locations[key] = (statistics.mean(lats[key]), statistics.mean(lngs[key]))
     median_locations[key] = (statistics.median(lats[key]), statistics.median(lngs[key]))
+
+    cbm_mean_locations[key] = (statistics.mean(cbm_lats[key]), statistics.mean(lngs[key]))
+    cbm_median_locations[key] = (statistics.median(cbm_lats[key]), statistics.median(lngs[key]))
 
 def kde_func_to_minimize(x, kernel):
     x = x.reshape(1, 2)
@@ -353,74 +408,78 @@ def kde_func_to_minimize(x, kernel):
     return -density[0] # Trying to minimize
 
 # Kernel density estimation to guess location.
+def kde(lats, lngs, median_locations):
+    kernel_t0 = time.time()
+    density_locations = {}
+    for key in lats:
+        if len(lats[key]) == 1:
+            density_locations[key] = (lats[key][0], lngs[key][0])
+            continue
+        elif len(lats[key]) == 2: # Points are colinear, results in singular matrix
+            density_locations[key] = (statistics.mean(lats[key]), statistics.mean(lngs[key]))
+            continue
 
-density_locations = {}
+        np_lats = np.array([math.radians(x) for x in lats[key]])
+        np_lngs = np.array([math.radians(x) for x in lngs[key]])
+        possible_points = np.vstack((np_lats, np_lngs))
 
-kernel_t0 = time.time()
-for key in lats:
-    if len(lats[key]) == 1:
-        density_locations[key] = (lats[key][0], lngs[key][0])
-        continue
-    elif len(lats[key]) == 2: # Points are colinear, results in singular matrix
-        density_locations[key] = (statistics.mean(lats[key]), statistics.mean(lngs[key]))
-        continue
+        kernel = KernelDensity(kernel='gaussian', bandwidth=constants.BANDWIDTH, metric='haversine').fit(possible_points.T)
 
-    np_lats = np.array([math.radians(x) for x in lats[key]])
-    np_lngs = np.array([math.radians(x) for x in lngs[key]])
-    possible_points = np.vstack((np_lats, np_lngs))
+        min_lat = min(np_lats)
+        max_lat = max(np_lats)
+        min_lng = min(np_lngs)
+        max_lng = max(np_lngs)
 
-    kernel = KernelDensity(kernel='gaussian', bandwidth=constants.BANDWIDTH, metric='haversine').fit(possible_points.T)
+        bnds = ((min_lat, max_lat), (min_lng, max_lng))
+        res = minimize(kde_func_to_minimize, np.asarray(median_locations[key]), args=(kernel,), method='BFGS')
 
-    min_lat = min(np_lats)
-    max_lat = max(np_lats)
-    min_lng = min(np_lngs)
-    max_lng = max(np_lngs)
+        if res.success:
+            density_locations[key] = (res.x[0], res.x[1])
+        else:
+            #print('WARNING - scipy minimize function failed on location ' + key)
+            #sys.stdout.flush()
 
-    bnds = ((min_lat, max_lat), (min_lng, max_lng))
-    res = minimize(kde_func_to_minimize, np.asarray(median_locations[key]), args=(kernel,), method='BFGS')
+            # Grid search for maximum density.
 
-    if res.success:
-        density_locations[key] = (res.x[0], res.x[1])
-    else:
-        print('WARNING - scipy minimize function failed on location ' + key)
-        sys.stdout.flush()
+            # density_locations[key] = median_locations[key] # Use median if it fails.
+            best_score = -float('inf')
+            best_longitude = -181
+            best_latitude = -91
 
-        # Grid search for maximum density.
+            latitude_search = np.linspace(min_lat, max_lat,
+                                          num=4001)  # Worst case pi/4000 radians (0.045 degrees) step size.
+            longitude_search = np.linspace(min_lng, max_lng, num=8001)  # Worst case pi/4000 radians step size.
 
-        # density_locations[key] = median_locations[key] # Use median if it fails.
-        best_score = -float('inf')
-        best_longitude = -181
-        best_latitude = -91
+            for i in range(latitude_search.shape[0]):
+                curr_lat = np.array([latitude_search[i]] * longitude_search.shape[0])
+                search_space = np.vstack((curr_lat, longitude_search))
 
-        latitude_search = np.linspace(min_lat, max_lat,
-                                      num=4001)  # Worst case pi/4000 radians (0.045 degrees) step size.
-        longitude_search = np.linspace(min_lng, max_lng, num=8001)  # Worst case pi/4000 radians step size.
+                density = kernel.score_samples(search_space.T)
 
-        for i in range(latitude_search.shape[0]):
-            curr_lat = np.array([latitude_search[i]] * longitude_search.shape[0])
-            search_space = np.vstack((curr_lat, longitude_search))
+                ind = np.argmax(density, axis=None)
 
-            density = kernel.score_samples(search_space.T)
+                if best_score < density[ind]:
+                    best_score = density[ind]
+                    best_longitude = math.degrees(longitude_search[ind])
+                    best_latitude = math.degrees(latitude_search[i])
 
-            ind = np.argmax(density, axis=None)
+                del curr_lat
+                del search_space
+                del density
 
-            if best_score < density[ind]:
-                best_score = density[ind]
-                best_longitude = math.degrees(longitude_search[ind])
-                best_latitude = math.degrees(latitude_search[i])
+            del latitude_search
+            del longitude_search
 
-            del curr_lat
-            del search_space
-            del density
+            density_locations[key] = (best_latitude, best_longitude)
 
-        del latitude_search
-        del longitude_search
+    kernel_t1 = time.time()
+    print('Calculating density time (m): ' + str((kernel_t1 - kernel_t0) / 60))
+    sys.stdout.flush()
 
-        density_locations[key] = (best_latitude, best_longitude)
+    return density_locations
 
-kernel_t1 = time.time()
-print('Calculating density time (m): ' + str((kernel_t1 - kernel_t0) / 60))
-sys.stdout.flush()
+density_locations = kde(lats, lngs, median_locations)
+cbm_density_locations = kde(cbm_lats, lngs, cbm_median_locations)
 
 '''
 kernel_t0 = time.time()
@@ -491,70 +550,93 @@ print('Calculating density time (h): ' + str((kernel_t1 - kernel_t0) / 3600))
 sys.stdout.flush()
 '''
 
-# Plot locations on a map.
-for place in lats:
-    if len(lats[place]) < 50: # Need at least 50 points.
-        continue
-
-    min_lat = max(min(lats[place]) - 1, -90)
-    max_lat = min(max(lats[place]) + 1, 90)
-    min_lng = max(min(lngs[place]) - 1, -180)
-    max_lng = min(max(lngs[place]) + 1, 180)
-
-    colors = []
-
-    actual_lng = float('inf')
-    actual_lat = float('inf')
-
-    for i in range(data.types['test']):
-        if days[i].place != place:
+def plot_map(lats, lngs, mean_locations, median_locations, density_locations, mode='sun'):
+    # Plot locations on a map.
+    for place in lats:
+        if len(lats[place]) < 50: # Need at least 50 points.
             continue
 
-        actual_lng = days[i].lng
-        actual_lat = days[i].lat
+        min_lat = max(min(lats[place]) - 1, -90)
+        max_lat = min(max(lats[place]) + 1, 90)
+        min_lng = max(min(lngs[place]) - 1, -180)
+        max_lng = min(max(lngs[place]) + 1, 180)
 
-        if days[i].sunrise_in_frames and days[i].sunset_in_frames:
-            colors.append('g')
-        elif not days[i].sunrise_in_frames and days[i].sunset_in_frames:
-            colors.append('r')
-        elif not days[i].sunset_in_frames and days[i].sunrise_in_frames:
-            colors.append(mcolors.CSS4_COLORS['crimson'])
-        else: # not days[i].sunrise_in_frames and not days[i].sunset_in_frames:
-            colors.append('k')
+        colors = []
 
-    plt.figure(figsize=(24,12))
-    map = Basemap(projection='cyl', # This projection is equidistant.
-                  llcrnrlat=min_lat, urcrnrlat=max_lat,
-                  llcrnrlon=min_lng, urcrnrlon=max_lng,
-                  resolution='h')
-    #map.drawcoastlines()
-    map.fillcontinents(color='coral',lake_color='aqua')
-    map.drawmapboundary(fill_color='aqua')
+        actual_lng = float('inf')
+        actual_lat = float('inf')
 
-    #x,y = map(lngs[place], lats[place])
-    #x_actual,y_actual = map([actual_lng], [actual_lat])
-    #x_mean,y_mean = map([mean_locations[place][1]], [mean_locations[place][0]])
-    #x_median,y_median = map([median_locations[place][1]], [median_locations[place][0]])
-    #x_density,y_density = map([density_locations[place][1]], [density_locations[place][0]])
+        for i in range(data.types['test']):
+            if days[i].place != place:
+                continue
 
-    actual_and_pred_lngs = [actual_lng] + [mean_locations[place][1]] + [median_locations[place][1]] + [density_locations[place][1]]
-    actual_and_pred_lats = [actual_lat] + [mean_locations[place][0]] + [median_locations[place][0]] + [density_locations[place][0]]
-    actual_and_pred_colors = ['w', 'm', 'c', mcolors.CSS4_COLORS['fuchsia']]
+            actual_lng = days[i].lng
+            actual_lat = days[i].lat
 
-    guesses = map.scatter(lngs[place], lats[place], s=40, c=colors, latlon=True, zorder=10)
-    actual_and_pred = map.scatter(actual_and_pred_lngs, actual_and_pred_lats, s=40, c=actual_and_pred_colors, latlon=True, zorder=10, marker='^')
+            if mode == 'sun':
+                if days[i].sunrise_in_frames and days[i].sunset_in_frames:
+                    colors.append('g')
+                elif not days[i].sunrise_in_frames and days[i].sunset_in_frames:
+                    colors.append('r')
+                elif not days[i].sunset_in_frames and days[i].sunrise_in_frames:
+                    colors.append(mcolors.CSS4_COLORS['crimson'])
+                else: # not days[i].sunrise_in_frames and not days[i].sunset_in_frames:
+                    colors.append('k')
+            elif mode == 'season':
+                if days[i].season == 'winter':
+                    colors.append('b')
+                elif days[i].season == 'spring':
+                    colors.append('y')
+                elif days[i].season == 'summer':
+                    colors.append('r')
+                else:
+                    colors.append(mcolors.CSS4_COLORS['tan'])
 
-    #plt.legend(handles=[guesses, actual, mean_guess, median_guess, density_guess])
-    guess_colors = ['g', 'r', mcolors.CSS4_COLORS['crimson'], 'k']
-    legend_labels = ['sunrise and sunset in frames', 'sunrise not in frames', 'sunset not in frames', 'sunrise and sunset not in frames', 'actual location', 'mean', 'median', 'gaussian kde']
+        plt.figure(figsize=(24,12))
+        map = Basemap(projection='cyl', # This projection is equidistant.
+                      llcrnrlat=min_lat, urcrnrlat=max_lat,
+                      llcrnrlon=min_lng, urcrnrlon=max_lng,
+                      resolution='h')
+        #map.drawcoastlines()
+        map.fillcontinents(color='coral',lake_color='aqua')
+        map.drawmapboundary(fill_color='aqua')
 
-    handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in guess_colors] + \
-                 [plt.plot([], marker="^", ls="", color=color)[0] for color in actual_and_pred_colors]
-    plt.legend(handlelist, legend_labels)
+        #x,y = map(lngs[place], lats[place])
+        #x_actual,y_actual = map([actual_lng], [actual_lat])
+        #x_mean,y_mean = map([mean_locations[place][1]], [mean_locations[place][0]])
+        #x_median,y_median = map([median_locations[place][1]], [median_locations[place][0]])
+        #x_density,y_density = map([density_locations[place][1]], [density_locations[place][0]])
 
-    plt.title(place)
-    plt.savefig('/srv/glusterfs/vli/maps/' + place + '.png')
-    plt.close()
+        actual_and_pred_lngs = [actual_lng] + [mean_locations[place][1]] + [median_locations[place][1]] + [density_locations[place][1]]
+        actual_and_pred_lats = [actual_lat] + [mean_locations[place][0]] + [median_locations[place][0]] + [density_locations[place][0]]
+        actual_and_pred_colors = ['w', 'm', 'c', mcolors.CSS4_COLORS['fuchsia']]
+
+        guesses = map.scatter(lngs[place], lats[place], s=40, c=colors, latlon=True, zorder=10)
+        actual_and_pred = map.scatter(actual_and_pred_lngs, actual_and_pred_lats, s=40, c=actual_and_pred_colors, latlon=True, zorder=10, marker='^')
+
+        #plt.legend(handles=[guesses, actual, mean_guess, median_guess, density_guess])
+
+        if mode == 'sun':
+            guess_colors = ['g', 'r', mcolors.CSS4_COLORS['crimson'], 'k']
+            legend_labels = ['sunrise and sunset in frames', 'sunrise not in frames', 'sunset not in frames', 'sunrise and sunset not in frames', 'actual location', 'mean', 'median', 'gaussian kde']
+
+            handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in guess_colors] + \
+                         [plt.plot([], marker="^", ls="", color=color)[0] for color in actual_and_pred_colors]
+        elif mode == 'season':
+            guess_colors = ['b', 'y', 'r', mcolors.CSS4_COLORS['tan']]
+            legend_labels = ['winter', 'spring', 'summer', 'fall'
+                             'actual location', 'mean', 'median', 'gaussian kde']
+            handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in guess_colors] + \
+                         [plt.plot([], marker="^", ls="", color=color)[0] for color in actual_and_pred_colors]
+
+        plt.legend(handlelist, legend_labels)
+
+        plt.title(place)
+        plt.savefig('/srv/glusterfs/vli/maps/' + mode + '/' + place + '.png')
+        plt.close()
+
+plot_map(lats, lngs, mean_locations, median_locations, density_locations, 'sun')
+plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, 'season')
 
 def compute_distance(lat1, lng1, lat2, lng2): # kilometers
     # Haversine formula for computing distance.
@@ -583,6 +665,14 @@ median_longitude_err = []
 median_latitude_err = []
 density_longitude_err = []
 density_latitude_err = []
+
+cbm_mean_distances = []
+cbm_median_distances = []
+cbm_density_distances = []
+cbm_mean_latitude_err = []
+cbm_median_latitude_err = []
+cbm_density_latitude_err = []
+
 for i in range(data.types['test']):
     place = days[i].place
 
@@ -599,12 +689,17 @@ for i in range(data.types['test']):
 
     mean_pred_lat = mean_locations[place][0]
     mean_pred_lng = mean_locations[place][1]
-
-    median_pred_lat = median_locations[place][0] #places_lat_lng[place][0]
-    median_pred_lng = median_locations[place][1] #places_lat_lng[place][1]
-
+    median_pred_lat = median_locations[place][0]
+    median_pred_lng = median_locations[place][1]
     density_pred_lat = density_locations[place][0]
     density_pred_lng = density_locations[place][1]
+
+    cbm_mean_pred_lat = cbm_mean_locations[place][0]
+    cbm_mean_pred_lng = cbm_mean_locations[place][1]
+    cbm_median_pred_lat = cbm_median_locations[place][0]
+    cbm_median_pred_lng = cbm_median_locations[place][1]
+    cbm_density_pred_lat = cbm_density_locations[place][0]
+    cbm_density_pred_lng = cbm_density_locations[place][1]
 
     mean_distance = compute_distance(actual_lat, actual_lng, mean_pred_lat, mean_pred_lng)
     mean_distances.append(mean_distance)
@@ -613,81 +708,76 @@ for i in range(data.types['test']):
     density_distance = compute_distance(actual_lat, actual_lng, density_pred_lat, density_pred_lng)
     density_distances.append(density_distance)
 
-    if median_distance < 25 or density_distance < 25:
-        print('Under 25')
-        print(place)
-        print('{}, {}'.format(days[i].lat, days[i].lng))
-        print(mean_distance)
-        print(median_distance)
-        print(density_distance)
-        print(days[i].interval_min)
-        #print(days[i].sunrise_in_frames)
-        #print(days[i].sunset_in_frames)
-        sys.stdout.flush()
+    cbm_mean_distance = compute_distance(actual_lat, actual_lng, cbm_mean_pred_lat, cbm_mean_pred_lng)
+    cbm_mean_distances.append(cbm_mean_distance)
+    cbm_median_distance = compute_distance(actual_lat, actual_lng, cbm_median_pred_lat, cbm_median_pred_lng)
+    cbm_median_distances.append(cbm_median_distance)
+    cbm_density_distance = compute_distance(actual_lat, actual_lng, cbm_density_pred_lat, cbm_density_pred_lng)
+    cbm_density_distances.append(cbm_density_distance)
 
     mean_latitude_err.append(compute_distance(actual_lat, actual_lng, mean_pred_lat, actual_lng))
     mean_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, mean_pred_lng))
-
     median_latitude_err.append(compute_distance(actual_lat, actual_lng, median_pred_lat, actual_lng))
     median_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, median_pred_lng))
-
     density_latitude_err.append(compute_distance(actual_lat, actual_lng, density_pred_lat, actual_lng))
     density_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, density_pred_lng))
 
+    cbm_mean_latitude_err.append(compute_distance(actual_lat, actual_lng, cbm_mean_pred_lat, actual_lng))
+    cbm_median_latitude_err.append(compute_distance(actual_lat, actual_lng, cbm_median_pred_lat, actual_lng))
+    cbm_density_latitude_err.append(compute_distance(actual_lat, actual_lng, cbm_density_pred_lat, actual_lng))
+
     if random.randint(1, 100) < 101: # VLI
-        print('Distance')
+        if median_distance < 25 or density_distance < 25:
+            print('Under 25km!')
+
         print(place)
         print('# Days Used: ' + str(days_used[-1]))
+        print('Distance')
         print('Using mean: ' + str(mean_distance))
         print('Using median: ' + str(median_distance))
         print('Using density: ' + str(density_distance))
-        print(np.vstack((np.array(lats[place]), np.array(lngs[place]))))
-        print(str(actual_lat) + ', ' + str(actual_lng))
-        print(str(mean_pred_lat) + ', ' + str(mean_pred_lng))
-        print(str(median_pred_lat) + ', ' + str(median_pred_lng))
-        print(str(density_pred_lat) + ', ' + str(density_pred_lng))
-
+        print('Actual lat, lng: ' + str(actual_lat) + ', ' + str(actual_lng))
+        print('Mean lat, lng: ' + str(mean_pred_lat) + ', ' + str(mean_pred_lng))
+        print('Median lat, lng: ' + str(median_pred_lat) + ', ' + str(median_pred_lng))
+        print('Density lat, lng: ' + str(density_pred_lat) + ', ' + str(density_pred_lng))
+        print('Avg. Interval (min): ' + str(intervals[place]))
+        print('Sunrise / Sunset Visible Breakdown of Days: ' + str(sun_visibles[place]))
         print('')
         sys.stdout.flush()
 
-    #print(distance)
-
-
 # Plot Error vs Days Used
-plt.figure(figsize=(24,12))
-mean_days_err, = plt.plot(days_used, mean_distances, 'mo', markersize=3, label='mean')
-plt.legend(handles=[mean_days_err])
-plt.xlabel('# Days Used')
-plt.ylabel('Avg. Error (km)')
-plt.title('Avg. Error (km) Using Mean vs. # Days Used')
-plt.savefig('/srv/glusterfs/vli/maps/mean_days_used.png')
-plt.close()
+def plot_vs_days_used(days_used, distances, fmt, label, color=None, linestyle=None, marker=None, cbm=False):
+    plt.figure(figsize=(24,12))
+    if fmt is not None:
+        days_err, = plt.plot(days_used, distances, fmt, markersize=3, label=label)
+    else:
+        plt.plot(days_used, distances, color=color, linestyle=linestyle, marker=marker, markersize=3, label='gaussian kde')
 
-plt.figure(figsize=(24,12))
-median_days_err, = plt.plot(days_used, median_distances, 'co', markersize=3, label='median')
-plt.legend(handles=[median_days_err])
-plt.xlabel('# Days Used')
-plt.ylabel('Avg. Error (km)')
-#plt.xlim(xmin=0)
-#plt.ylim(ymin=0)
-plt.title('Avg. Error (km) Using Median vs. # Days Used')
-plt.savefig('/srv/glusterfs/vli/maps/median_days_used.png')
-plt.close()
+    plt.legend(handles=[days_err])
+    plt.xlabel('# Days Used')
+    plt.ylabel('Avg. Error (km)')
+    plt.title('Avg. Error (km) Using ' + label[0].upper() + label[1:] + ' vs. # Days Used')
 
-plt.figure(figsize=(24,12))
-density_days_err, = plt.plot(days_used, density_distances, color=mcolors.CSS4_COLORS['fuchsia'], linestyle='None', marker='o', markersize=3, label='gaussian kde')
-plt.legend(handles=[density_days_err])
-plt.xlabel('# Days Used')
-plt.ylabel('Avg. Error (km)')
-#plt.xlim(xmin=0)
-#plt.ylim(ymin=0)
-plt.title('Avg. Error (km) Using Gaussian KDE vs. # Days Used')
-plt.savefig('/srv/glusterfs/vli/maps/kde_days_used.png')
-plt.close()
+    if cbm:
+        prefix = 'cbm_'
+    else:
+        prefix = ''
 
-# Plot average distance error vs. time interval.
+    plt.savefig('/srv/glusterfs/vli/maps/' + prefix + label + '_days_used.png')
+    plt.close()
+
+plot_vs_days_used(days_used, mean_distances, 'mo', 'mean')
+plot_vs_days_used(days_used, median_distances, 'co', 'median')
+plot_vs_days_used(days_used, density_distances, None, 'gaussian kde', color=mcolors.CSS4_COLORS['fuchsia'], linestyle='None', marker='o')
+
+plot_vs_days_used(days_used, cbm_mean_distances, 'mo', 'mean', cbm=True)
+plot_vs_days_used(days_used, cbm_median_distances, 'co', 'median', cbm=True)
+plot_vs_days_used(days_used, cbm_density_distances, None, 'gaussian kde', color=mcolors.CSS4_COLORS['fuchsia'], linestyle='None', marker='o', cbm=True)
+
+# Plot average distance error vs. time interval OVER ALL DAYS.
 buckets = list(range(0, round(24 * 60 / constants.IMAGES_PER_DAY) + 5, 5)) # 5 minute intervals
 bucket_labels = [str(x) + '-' + str(x + 5) for x in buckets]
+bucket_labels[-1] = bucket_labels[-1] + '+'
 bucket_distances = [[] for x in range(len(buckets))]
 
 for i in range(data.types['test']):
