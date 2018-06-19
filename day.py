@@ -171,6 +171,21 @@ class Day():
         sys.stdout.flush()
         '''
 
+
+        if mode == 'sunrise': # VLI remove mode as well from args - this is purely for debugging
+            if self.sunrise_in_frames:
+                if not (self.sunrise_idx >= 0 and self.sunrise_idx < constants.IMAGES_PER_DAY):
+                    sunrise_before = False
+                else:
+                    sunrise_before = True
+        else:
+            if self.sunset_in_frames:
+                if not (self.sunset_idx >= 0 and self.sunset_idx < constants.IMAGES_PER_DAY):
+                    sunset_before = False
+                else:
+                    sunset_before = True
+        #### END VLI
+
         self.times = [self.all_times[x] for x in subset_idx]
         self.img_paths = [self.all_img_paths[x] for x in subset_idx]
 
@@ -179,16 +194,22 @@ class Day():
         if mode == 'sunrise': # VLI remove mode as well from args - this is purely for debugging
             if self.sunrise_in_frames:
                 if not (self.sunrise_idx >= 0 and self.sunrise_idx < constants.IMAGES_PER_DAY):
-                    print('CHANGE FRAMES DID NOT CAPTURE SUNRISE')
+                    if sunrise_before:
+                        print('CHANGE FRAMES MADE SUNRISE WORSE') # Can count number of times this phrase appears.
                 else:
-                    print(self.sunrise_idx)
+                    if not sunrise_before:
+                        print('CHANGE FRAMES MADE SUNRISE BETTER') # Can count number of times this phrase appears.
+
         else:
             if self.sunset_in_frames:
                 if not (self.sunset_idx >= 0 and self.sunset_idx < constants.IMAGES_PER_DAY):
-                    print('CHANGE FRAMES DID NOT CAPTURE SUNSET')
+                    if sunset_before:
+                        print('CHANGE FRAMES MADE SUNSET WORSE') # Can count number of times this phrase appears.
                 else:
-                    print(self.sunset_idx)
+                    if not sunset_before:
+                        print('CHANGE FRAMES MADE SUNSET BETTER') # Can count number of times this phrase appears.
         sys.stdout.flush()
+        ### END VLI
 
 
     def random_frames(self):
