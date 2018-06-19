@@ -755,7 +755,7 @@ def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker
     if fmt is not None:
         days_err, = plt.plot(days_used, distances, fmt, markersize=3, label=label)
     else:
-        plt.plot(days_used, distances, color=color, linestyle=linestyle, marker=marker, markersize=3, label='gaussian kde')
+        days_err, = plt.plot(days_used, distances, color=color, linestyle=linestyle, marker=marker, markersize=3, label='gaussian kde')
 
     plt.legend(handles=[days_err])
     plt.xlabel('# Days Used')
