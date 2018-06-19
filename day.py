@@ -245,15 +245,24 @@ class Day():
         diff_min = [x.total_seconds() / 60 for x in diff]
         self.interval_min = statistics.mean(diff_min)
 
-
-        if self.date.month >= 3 and self.date.month <= 5:
-            self.season = 'spring'
-        elif self.date.month >= 6 and self.date.month <= 8:
-            self.season = 'summer'
-        elif self.date.month >= 9 and self.date.month <= 11:
-            self.season = 'fall'
+        if self.lat > 0:
+            if self.date.month >= 3 and self.date.month <= 5:
+                self.season = 'spring'
+            elif self.date.month >= 6 and self.date.month <= 8:
+                self.season = 'summer'
+            elif self.date.month >= 9 and self.date.month <= 11:
+                self.season = 'fall'
+            else:
+                self.season = 'winter'
         else:
-            self.season = 'winter'
+            if self.date.month >= 3 and self.date.month <= 5:
+                self.season = 'fall'
+            elif self.date.month >= 6 and self.date.month <= 8:
+                self.season = 'winter'
+            elif self.date.month >= 9 and self.date.month <= 11:
+                self.season = 'spring'
+            else:
+                self.season = 'summer'
 
 
 
