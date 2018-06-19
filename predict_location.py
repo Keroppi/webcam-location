@@ -550,6 +550,13 @@ print('Calculating density time (h): ' + str((kernel_t1 - kernel_t0) / 3600))
 sys.stdout.flush()
 '''
 
+actual_locations = {}
+for i in range(data.types['test']):
+    if actual_locations.get(days[i].place) is None:
+        actual_locations[days[i].place] = (days[i].lat, days[i].lng)
+    else:
+        continue
+
 def plot_map(lats, lngs, mean_locations, median_locations, density_locations, mode='sun'):
     # Plot locations on a map.
     for place in lats:
@@ -563,15 +570,17 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, mo
 
         colors = []
 
-        actual_lng = float('inf')
-        actual_lat = float('inf')
+        #actual_lng = float('inf')
+        #actual_lat = float('inf')
+        actual_lat = actual_locations[place][0]
+        actual_lng = actual_locations[place][1]
 
         for i in range(data.types['test']):
             if days[i].place != place:
                 continue
 
-            actual_lng = days[i].lng
-            actual_lat = days[i].lat
+            #actual_lng = days[i].lng
+            #actual_lat = days[i].lat
 
             if mode == 'sun':
                 if days[i].sunrise_in_frames and days[i].sunset_in_frames:
@@ -654,8 +663,8 @@ def compute_distance(lat1, lng1, lat2, lng2): # kilometers
 
     return distance
 
+#finished_places = []
 days_used = []
-finished_places = []
 mean_distances = []
 median_distances = []
 density_distances = []
@@ -673,19 +682,20 @@ cbm_mean_latitude_err = []
 cbm_median_latitude_err = []
 cbm_density_latitude_err = []
 
-for i in range(data.types['test']):
-    place = days[i].place
+#for i in range(data.types['test']):
+for place in lats:
+    #place = days[i].place
 
     # Go through each place.
-    if place in finished_places:
-        continue
-    else:
-        finished_places.append(place)
+    #if place in finished_places:
+    #    continue
+    #else:
+    #    finished_places.append(place)
 
     days_used.append(len(lats[place]))
 
-    actual_lat = days[i].lat
-    actual_lng = days[i].lng
+    actual_lat = actual_locations[place][0] #days[i].lat
+    actual_lng = actual_locations[place][1] #days[i].lng
 
     mean_pred_lat = mean_locations[place][0]
     mean_pred_lng = mean_locations[place][1]
@@ -822,8 +832,8 @@ for bdIdx, distance_errs in enumerate(cbm_bucket_distances):
     else:
         cbm_bucket_distances[bdIdx] = 0
 
-bar(buckets, bucket_distances, 'Avg. Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Avg. Error (km) vs. Photo Interval (min)', 'interval.png')
-bar(buckets, cbm_bucket_distances, 'Avg. Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Avg. Error (km) vs. Photo Interval (min)', 'cbm_interval.png')
+bar(buckets, bucket_distances, 'Avg. Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Avg. Error (km) Over All Days vs. Photo Interval (min)', 'interval.png')
+bar(buckets, cbm_bucket_distances, 'Avg. Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Avg. Error (km) Over All Days vs. Photo Interval (min)', 'cbm_interval.png')
 
 # Plot average distance error vs. sunrise, sunset available over ALL DAYS.
 sun_type_labels = ['Both', 'Sunrise Only', 'Sunset Only', 'Neither']
@@ -858,8 +868,8 @@ for sIdx, distance_errs in enumerate(cbm_sun_type_distances):
     else:
         cbm_sun_type_distances[sIdx] = 0
 
-bar(sun_type_labels, sun_type_distances, 'Avg. Distance Error (km)', 'Sunrise and sunset in frame?', sun_type_labels, 'Avg. Error (km) vs. Sunrise / Sunset In Frame', 'sun_in_frame.png')
-bar(sun_type_labels, cbm_sun_type_distances, 'Avg. Distance Error (km)', 'Sunrise and sunset in frame?', sun_type_labels, 'Avg. Error (km) vs. Sunrise / Sunset In Frame', 'cbm_sun_in_frame.png')
+bar(sun_type_labels, sun_type_distances, 'Avg. Distance Error (km)', 'Sunrise and sunset in frame?', sun_type_labels, 'Avg. Error (km) Over All Days vs. Sunrise / Sunset In Frame', 'sun_in_frame.png')
+bar(sun_type_labels, cbm_sun_type_distances, 'Avg. Distance Error (km)', 'Sunrise and sunset in frame?', sun_type_labels, 'Avg. Error (km) Over All Days vs. Sunrise / Sunset In Frame', 'cbm_sun_in_frame.png')
 
 # Plot average distance error vs. season over ALL DAYS.
 season_labels = ['Winter', 'Spring', 'Summer', 'Fall']
@@ -894,8 +904,70 @@ for sIdx, distance_errs in enumerate(cbm_season_distances):
     else:
         cbm_season_distances[sIdx] = 0
 
-bar(season_labels, season_distances, 'Avg. Distance Error (km)', 'Season', season_labels, 'Avg. Error (km) vs. Season', 'season.png')
-bar(season_labels, cbm_season_distances, 'Avg. Distance Error (km)', 'Season', season_labels, 'Avg. Error (km) vs. Season', 'cbm_season.png')
+bar(season_labels, season_distances, 'Avg. Distance Error (km)', 'Season', season_labels, 'Avg. Error (km) Over All Days vs. Season', 'season.png')
+bar(season_labels, cbm_season_distances, 'Avg. Distance Error (km)', 'Season', season_labels, 'Avg. Error (km) Over All Days vs. Season', 'cbm_season.png')
+
+# Plot average distance error vs. intervals over ALL PLACES.
+# Only using CBM model for now.
+cbm_median_bucket_distances = [[] for x in range(len(buckets))]
+cbm_density_bucket_distances = [[] for x in range(len(buckets))]
+for key in intervals:
+    for bIdx, bucket in enumerate(buckets):
+        if intervals[key] < bucket + 5:
+            break
+
+    cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
+    cbm_median_bucket_distances[bIdx].append(cbm_median_distance_err)
+
+    cbm_density_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_density_locations[key][0], cbm_density_locations[key][1])
+    cbm_density_bucket_distances[bIdx].append(cbm_density_distance_err)
+
+for bdIdx, distance_errs in enumerate(cbm_median_bucket_distances):
+    if len(distance_errs) > 0:
+        cbm_median_bucket_distances[bdIdx] = statistics.mean(distance_errs)
+    else:
+        cbm_median_bucket_distances[bdIdx] = 0
+
+for bdIdx, distance_errs in enumerate(cbm_density_bucket_distances):
+    if len(distance_errs) > 0:
+        cbm_density_bucket_distances[bdIdx] = statistics.mean(distance_errs)
+    else:
+        cbm_density_bucket_distances[bdIdx] = 0
+
+bar(buckets, cbm_median_bucket_distances, 'Avg. Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Avg. Error (km) Over All Locations Using Median vs. Photo Interval (min)', 'cbm_interval_median_places.png')
+bar(buckets, cbm_density_bucket_distances, 'Avg. Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Avg. Error (km) Over All Locations Using Gaussian KDE vs. Photo Interval (min)', 'cbm_interval_density_places.png')
+
+# Plot average distance error vs. percentage of days with sunrise and sunset visible over ALL PLACES.
+# Only using CBM model for now.
+buckets = list(range(0, 100, 10)) # 10% buckets
+bucket_labels = [str(x) + '-' + str(x + 10) for x in buckets]
+cbm_median_sun_type_distances = [[] for x in range(len(buckets))]
+cbm_density_sun_type_distances = [[] for x in range(len(buckets))]
+for key in intervals:
+    for bIdx, bucket in enumerate(buckets):
+        if sun_visibles[key][0] * 100 < bucket + 10:
+            break
+
+    cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
+    cbm_median_sun_type_distances[bIdx].append(cbm_median_distance_err)
+
+    cbm_density_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_density_locations[key][0], cbm_density_locations[key][1])
+    cbm_density_sun_type_distances[bIdx].append(cbm_density_distance_err)
+
+for bdIdx, distance_errs in enumerate(cbm_median_sun_type_distances):
+    if len(distance_errs) > 0:
+        cbm_median_sun_type_distances[bdIdx] = statistics.mean(distance_errs)
+    else:
+        cbm_median_sun_type_distances[bdIdx] = 0
+
+for bdIdx, distance_errs in enumerate(cbm_density_sun_type_distances):
+    if len(distance_errs) > 0:
+        cbm_density_sun_type_distances[bdIdx] = statistics.mean(distance_errs)
+    else:
+        cbm_density_sun_type_distances[bdIdx] = 0
+
+bar(buckets, cbm_median_sun_type_distances, 'Avg. Distance Error (km)', '% of Days With Both Sunrise and Sunset Visible', bucket_labels, 'Avg. Error (km) Over All Locations Using Median vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_median_places.png')
+bar(buckets, cbm_density_sun_type_distances, 'Avg. Distance Error (km)', '% of Days With Both Sunrise and Sunset Visible', bucket_labels, 'Avg. Error (km) Over All Locations Using Gaussian KDE vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_density_places.png')
 
 print('Brock Means Avg. Distance Error: {:.6f}'.format(statistics.mean(mean_distances)))
 print('Brock Medians Avg. Distance Error: {:.6f}'.format(statistics.mean(median_distances)))
