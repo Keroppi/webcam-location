@@ -101,8 +101,6 @@ if from_model: # Use the trained model to generate predictions.
     print('# Test Examples: {}'.format(len(test_loader.dataset)))
     sys.stdout.flush()
 
-    # VLI
-    ''' 
     sunrise_predict_t0 = time.time()
     #sunrises = []
     for batch_idx, (input, _) in enumerate(test_loader):
@@ -154,7 +152,7 @@ if from_model: # Use the trained model to generate predictions.
     sunrise_predict_t1 = time.time()
     print('Sunrise prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
     sys.stdout.flush()
-    '''
+
     sunset_predict_t0 = time.time()
     #sunsets = []
     for batch_idx, (input, _) in enumerate(test_loader):
@@ -226,8 +224,6 @@ else: # Predictions already stored in a pickled numpy obj.
     for d_idx, day in enumerate(days[:num_test_days]):
         local_sunset = day.get_local_time(sunset_pred[d_idx])
         sunsets.append(local_sunset)
-
-sys.exit() # VLI
 
 # Compute solar noon and day length.
 solar_noons = []

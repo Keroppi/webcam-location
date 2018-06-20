@@ -139,7 +139,7 @@ class Day():
         start_idx = center_idx - math.floor((constants.IMAGES_PER_DAY - 1) / 2)
         end_idx = center_idx + math.ceil((constants.IMAGES_PER_DAY - 1) / 2)
 
-        # VLI
+        '''
         if mode == 'sunrise':
             diff = abs((self.sunrise - self.all_times[center_idx]).total_seconds() / 3600)
             if diff < 0.5:
@@ -152,7 +152,7 @@ class Day():
                 print('SUNSET GUESS LESS THAN 0.5 HOUR OFF')
                 #print(self.sunset)
                 #print(self.all_times[center_idx])
-        # END VLI
+        '''
 
         if start_idx < 0:
             start_idx = 0
@@ -197,7 +197,7 @@ class Day():
             if self.sunset_in_frames:
                 if not (self.sunset_idx >= 0 and self.sunset_idx <= constants.IMAGES_PER_DAY - 1):
                     sunset_before = False
-
+                    '''
                     print('SUNSET WAS BAD BEFORE')  # Can count number of times this phrase appears.
                     print(self.sunset)
                     print(self.times[0])
@@ -205,9 +205,10 @@ class Day():
                     print(self.all_times[0])
                     print(self.all_times[-1])
                     print(self.all_times[center_idx])
+                    '''
                 else:
                     sunset_before = True
-
+                    '''
                     print('SUNSET WAS GOOD BEFORE')  # Can count number of times this phrase appears.
                     print(self.sunset)
                     print(self.times[0])
@@ -215,7 +216,7 @@ class Day():
                     print(self.all_times[0])
                     print(self.all_times[-1])
                     print(self.all_times[center_idx])
-
+                    '''
         #### END VLI
 
         self.times = [self.all_times[x] for x in subset_idx]
@@ -279,9 +280,9 @@ class Day():
 
         self.sunrise_in_frames, self.sunset_in_frames = self.in_frames(self.all_times, self.sunrise, self.sunset)
 
-        if self.sunset_in_frames and train_test_valid == 'test': # VLI
-            print('SUNSET IN FRAMES')
-            sys.stdout.flush()
+        #if self.sunset_in_frames and train_test_valid == 'test': 
+        #    print('SUNSET IN FRAMES')
+        #    sys.stdout.flush()
 
         diff = [self.all_times[idx] - self.all_times[idx - 1] for idx, _ in enumerate(self.all_times) if idx > 0]
         diff_min = [x.total_seconds() / 60 for x in diff]
