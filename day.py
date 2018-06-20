@@ -67,16 +67,19 @@ class Day():
             remainder = (sunset - times[max_sunset_idx - 1]) / (times[max_sunset_idx] - times[max_sunset_idx - 1])
             sunset_idx = remainder + max_sunset_idx - 1
 
-        #print(sunrise_idx)
-        #print(sunrise)
-        #print(times[max_sunrise_idx - 1])
-        #print(times[max_sunrise_idx])
+        print('Sunrise / Sunset and Idx')
+        print(sunrise_idx)
+        print(sunrise)
+        print(times[max_sunrise_idx - 1])
+        print(times[max_sunrise_idx])
 
-        #print(sunset_idx)
-        #print(sunset)
-        #print(times[max_sunset_idx - 1])
-        #print(times[max_sunset_idx])
-        #print('')
+        print(sunset_idx)
+        print(sunset)
+        print(times[max_sunset_idx - 1])
+        print(times[max_sunset_idx])
+
+        print(time_diff)
+        print('')
 
         return (sunrise_idx, sunset_idx)
 
