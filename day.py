@@ -251,14 +251,14 @@ class Day():
 
 
     def random_frames(self):
-        self.times, self.img_paths = Day.random_subset(self.all_times, self.all_img_paths)
+        self.times, self.img_paths = self.random_subset(self.all_times, self.all_img_paths)
         self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, self.sunrise, self.sunset)
 
     def __init__(self, place, times, img_paths, sunrise, sunset, train_test_valid, lat, lng, time_offset, mali_solar_noon):
         self.all_times = times
         self.all_img_paths = img_paths
 
-        self.times, self.img_paths = Day.random_subset(times, img_paths)
+        self.times, self.img_paths = self.random_subset(times, img_paths)
 
         self.train_test_valid = train_test_valid
         self.place = place
