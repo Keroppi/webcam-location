@@ -1,6 +1,9 @@
 import constants
 import numpy as np, sys, PIL, math, time, datetime, random, statistics
 
+MIN_SUNRISE_IDX = float('inf')
+MAX_SUNSET_IDX = -float('inf')
+
 class Day():
     def get_local_time(self, idx):
         if idx <= constants.IMAGES_PER_DAY - 1 and idx >= 0:
@@ -14,17 +17,17 @@ class Day():
             return self.times[floor_idx] + (idx - floor_idx) * diff
         elif idx < 0:
             diff = self.times[-1] - self.times[0]
-            return self.times[0] + idx * diff
+            return self.times[0] + idx * diff #/ (constants.IMAGES_PER_DAY - 1) #
         else:
             diff = self.times[-1] - self.times[0]
-            return self.times[constants.IMAGES_PER_DAY - 1] + (idx - (constants.IMAGES_PER_DAY - 1)) * diff
+            return self.times[constants.IMAGES_PER_DAY - 1] + (idx - (constants.IMAGES_PER_DAY - 1)) * diff #/ (constants.IMAGES_PER_DAY - 1) #
 
     def get_sun_idx(self, times, sunrise, sunset):
         sunrise_idx = 0
         sunset_idx = 0
 
         # Time between first and last images.
-        #Uused for scaling if the sunrise / sunset fall outside the range of images.
+        # Used for scaling if the sunrise / sunset fall outside the range of images.
         time_diff = times[-1] - times[0]
 
         max_sunrise_idx = None
@@ -45,11 +48,11 @@ class Day():
 
         if max_sunrise_idx is None: # Past the last image.
             sunrise_idx = constants.IMAGES_PER_DAY - 1
-            extra = (sunrise - times[-1]) / time_diff
+            extra = (sunrise - times[-1]) / time_diff #* (constants.IMAGES_PER_DAY - 1) #
             sunrise_idx += extra
         elif max_sunrise_idx == 0: # Before the first image.
             sunrise_idx = 0
-            extra = (sunrise - times[0]) / time_diff
+            extra = (sunrise - times[0]) / time_diff #* (constants.IMAGES_PER_DAY - 1) #
             sunrise_idx += extra
         else:
             remainder = (sunrise - times[max_sunrise_idx - 1]) / (times[max_sunrise_idx] - times[max_sunrise_idx - 1])
@@ -57,11 +60,11 @@ class Day():
 
         if max_sunset_idx is None:
             sunset_idx = constants.IMAGES_PER_DAY - 1
-            extra = (sunset - times[-1]) / time_diff
+            extra = (sunset - times[-1]) / time_diff #* (constants.IMAGES_PER_DAY - 1) #
             sunset_idx += extra
         elif max_sunset_idx == 0:
             sunset_idx = 0
-            extra = (sunset - times[0]) / time_diff
+            extra = (sunset - times[0]) / time_diff #* (constants.IMAGES_PER_DAY - 1) #
             sunset_idx += extra
         else:
             remainder = (sunset - times[max_sunset_idx - 1]) / (times[max_sunset_idx] - times[max_sunset_idx - 1])
@@ -238,12 +241,12 @@ class Day():
                 if not (self.sunset_idx >= 0 and self.sunset_idx <= constants.IMAGES_PER_DAY - 1):
                     if sunset_before:
                         print('CHANGE FRAMES MADE SUNSET WORSE') # Can count number of times this phrase appears.
-                        print(self.sunset)
-                        print(self.times[0])
-                        print(self.times[-1])
-                        print(self.all_times[0])
-                        print(self.all_times[-1])
-                        print(self.all_times[center_idx])
+                        #print(self.sunset)
+                        #print(self.times[0])
+                        #print(self.times[-1])
+                        #print(self.all_times[0])
+                        #print(self.all_times[-1])
+                        #print(self.all_times[center_idx])
                 else:
                     if not sunset_before:
                         print('CHANGE FRAMES MADE SUNSET BETTER') # Can count number of times this phrase appears.
@@ -280,7 +283,7 @@ class Day():
 
         self.sunrise_in_frames, self.sunset_in_frames = self.in_frames(self.all_times, self.sunrise, self.sunset)
 
-        #if self.sunset_in_frames and train_test_valid == 'test': 
+        #if self.sunset_in_frames and train_test_valid == 'test':
         #    print('SUNSET IN FRAMES')
         #    sys.stdout.flush()
 
@@ -307,6 +310,13 @@ class Day():
             else:
                 self.season = 'summer'
 
+        MIN_SUNRISE_IDX = min(MIN_SUNRISE_IDX, self.sunrise_idx)
+        MAX_SUNSET_IDX = min(MAX_SUNSET_IDX, self.sunset_idx)
+
+        print('SMALLEST AND LARGEST IDX')
+        print(MIN_SUNRISE_IDX)
+        print(MAX_SUNSET_IDX)
+        sys.stdout.flush()
 
 
 
