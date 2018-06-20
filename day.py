@@ -70,13 +70,13 @@ class Day():
         print('Sunrise / Sunset and Idx')
         print(sunrise_idx)
         print(sunrise)
-        print(times[max_sunrise_idx - 1])
-        print(times[max_sunrise_idx])
+        print(times[math.floor(sunrise_idx)])
+        print(times[math.ceil(sunrise_idx)])
 
         print(sunset_idx)
         print(sunset)
-        print(times[max_sunset_idx - 1])
-        print(times[max_sunset_idx])
+        print(times[math.floor(sunset_idx)])
+        print(times[math.ceil(sunset_idx)])
 
         print(time_diff)
         print('')
