@@ -98,6 +98,9 @@ if from_model: # Use the trained model to generate predictions.
 
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=constants.BATCH_SIZE, num_workers=num_workers, pin_memory=pin_memory)
 
+    print('# Test Examples: {}'.format(len(test_loader.dataset)))
+    sys.stdout.flush()
+
     sunrise_predict_t0 = time.time()
     #sunrises = []
     for batch_idx, (input, _) in enumerate(test_loader):
