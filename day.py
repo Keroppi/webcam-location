@@ -1,9 +1,6 @@
 import constants
 import numpy as np, sys, PIL, math, time, datetime, random, statistics
 
-MIN_SUNRISE_IDX = float('inf')
-MAX_SUNSET_IDX = -float('inf')
-
 class Day():
     def get_local_time(self, idx):
         if idx <= constants.IMAGES_PER_DAY - 1 and idx >= 0:
@@ -310,12 +307,9 @@ class Day():
             else:
                 self.season = 'summer'
 
-        MIN_SUNRISE_IDX = min(MIN_SUNRISE_IDX, self.sunrise_idx)
-        MAX_SUNSET_IDX = min(MAX_SUNSET_IDX, self.sunset_idx)
-
         print('SMALLEST AND LARGEST IDX')
-        print(MIN_SUNRISE_IDX)
-        print(MAX_SUNSET_IDX)
+        print(self.sunrise_idx)
+        print(self.sunset_idx)
         sys.stdout.flush()
 
 
