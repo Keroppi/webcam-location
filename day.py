@@ -141,13 +141,13 @@ class Day():
 
         # VLI
         if mode == 'sunrise':
-            diff = math.abs((self.sunrise - self.all_times[center_idx]).total_seconds() / 3600)
+            diff = abs((self.sunrise - self.all_times[center_idx]).total_seconds() / 3600)
             if diff < 0.5:
                 print('SUNRISE GUESS LESS THAN 0.5 HOUR OFF')
                 print(self.sunrise)
                 print(self.all_times[center_idx])
         else:
-            diff = math.abs((self.sunset - self.all_times[center_idx]).total_seconds() / 3600)
+            diff = abs((self.sunset - self.all_times[center_idx]).total_seconds() / 3600)
             if diff < 0.5:
                 print('SUNSET GUESS LESS THAN 0.5 HOUR OFF')
                 print(self.sunset)
@@ -279,7 +279,7 @@ class Day():
 
         self.sunrise_in_frames, self.sunset_in_frames = self.in_frames(self.all_times, self.sunrise, self.sunset)
 
-        if self.sunset_in_frames: # VLI
+        if self.sunset_in_frames and train_test_valid == 'test': # VLI
             print('SUNSET IN FRAMES')
             sys.stdout.flush()
 
