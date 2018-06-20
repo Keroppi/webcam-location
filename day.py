@@ -67,26 +67,28 @@ class Day():
             remainder = (sunset - times[max_sunset_idx - 1]) / (times[max_sunset_idx] - times[max_sunset_idx - 1])
             sunset_idx = remainder + max_sunset_idx - 1
 
-        print('Sunrise / Sunset and Idx')
-        print(len(times))
-        print(sunrise_idx)
-        print(sunrise)
-        if sunrise_idx >= 0:
-            print(times[math.floor(sunrise_idx)])
-            print(times[math.ceil(sunrise_idx)])
-        print('')
+        '''
+        if len(times) == constants.IMAGES_PER_DAY:
+            print('Sunrise / Sunset and Idx')
+            print(sunrise_idx)
+            print(sunrise)
+            if sunrise_idx >= 0:
+                print(times[math.floor(sunrise_idx)])
+                print(times[math.ceil(sunrise_idx)])
+            print('')
 
-        print(sunset_idx)
-        print(sunset)
+            print(sunset_idx)
+            print(sunset)
 
-        if sunset_idx <= len(times) - 1:
-            print(times[math.floor(sunset_idx)])
-            print(times[math.ceil(sunset_idx)])
-        print('')
-        print(time_diff)
-        print(times[0])
-        print(times[-1])
-        print('')
+            if sunset_idx <= len(times) - 1:
+                print(times[math.floor(sunset_idx)])
+                print(times[math.ceil(sunset_idx)])
+            print('')
+            print(time_diff)
+            print(times[0])
+            print(times[-1])
+            print('')
+        '''
 
         return (sunrise_idx, sunset_idx)
 
