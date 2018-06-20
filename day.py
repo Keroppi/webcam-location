@@ -84,12 +84,12 @@ class Day():
     def in_frames(self, times, sunrise, sunset):
         all_sunrise_idx, all_sunset_idx = self.get_sun_idx(times, sunrise, sunset)
 
-        if all_sunrise_idx >= 0 and all_sunrise_idx < len(times):
+        if all_sunrise_idx >= 0 and all_sunrise_idx <= len(times) - 1:
             sunrise_in_frames = True
         else:
             sunrise_in_frames = False
 
-        if all_sunset_idx >= 0 and all_sunset_idx < len(times):
+        if all_sunset_idx >= 0 and all_sunset_idx <= len(times) - 1:
             sunset_in_frames = True
         else:
             sunset_in_frames = False
@@ -189,13 +189,13 @@ class Day():
 
         if mode == 'sunrise': # VLI remove mode as well from args - this is purely for debugging
             if self.sunrise_in_frames:
-                if not (self.sunrise_idx >= 0 and self.sunrise_idx < constants.IMAGES_PER_DAY):
+                if not (self.sunrise_idx >= 0 and self.sunrise_idx <= constants.IMAGES_PER_DAY - 1):
                     sunrise_before = False
                 else:
                     sunrise_before = True
         else:
             if self.sunset_in_frames:
-                if not (self.sunset_idx >= 0 and self.sunset_idx < constants.IMAGES_PER_DAY):
+                if not (self.sunset_idx >= 0 and self.sunset_idx <= constants.IMAGES_PER_DAY - 1):
                     sunset_before = False
 
                     print('SUNSET WAS BAD BEFORE')  # Can count number of times this phrase appears.
@@ -225,7 +225,7 @@ class Day():
 
         if mode == 'sunrise': # VLI remove mode as well from args - this is purely for debugging
             if self.sunrise_in_frames:
-                if not (self.sunrise_idx >= 0 and self.sunrise_idx < constants.IMAGES_PER_DAY):
+                if not (self.sunrise_idx >= 0 and self.sunrise_idx <= constants.IMAGES_PER_DAY - 1):
                     if sunrise_before:
                         print('CHANGE FRAMES MADE SUNRISE WORSE') # Can count number of times this phrase appears.
                 else:
@@ -234,7 +234,7 @@ class Day():
 
         else:
             if self.sunset_in_frames:
-                if not (self.sunset_idx >= 0 and self.sunset_idx < constants.IMAGES_PER_DAY):
+                if not (self.sunset_idx >= 0 and self.sunset_idx <= constants.IMAGES_PER_DAY - 1):
                     if sunset_before:
                         print('CHANGE FRAMES MADE SUNSET WORSE') # Can count number of times this phrase appears.
                         print(self.sunset)
@@ -279,9 +279,9 @@ class Day():
 
         self.sunrise_in_frames, self.sunset_in_frames = self.in_frames(self.all_times, self.sunrise, self.sunset)
 
-        #if self.sunset_in_frames and train_test_valid == 'test': # VLI
-        #    print('SUNSET IN FRAMES')
-        #    sys.stdout.flush()
+        if self.sunset_in_frames and train_test_valid == 'test': # VLI
+            print('SUNSET IN FRAMES')
+            sys.stdout.flush()
 
         diff = [self.all_times[idx] - self.all_times[idx - 1] for idx, _ in enumerate(self.all_times) if idx > 0]
         diff_min = [x.total_seconds() / 60 for x in diff]
