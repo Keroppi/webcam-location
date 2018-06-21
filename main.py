@@ -150,6 +150,9 @@ else:
     start_epoch = 0
     best_error = float('inf')
 
+start_epoch = 0 # VLI DELETE
+best_error = float('inf') # VLI DELETE
+
 if torch.cuda.is_available():
     if torch.cuda.device_count() > 1: # Load state dict before wrapping in DataParallel
         model = torch.nn.DataParallel(model)

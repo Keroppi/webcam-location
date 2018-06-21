@@ -973,13 +973,36 @@ bar(buckets, cbm_median_sun_type_distances, 'Avg. Distance Error (km)', '% of Da
 bar(buckets, cbm_density_sun_type_distances, 'Avg. Distance Error (km)', '% of Days With Both Sunrise and Sunset Visible', bucket_labels, 'Avg. Error (km) Over All Locations Using Gaussian KDE vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_density_places.png')
 
 # Average distance error vs. latitude over ALL PLACES.
-
 buckets = list(range(-90, 90, 10)) # 10 degree buckets
 bucket_labels = [str(x) + '-' + str(x + 10) for x in buckets]
 cbm_median_lat_distances = [[] for x in range(len(buckets))]
 cbm_density_lat_distances = [[] for x in range(len(buckets))]
 
+for key in intervals:
+    for bIdx, bucket in enumerate(buckets):
+        if cbm_lats[key] < bucket + 10:
+            break
 
+    cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
+    cbm_median_lat_distances[bIdx].append(cbm_median_distance_err)
+
+    cbm_density_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_density_locations[key][0], cbm_density_locations[key][1])
+    cbm_density_lat_distances[bIdx].append(cbm_density_distance_err)
+
+for bdIdx, distance_errs in enumerate(cbm_median_lat_distances):
+    if len(distance_errs) > 0:
+        cbm_median_lat_distances[bdIdx] = statistics.mean(distance_errs)
+    else:
+        cbm_median_lat_distances[bdIdx] = 0
+
+for bdIdx, distance_errs in enumerate(cbm_density_lat_distances):
+    if len(distance_errs) > 0:
+        cbm_density_lat_distances[bdIdx] = statistics.mean(distance_errs)
+    else:
+        cbm_density_lat_distances[bdIdx] = 0
+
+bar(buckets, cbm_median_lat_distances, 'Avg. Distance Error (km)', 'Latitude', bucket_labels, 'Avg. Error (km) Over All Locations Using Median vs. Latitude', 'cbm_lat_median_places.png')
+bar(buckets, cbm_density_lat_distances, 'Avg. Distance Error (km)', 'Latitude', bucket_labels, 'Avg. Error (km) Over All Locations Using Gaussian KDE vs. Latitude', 'cbm_lat_density_places.png')
 
 print('Brock Means Avg. Distance Error: {:.6f}'.format(statistics.mean(mean_distances)))
 print('Brock Medians Avg. Distance Error: {:.6f}'.format(statistics.mean(median_distances)))
