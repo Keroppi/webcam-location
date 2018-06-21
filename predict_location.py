@@ -246,7 +246,7 @@ for d_idx, (sunrise, sunset) in enumerate(zip(sunrises, sunsets)):
         solar_noon = solar_noon.replace(hour=10, minute=0, second=0, microsecond=0)
 
     '''
-    if random.randint(1, 100) < 5: # VLI
+    if random.randint(1, 100) < 5:
         print('Sunrise / sunset / solar noon')
         print(sunrise)
         print(sunset)
@@ -289,7 +289,7 @@ for d_idx, solar_noon in enumerate(solar_noons):
         sys.stdout.flush()
 
     '''
-    if random.randint(1, 100) < 5: # VLI
+    if random.randint(1, 100) < 5: 
         print('Lng')
         print(lng)
         print('')
@@ -317,7 +317,7 @@ for d_idx, day_length in enumerate(day_lengths):
     cbm_lat = 180 / math.pi * math.atan(math.cos(phi) / math.sin(phi) * math.cos(-math.pi / 24 * (day_length_hours - 24)))
 
     '''
-    if random.randint(1, 100) < 5: # VLI
+    if random.randint(1, 100) < 5: 
         print('Lat')
         print(lat)
         print('')
@@ -739,7 +739,7 @@ for place in lats:
     cbm_median_latitude_err.append(compute_distance(actual_lat, actual_lng, cbm_median_pred_lat, actual_lng))
     cbm_density_latitude_err.append(compute_distance(actual_lat, actual_lng, cbm_density_pred_lat, actual_lng))
 
-    if random.randint(1, 100) < 101: # VLI
+    if random.randint(1, 100) < 101:
         if median_distance < 25 or density_distance < 25:
             print('Under 25km!')
 
