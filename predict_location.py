@@ -650,7 +650,7 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, mo
 plot_map(lats, lngs, mean_locations, median_locations, density_locations, 'sun')
 plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, 'season')
 
-def compute_distance(lat1, lng1, lat2, lng2): # kilometers
+def compute_haversine_distance(lat1, lng1, lat2, lng2): # kilometers
     # Haversine formula for computing distance.
     # https://www.movable-type.co.uk/scripts/latlong.html
 
@@ -665,6 +665,59 @@ def compute_distance(lat1, lng1, lat2, lng2): # kilometers
     distance = radius_of_earth * temp1
 
     return distance
+
+def compute_distance(lat1, lng1, lat2, lng2): # km
+    lat1_rad = math.radians(lat1)
+    lat2_rad = math.radians(lat2)
+
+    a = 6378.137 # km
+    b = 6356.752314245 # km
+    f = 1 / 298.257223563
+
+    L = math.radians(lng2 - lng1)
+
+    tanU1 = (1 - f) * math.tan(lat1_rad)
+    cosU1 = 1 / math.sqrt((1 + tanU1 * tanU1))
+    sinU1 = tanU1 * cosU1
+    tanU2 = (1 - f) * math.tan(lat2_rad)
+    cosU2 = 1 / math.sqrt((1 + tanU2 * tanU2))
+    sinU2 = tanU2 * cosU2
+
+    lamb = L
+    iterations = 0
+
+    while True:
+        sin_lambda = math.sin(lamb)
+        cos_lambda = math.cos(lamb)
+
+        sin_sigma = math.sqrt(math.pow(cosU2 * sin_lambda, 2) + math.pow(cosU1 * sinU2 - sinU1 * cosU2 * cos_lambda, 2))
+        cos_sigma = sinU1 * sinU2 + cosU1 * cosU2 * cos_lambda
+        sigma = math.atan(sin_sigma / cos_sigma)
+
+        sin_alpha = cosU1 * cosU2 * sin_lambda / sin_sigma
+        cos_sq_alpha = 1 - math.pow(sin_alpha, 2)
+        cos_2_sigma_m = cos_sigma - 2 * sinU1 * sinU2 / cos_sq_alpha
+        C = f / 16 * cos_sq_alpha * (4 + f * (4 - 3 * cos_sq_alpha))
+        new_lamb = L + (1 - C) * f * sin_alpha * (sigma + C * sin_sigma * (cos_2_sigma_m + C * cos_sigma * (-1 + 2 * math.pow(cos_2_sigma_m, 2))))
+
+        if math.fabs(new_lamb - lamb) < 1e-12:
+            u_sq = cos_sq_alpha * (a * a - b * b) / (b * b)
+            A = 1 + u_sq / 16384 * (4096 + u_sq * (-768 + u_sq * (320 - 175 * u_sq)))
+            B = u_sq / 1024 * (256 + u_sq * (-128 + u_sq * (74 - 47 * u_sq)))
+            delta_sigma = B * sin_sigma * (cos_2_sigma_m + 1 / 4 * B * (cos_sigma * (-1 + 2 * math.pow(cos_2_sigma_m, 2)) - B / 6 * cos_2_sigma_m * (-3 + 4 * math.pow(sin_sigma, 2)) * (-3 + 4 * math.pow(cos_2_sigma_m, 2)) ))
+            s = b * A * (sigma - delta_sigma)
+
+            return s
+
+        iterations += 1
+        lamb = new_lamb
+
+        if iterations > 1000:
+            print('WARNING - Vincenty distance did not converge.')
+            sys.stdout.flush()
+
+            return compute_haversine_distance(lat1, lng1, lat2, lng2) # Use haversine distance if it doesn't converge.
+
 
 #finished_places = []
 days_used = []
