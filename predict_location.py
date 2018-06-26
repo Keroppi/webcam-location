@@ -1057,6 +1057,56 @@ for bdIdx, distance_errs in enumerate(cbm_density_lat_distances):
 bar(buckets, cbm_median_lat_distances, 'Avg. Distance Error (km)', 'Latitude', bucket_labels, 'Avg. Error (km) Over All Locations Using Median vs. Latitude', 'cbm_lat_median_places.png')
 bar(buckets, cbm_density_lat_distances, 'Avg. Distance Error (km)', 'Latitude', bucket_labels, 'Avg. Error (km) Over All Locations Using Gaussian KDE vs. Latitude', 'cbm_lat_density_places.png')
 
+# Average distance error vs. longitude over ALL PLACES.
+buckets = list(range(-180, 180, 20)) # 20 degree buckets
+bucket_labels = [str(x) + '-' + str(x + 20) for x in buckets]
+cbm_median_lng_distances = [[] for x in range(len(buckets))]
+cbm_density_lng_distances = [[] for x in range(len(buckets))]
+
+for key in intervals:
+    for bIdx, bucket in enumerate(buckets):
+        if lngs[key] < bucket + 10:
+            break
+
+    cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
+    cbm_median_lng_distances[bIdx].append(cbm_median_distance_err)
+
+    cbm_density_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_density_locations[key][0], cbm_density_locations[key][1])
+    cbm_density_lng_distances[bIdx].append(cbm_density_distance_err)
+
+for bdIdx, distance_errs in enumerate(cbm_median_lng_distances):
+    if len(distance_errs) > 0:
+        cbm_median_lng_distances[bdIdx] = statistics.mean(distance_errs)
+    else:
+        cbm_median_lng_distances[bdIdx] = 0
+
+for bdIdx, distance_errs in enumerate(cbm_density_lng_distances):
+    if len(distance_errs) > 0:
+        cbm_density_lng_distances[bdIdx] = statistics.mean(distance_errs)
+    else:
+        cbm_density_lng_distances[bdIdx] = 0
+
+bar(buckets, cbm_median_lng_distances, 'Avg. Distance Error (km)', 'Longitude', bucket_labels, 'Avg. Error (km) Over All Locations Using Median vs. Longitude', 'cbm_lng_median_places.png')
+bar(buckets, cbm_density_lng_distances, 'Avg. Distance Error (km)', 'Longitude', bucket_labels, 'Avg. Error (km) Over All Locations Using Gaussian KDE vs. Longitude', 'cbm_lng_density_places.png')
+
+for i in range(data.types['test']):
+    green = 0
+    sunrise_only = 0
+    sunset_only = 0
+    black = 0
+
+    if days[i].sunrise_in_frames and days[i].sunset_in_frames:
+        green += 1
+    elif days[i].sunrise_in_frames and not days[i].sunset_in_frames:
+        sunrise_only += 1
+    elif not days[i].sunrise_in_frames and days[i].sunset_in_frames:
+        sunset_only += 1
+    else:
+        black += 1
+
+    print('Green / Sunrise Only / Sunset Only / Black: {}, {}, {}, {}'.format(green, sunrise_only, sunset_only, black))
+    sys.stdout.flush()
+
 print('Brock Means Avg. Distance Error: {:.6f}'.format(statistics.mean(mean_distances)))
 print('Brock Medians Avg. Distance Error: {:.6f}'.format(statistics.mean(median_distances)))
 print('Brock Density Avg. Distance Error: {:.6f}'.format(statistics.mean(density_distances)))
