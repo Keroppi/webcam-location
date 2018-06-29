@@ -389,7 +389,7 @@ def ransac(data):
         for g_idx1, guess1 in enumerate(guesses):
             inliers[g_idx1].append(guess1)
 
-            for g_idx2, guess2 in guesses[:g_idx1] + guesses[g_idx1 + 1:]:
+            for g_idx2, guess2 in enumerate(guesses[:g_idx1] + guesses[g_idx1 + 1:]):
                 if math.fabs(guess1 - guess2) < constants.INLIER_THRESHOLD:
                     inliers[g_idx1].append(guess2)
 
