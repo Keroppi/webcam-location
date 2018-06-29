@@ -241,10 +241,11 @@ class Day():
                 if not (self.sunrise_idx >= 0 and self.sunrise_idx <= constants.IMAGES_PER_DAY - 1):
                     if sunrise_before:
                         print('CHANGE FRAMES MADE SUNRISE WORSE') # Can count number of times this phrase appears.
+                    else:
+                        print('CHANGE FRAMES DID NOT IMPROVE SUNRISE')
                 else:
                     if not sunrise_before:
                         print('CHANGE FRAMES MADE SUNRISE BETTER') # Can count number of times this phrase appears.
-
         else:
             if self.sunset_in_frames:
                 if not (self.sunset_idx >= 0 and self.sunset_idx <= constants.IMAGES_PER_DAY - 1):
@@ -256,9 +257,12 @@ class Day():
                         #print(self.all_times[0])
                         #print(self.all_times[-1])
                         #print(self.all_times[center_idx])
+                    else:
+                        print('CHANGE FRAMES DID NOT IMPROVE SUNSET')
                 else:
                     if not sunset_before:
                         print('CHANGE FRAMES MADE SUNSET BETTER') # Can count number of times this phrase appears.
+
         sys.stdout.flush()
         ### END VLI
 

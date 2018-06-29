@@ -16,4 +16,4 @@ SPLIT_TEST = 100 # 25% test, 0% validation
 BANDWIDTH = 0.02
 CENTER = False
 LAMBDA = 1 # REGULARIZER
-
+INLIER_THRESHOLD = 2 # degrees latitude, longitude
