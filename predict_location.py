@@ -1058,7 +1058,7 @@ for bdIdx, distance_errs in enumerate(cbm_density_bucket_distances):
     else:
         cbm_density_bucket_distances[bdIdx] = 0
 
-for bdIdx, distance_errs in enumerate(cbm_density_bucket_distances):
+for bdIdx, distance_errs in enumerate(ransac_bucket_distances):
     if len(distance_errs) > 0:
         ransac_bucket_distances[bdIdx] = statistics.mean(distance_errs)
     else:
