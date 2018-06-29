@@ -401,6 +401,8 @@ def ransac(data):
 
         ransacs[place] = statistics.mean(inliers[max_idx])
 
+    return ransacs
+
 ransac_lats = ransac(cbm_lats)
 ransac_lngs = ransac(lngs)
 ransac_locations = {}
