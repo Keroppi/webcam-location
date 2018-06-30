@@ -855,7 +855,7 @@ for place in lats:
     ransac_distances.append(ransac_distance)
 
     if random.randint(1, 100) < 101:
-        if median_distance < 25 or density_distance < 25:
+        if median_distance < 25 or density_distance < 25 or ransac_distance < 25:
             print('Under 25km!')
 
         print(place)
