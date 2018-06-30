@@ -333,6 +333,17 @@ for d_idx, day_length in enumerate(day_lengths):
     latitudes.append(lat) # Only one day to predict latitude - could average across many days.
     cbm_latitudes.append(cbm_lat)  # Only one day to predict latitude - could average across many days.
 
+    if cbm_lat > 90 or cbm_lat < -90:
+        print('WARNING - CBM latitude out of range')
+        print(cbm_lat)
+        print((day_of_year, day_length_hours))
+    if lat > 90 or lat < -90:
+        print('WARNING - Brock latitude out of range')
+        print(lat)
+        print((day_of_year, day_length_hours))
+
+    sys.stdout.flush()
+
 '''
 # Store which day of the year and day length for each place.
 day_lens = {}
@@ -489,7 +500,7 @@ def kde(lats, lngs, median_locations):
         max_lng = max(np_lngs)
 
         bnds = ((min_lat, max_lat), (min_lng, max_lng))
-        res = minimize(kde_func_to_minimize, np.asarray(median_locations[key]), args=(kernel,), method='BFGS')
+        res = minimize(kde_func_to_minimize, np.asarray(median_locations[key]), args=(kernel,), method='L-BFGS-B', bounds=bnds)
 
         if res.success:
             density_locations[key] = (res.x[0], res.x[1])
@@ -520,6 +531,17 @@ def kde(lats, lngs, median_locations):
                     best_score = density[ind]
                     best_longitude = math.degrees(longitude_search[ind])
                     best_latitude = math.degrees(latitude_search[i])
+
+                    if best_longitude > 180 or best_longitude < -180:
+                        print('WARNING - KDE returns out of bound longitude.')
+                        print(key)
+                        print(best_longitude)
+                    if best_latitude > 90 or best_latitude < -90:
+                        print('WARNING - KDE returns out of bound latitude.')
+                        print(key)
+                        print(best_latitude)
+                    sys.stdout.flush()
+
 
                 del curr_lat
                 del search_space
@@ -826,9 +848,15 @@ for place in lats:
         print('Using density: ' + str(cbm_density_distance))
         print('Using RANSAC: ' + str(ransac_distance))
         print('Actual lat, lng: ' + str(actual_lat) + ', ' + str(actual_lng))
+        print('Brock Distance')
         print('Mean lat, lng: ' + str(mean_pred_lat) + ', ' + str(mean_pred_lng))
         print('Median lat, lng: ' + str(median_pred_lat) + ', ' + str(median_pred_lng))
         print('Density lat, lng: ' + str(density_pred_lat) + ', ' + str(density_pred_lng))
+        print('CBM Distance')
+        print('Mean lat, lng: ' + str(cbm_mean_pred_lat) + ', ' + str(cbm_mean_pred_lng))
+        print('Median lat, lng: ' + str(cbm_median_pred_lat) + ', ' + str(cbm_median_pred_lng))
+        print('Density lat, lng: ' + str(cbm_density_pred_lat) + ', ' + str(cbm_density_pred_lng))
+        print('RANSAC lat, lng: ' + str(ransac_pred_lat) + ', ' + str(ransac_pred_lng))
         print('Avg. Interval (min): ' + str(intervals[place]))
         print('Sunrise / Sunset Visible Breakdown of Days: ' + str(sun_visibles[place]))
         print('')
@@ -1079,34 +1107,20 @@ for key in lats:
     density_idx = len(buckets) - 1
     ransac_idx = len(buckets) - 1
 
-    got_here1 = False  # VLI
     got_here2 = False # VLI
-    got_here3 = False  # VLI
     for bIdx, bucket in enumerate(buckets):
         if cbm_median_locations[key][0] < bucket + 10:
             median_idx = min(bIdx, median_idx)
-            got_here1 = True  # VLI
         if cbm_density_locations[key][0] < bucket + 10:
             density_idx = min(bIdx, density_idx)
             got_here2 = True # VLI
         if ransac_locations[key][0] < bucket + 10:
             ransac_idx = min(bIdx, ransac_idx)
-            got_here3 = True  # VLI
 
-    if not got_here1: # VLI
-        print('WARNING - median_idx never set.')
-        print(key)
-        print(cbm_median_locations[key][0])
-        sys.stdout.flush()
     if not got_here2: # VLI
         print('WARNING - density_idx never set.')
         print(key)
         print(cbm_density_locations[key][0])
-        sys.stdout.flush()
-    if not got_here3: # VLI
-        print('WARNING - ransac_idx never set.')
-        print(key)
-        print(ransac_locations[key][0])
         sys.stdout.flush()
 
     cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
