@@ -1118,19 +1118,27 @@ cbm_median_lat_distances = [[] for x in range(len(buckets))]
 cbm_density_lat_distances = [[] for x in range(len(buckets))]
 ransac_lat_distances = [[] for x in range(len(buckets))]
 
-for key in intervals:
+for key in lats:
+    median_idx = len(buckets)
+    density_idx = len(buckets)
+    ransac_idx = len(buckets)
+
     for bIdx, bucket in enumerate(buckets):
-        if cbm_lats[key] < bucket + 10:
-            break
+        if cbm_median_locations[key][0] <= bucket + 10:
+            median_idx = min(bIdx, median_idx)
+        if cbm_density_locations[key][0] <= bucket + 10:
+            density_idx = min(bIdx, density_idx)
+        if ransac_locations[key][0] <= bucket + 10:
+            ransac_idx = min(bIdx, ransac_idx)
 
     cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
-    cbm_median_lat_distances[bIdx].append(cbm_median_distance_err)
+    cbm_median_lat_distances[median_idx].append(cbm_median_distance_err)
 
     cbm_density_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_density_locations[key][0], cbm_density_locations[key][1])
-    cbm_density_lat_distances[bIdx].append(cbm_density_distance_err)
+    cbm_density_lat_distances[density_idx].append(cbm_density_distance_err)
 
     ransac_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], ransac_locations[key][0], ransac_locations[key][1])
-    ransac_lat_distances[bIdx].append(ransac_distance_err)
+    ransac_lat_distances[ransac_idx].append(ransac_distance_err)
 
 for bdIdx, distance_errs in enumerate(cbm_median_lat_distances):
     if len(distance_errs) > 0:
@@ -1161,19 +1169,27 @@ cbm_median_lng_distances = [[] for x in range(len(buckets))]
 cbm_density_lng_distances = [[] for x in range(len(buckets))]
 ransac_lng_distances = [[] for x in range(len(buckets))]
 
-for key in intervals:
+for key in lngs:
+    median_idx = len(buckets)
+    density_idx = len(buckets)
+    ransac_idx = len(buckets)
+
     for bIdx, bucket in enumerate(buckets):
-        if lngs[key] < bucket + 10:
-            break
+        if cbm_median_locations[key][1] <= bucket + 10:
+            median_idx = min(bIdx, median_idx)
+        if cbm_density_locations[key][1] <= bucket + 10:
+            density_idx = min(bIdx, density_idx)
+        if ransac_locations[key][1] <= bucket + 10:
+            ransac_idx = min(bIdx, ransac_idx)
 
     cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
-    cbm_median_lng_distances[bIdx].append(cbm_median_distance_err)
+    cbm_median_lng_distances[median_idx].append(cbm_median_distance_err)
 
     cbm_density_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_density_locations[key][0], cbm_density_locations[key][1])
-    cbm_density_lng_distances[bIdx].append(cbm_density_distance_err)
+    cbm_density_lng_distances[density_idx].append(cbm_density_distance_err)
 
     ransac_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], ransac_locations[key][0], ransac_locations[key][1])
-    ransac_lng_distances[bIdx].append(ransac_distance_err)
+    ransac_lng_distances[ransac_idx].append(ransac_distance_err)
 
 for bdIdx, distance_errs in enumerate(cbm_median_lng_distances):
     if len(distance_errs) > 0:
