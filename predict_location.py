@@ -1107,21 +1107,13 @@ for key in lats:
     density_idx = len(buckets) - 1
     ransac_idx = len(buckets) - 1
 
-    got_here2 = False # VLI
     for bIdx, bucket in enumerate(buckets):
         if cbm_median_locations[key][0] < bucket + 10:
             median_idx = min(bIdx, median_idx)
         if cbm_density_locations[key][0] < bucket + 10:
             density_idx = min(bIdx, density_idx)
-            got_here2 = True # VLI
         if ransac_locations[key][0] < bucket + 10:
             ransac_idx = min(bIdx, ransac_idx)
-
-    if not got_here2: # VLI
-        print('WARNING - density_idx never set.')
-        print(key)
-        print(cbm_density_locations[key][0])
-        sys.stdout.flush()
 
     cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
     cbm_median_lat_distances[median_idx].append(cbm_median_distance_err)
@@ -1205,12 +1197,12 @@ bar(buckets, cbm_median_lng_distances, 'Avg. Distance Error (km)', 'Longitude', 
 bar(buckets, cbm_density_lng_distances, 'Avg. Distance Error (km)', 'Longitude', bucket_labels, 'Avg. Error (km) Over All Locations Using Gaussian KDE vs. Longitude', 'cbm_lng_density_places.png')
 bar(buckets, ransac_lng_distances, 'Avg. Distance Error (km)', 'Longitude', bucket_labels, 'Avg. Error (km) Over All Locations Using RANSAC vs. Longitude', 'cbm_lng_ransac_places.png')
 
-for i in range(data.types['test']):
-    green = 0
-    sunrise_only = 0
-    sunset_only = 0
-    black = 0
+green = 0
+sunrise_only = 0
+sunset_only = 0
+black = 0
 
+for i in range(data.types['test']):
     if days[i].sunrise_in_frames and days[i].sunset_in_frames:
         green += 1
     elif days[i].sunrise_in_frames and not days[i].sunset_in_frames:
@@ -1220,8 +1212,8 @@ for i in range(data.types['test']):
     else:
         black += 1
 
-    print('Green / Sunrise Only / Sunset Only / Black: {}, {}, {}, {}'.format(green, sunrise_only, sunset_only, black))
-    sys.stdout.flush()
+print('Green / Sunrise Only / Sunset Only / Black: {}, {}, {}, {}'.format(green, sunrise_only, sunset_only, black))
+sys.stdout.flush()
 
 print('Brock Means Avg. Distance Error: {:.6f}'.format(statistics.mean(mean_distances)))
 print('Brock Medians Avg. Distance Error: {:.6f}'.format(statistics.mean(median_distances)))
