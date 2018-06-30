@@ -539,75 +539,6 @@ def kde(lats, lngs, median_locations):
 density_locations = kde(lats, lngs, median_locations)
 cbm_density_locations = kde(cbm_lats, lngs, cbm_median_locations)
 
-'''
-kernel_t0 = time.time()
-for key in lats:
-    if len(lats[key]) == 1:
-        density_locations[key] = (lats[key][0], lngs[key][0])
-        continue
-    elif len(lats[key]) == 2: # Points are colinear, results in singular matrix
-        density_locations[key] = (statistics.mean(lats[key]), statistics.mean(lngs[key]))
-        continue
-
-    np_lats = np.array([math.radians(x) for x in lats[key]])
-    np_lngs = np.array([math.radians(x) for x in lngs[key]])
-    possible_points = np.vstack((np_lats, np_lngs))
-
-    #finite = np.where(np.isfinite(possible_points) == False)[0].shape == (0,) # Check all values are not inf or NaN
-
-    #if finite:
-
-    kernel = KernelDensity(kernel='gaussian', bandwidth=constants.BANDWIDTH, metric='haversine').fit(possible_points.T)
-    #kernel = scipy.stats.gaussian_kde(possible_points, bw_method=None)
-
-    best_score = -float('inf')
-    best_longitude = -181
-    best_latitude = -91
-
-    min_lat = min(np_lats)
-    max_lat = max(np_lats)
-    min_lng = min(np_lngs)
-    max_lng = max(np_lngs)
-
-    latitude_search = np.linspace(min_lat, max_lat, num=1001) # Worst case pi/1000 radians (0.18 degrees) step size.
-    longitude_search = np.linspace(min_lng, max_lng, num=2001) # Worst case pi/1000 radians step size.
-    #lat_v, lng_v = np.meshgrid(latitude_search, longitude_search)
-    for i in range(latitude_search.shape[0]):
-        curr_lat = np.array([latitude_search[i]] * longitude_search.shape[0])
-        search_space = np.vstack((curr_lat, longitude_search))
-
-        density = kernel.score_samples(search_space.T)
-        #density = kernel(search_space)
-
-        ind = np.argmax(density, axis=None)
-
-        if best_score < density[ind]:
-            best_score = density[ind]
-            best_longitude = math.degrees(longitude_search[ind])
-            best_latitude = math.degrees(latitude_search[i])
-
-        del curr_lat
-        del search_space
-        del density
-
-    del latitude_search
-    del longitude_search
-
-    density_locations[key] = (best_latitude, best_longitude)
-    #else:
-    #    density_locations[key] = None
-    #    print('WARNING - NaN or inf found at ' + key)
-    #    print(possible_points)
-    #    lats_valid = [math.isnan(lat) or math.isinf(lat) for lat in latitudes]
-    #    lngs_valid = [math.isnan(lng) or math.isinf(lng) for lng in longitudes]
-    #    print(False in lats_valid)
-    #    print(False in lngs_valid)
-    #    sys.stdout.flush()
-kernel_t1 = time.time()
-print('Calculating density time (h): ' + str((kernel_t1 - kernel_t0) / 3600))
-sys.stdout.flush()
-'''
-
 actual_locations = {}
 for i in range(data.types['test']):
     if actual_locations.get(days[i].place) is None:
@@ -1148,20 +1079,34 @@ for key in lats:
     density_idx = len(buckets) - 1
     ransac_idx = len(buckets) - 1
 
-    got_here = False # VLI
+    got_here1 = False  # VLI
+    got_here2 = False # VLI
+    got_here3 = False  # VLI
     for bIdx, bucket in enumerate(buckets):
         if cbm_median_locations[key][0] < bucket + 10:
             median_idx = min(bIdx, median_idx)
+            got_here1 = True  # VLI
         if cbm_density_locations[key][0] < bucket + 10:
             density_idx = min(bIdx, density_idx)
-            got_here = True # VLI
+            got_here2 = True # VLI
         if ransac_locations[key][0] < bucket + 10:
             ransac_idx = min(bIdx, ransac_idx)
+            got_here3 = True  # VLI
 
-    if not got_here: # VLI
+    if not got_here1: # VLI
+        print('WARNING - median_idx never set.')
+        print(key)
+        print(cbm_median_locations[key][0])
+        sys.stdout.flush()
+    if not got_here2: # VLI
         print('WARNING - density_idx never set.')
         print(key)
         print(cbm_density_locations[key][0])
+        sys.stdout.flush()
+    if not got_here3: # VLI
+        print('WARNING - ransac_idx never set.')
+        print(key)
+        print(ransac_locations[key][0])
         sys.stdout.flush()
 
     cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
