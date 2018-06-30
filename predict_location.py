@@ -721,15 +721,20 @@ def compute_haversine_distance(lat1, lng1, lat2, lng2): # kilometers
 
     return distance
 
-def compute_distance(lat1, lng1, lat2, lng2): # km
+def compute_distance(lat1, lng1, lat2, lng2):  # km
+    if lng1 == -180:  #
+        lng1 = 180  #
+
     lat1_rad = math.radians(lat1)
     lat2_rad = math.radians(lat2)
+    lng1_rad = math.radians(lng1)  #
+    lng2_rad = math.radians(lng2)  #
 
-    a = 6378.137 # km
-    b = 6356.752314245 # km
+    a = 6378.137  # km
+    b = 6356.752314245  # km
     f = 1 / 298.257223563
 
-    L = math.radians(lng2 - lng1)
+    L = lng2_rad - lng1_rad  # math.radians(lng2 - lng1) #
 
     tanU1 = (1 - f) * math.tan(lat1_rad)
     cosU1 = 1 / math.sqrt((1 + tanU1 * tanU1))
@@ -740,39 +745,59 @@ def compute_distance(lat1, lng1, lat2, lng2): # km
 
     lamb = L
     iterations = 0
+    antimeridian = math.fabs(L) > math.pi
 
     while True:
         sin_lambda = math.sin(lamb)
         cos_lambda = math.cos(lamb)
 
         sin_sigma = math.sqrt(math.pow(cosU2 * sin_lambda, 2) + math.pow(cosU1 * sinU2 - sinU1 * cosU2 * cos_lambda, 2))
+
+        if sin_sigma == 0:  #
+            iterations += 1001  # coincident points #
+
         cos_sigma = sinU1 * sinU2 + cosU1 * cosU2 * cos_lambda
-        sigma = math.atan(sin_sigma / cos_sigma)
+        sigma = math.atan2(sin_sigma, cos_sigma)  #
 
         sin_alpha = cosU1 * cosU2 * sin_lambda / sin_sigma
         cos_sq_alpha = 1 - math.pow(sin_alpha, 2)
-        cos_2_sigma_m = cos_sigma - 2 * sinU1 * sinU2 / cos_sq_alpha
+
+        if cos_sq_alpha != 0:  #
+            cos_2_sigma_m = cos_sigma - 2 * sinU1 * sinU2 / cos_sq_alpha  #
+        else:  # Equatorial line #
+            cos_2_sigma_m = 0  #
+
         C = f / 16 * cos_sq_alpha * (4 + f * (4 - 3 * cos_sq_alpha))
-        new_lamb = L + (1 - C) * f * sin_alpha * (sigma + C * sin_sigma * (cos_2_sigma_m + C * cos_sigma * (-1 + 2 * math.pow(cos_2_sigma_m, 2))))
+        new_lamb = L + (1 - C) * f * sin_alpha * (
+                    sigma + C * sin_sigma * (cos_2_sigma_m + C * cos_sigma * (-1 + 2 * math.pow(cos_2_sigma_m, 2))))
+
+        if antimeridian:  #
+            iteration_check = math.fabs(new_lamb) - math.pi  #
+        else:  #
+            iteration_check = math.fabs(new_lamb)  #
+
+        if iteration_check > math.pi:  #
+            iterations += 1001  #
+
+        if iterations > 1000:
+            print('WARNING - Vincenty distance did not converge.')
+            sys.stdout.flush()
+
+            return compute_haversine_distance(lat1, lng1, lat2, lng2)  # Use haversine distance if it doesn't converge.
 
         if math.fabs(new_lamb - lamb) < 1e-12:
             u_sq = cos_sq_alpha * (a * a - b * b) / (b * b)
             A = 1 + u_sq / 16384 * (4096 + u_sq * (-768 + u_sq * (320 - 175 * u_sq)))
             B = u_sq / 1024 * (256 + u_sq * (-128 + u_sq * (74 - 47 * u_sq)))
-            delta_sigma = B * sin_sigma * (cos_2_sigma_m + 1 / 4 * B * (cos_sigma * (-1 + 2 * math.pow(cos_2_sigma_m, 2)) - B / 6 * cos_2_sigma_m * (-3 + 4 * math.pow(sin_sigma, 2)) * (-3 + 4 * math.pow(cos_2_sigma_m, 2)) ))
+            delta_sigma = B * sin_sigma * (cos_2_sigma_m + 1 / 4 * B * (
+                        cos_sigma * (-1 + 2 * math.pow(cos_2_sigma_m, 2)) - B / 6 * cos_2_sigma_m * (
+                            -3 + 4 * math.pow(sin_sigma, 2)) * (-3 + 4 * math.pow(cos_2_sigma_m, 2))))
             s = b * A * (sigma - delta_sigma)
 
             return s
 
         iterations += 1
         lamb = new_lamb
-
-        if iterations > 1000:
-            print('WARNING - Vincenty distance did not converge.')
-            sys.stdout.flush()
-
-            return compute_haversine_distance(lat1, lng1, lat2, lng2) # Use haversine distance if it doesn't converge.
-
 
 #finished_places = []
 days_used = []
@@ -1119,17 +1144,25 @@ cbm_density_lat_distances = [[] for x in range(len(buckets))]
 ransac_lat_distances = [[] for x in range(len(buckets))]
 
 for key in lats:
-    median_idx = len(buckets)
-    density_idx = len(buckets)
-    ransac_idx = len(buckets)
+    median_idx = len(buckets) - 1
+    density_idx = len(buckets) - 1
+    ransac_idx = len(buckets) - 1
 
+    got_here = False # VLI
     for bIdx, bucket in enumerate(buckets):
-        if cbm_median_locations[key][0] <= bucket + 10:
+        if cbm_median_locations[key][0] < bucket + 10:
             median_idx = min(bIdx, median_idx)
-        if cbm_density_locations[key][0] <= bucket + 10:
+        if cbm_density_locations[key][0] < bucket + 10:
             density_idx = min(bIdx, density_idx)
-        if ransac_locations[key][0] <= bucket + 10:
+            got_here = True # VLI
+        if ransac_locations[key][0] < bucket + 10:
             ransac_idx = min(bIdx, ransac_idx)
+
+    if not got_here: # VLI
+        print('WARNING - density_idx never set.')
+        print(key)
+        print(cbm_density_locations[key][0])
+        sys.stdout.flush()
 
     cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
     cbm_median_lat_distances[median_idx].append(cbm_median_distance_err)
@@ -1170,16 +1203,16 @@ cbm_density_lng_distances = [[] for x in range(len(buckets))]
 ransac_lng_distances = [[] for x in range(len(buckets))]
 
 for key in lngs:
-    median_idx = len(buckets)
-    density_idx = len(buckets)
-    ransac_idx = len(buckets)
+    median_idx = len(buckets) - 1
+    density_idx = len(buckets) - 1
+    ransac_idx = len(buckets) - 1
 
     for bIdx, bucket in enumerate(buckets):
-        if cbm_median_locations[key][1] <= bucket + 10:
+        if cbm_median_locations[key][1] <= bucket + 20:
             median_idx = min(bIdx, median_idx)
-        if cbm_density_locations[key][1] <= bucket + 10:
+        if cbm_density_locations[key][1] <= bucket + 20:
             density_idx = min(bIdx, density_idx)
-        if ransac_locations[key][1] <= bucket + 10:
+        if ransac_locations[key][1] <= bucket + 20:
             ransac_idx = min(bIdx, ransac_idx)
 
     cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
