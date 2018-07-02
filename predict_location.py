@@ -773,6 +773,8 @@ cbm_median_latitude_err = []
 cbm_density_latitude_err = []
 
 ransac_distances = []
+ransac_longitude_err = []
+ransac_latitude_err = []
 
 #for i in range(data.types['test']):
 for place in lats:
@@ -832,6 +834,8 @@ for place in lats:
 
     ransac_distance = compute_distance(actual_lat, actual_lng, ransac_pred_lat, ransac_pred_lng)
     ransac_distances.append(ransac_distance)
+    ransac_latitude_err.append(compute_distance(actual_lat, actual_lng, ransac_pred_lat, actual_lng))
+    ransac_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, ransac_pred_lng))
 
     if random.randint(1, 100) < 101:
         if median_distance < 25 or density_distance < 25 or ransac_distance < 25:
@@ -1250,15 +1254,19 @@ print('')
 print('Means Avg. Longitude Error: {:.6f}'.format(statistics.mean(mean_longitude_err)))
 print('Medians Avg. Longitude Error: {:.6f}'.format(statistics.mean(median_longitude_err)))
 print('Density Avg. Longitude Error: {:.6f}'.format(statistics.mean(density_longitude_err)))
+print('RANSAC Avg. Longitude Error: {:.6f}'.format(statistics.mean(ransac_longitude_err)))
 print('Means Median Longitude Error: {:.6f}'.format(statistics.median(mean_longitude_err)))
 print('Medians Median Longitude Error: {:.6f}'.format(statistics.median(median_longitude_err)))
 print('Density Median Longitude Error: {:.6f}'.format(statistics.median(density_longitude_err)))
+print('RANSAC Median Longitude Error: {:.6f}'.format(statistics.median(ransac_longitude_err)))
 print('Means Max Longitude Error: {:.6f}'.format(max(mean_longitude_err)))
 print('Means Min Longitude Error: {:.6f}'.format(min(mean_longitude_err)))
 print('Medians Max Longitude Error: {:.6f}'.format(max(median_longitude_err)))
 print('Medians Min Longitude Error: {:.6f}'.format(min(median_longitude_err)))
 print('Density Max Longitude Error: {:.6f}'.format(max(density_longitude_err)))
 print('Density Min Longitude Error: {:.6f}'.format(min(density_longitude_err)))
+print('RANSAC Max Longitude Error: {:.6f}'.format(max(ransac_longitude_err)))
+print('RANSAC Min Longitude Error: {:.6f}'.format(min(ransac_longitude_err)))
 print('')
 print('Brock Means Avg. Latitude Error: {:.6f}'.format(statistics.mean(mean_latitude_err)))
 print('Brock Medians Avg. Latitude Error: {:.6f}'.format(statistics.mean(median_latitude_err)))
@@ -1276,14 +1284,18 @@ print('')
 print('CBM Means Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_mean_latitude_err)))
 print('CBM Medians Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_median_latitude_err)))
 print('CBM Density Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_density_latitude_err)))
+print('RANSAC Avg. Latitude Error: {:.6f}'.format(statistics.mean(ransac_latitude_err)))
 print('CBM Means Median Latitude Error: {:.6f}'.format(statistics.median(cbm_mean_latitude_err)))
 print('CBM Medians Median Latitude Error: {:.6f}'.format(statistics.median(cbm_median_latitude_err)))
 print('CBM Density Median Latitude Error: {:.6f}'.format(statistics.median(cbm_density_latitude_err)))
+print('RANSAC Median Latitude Error: {:.6f}'.format(statistics.median(ransac_latitude_err)))
 print('CBM Means Max Latitude Error: {:.6f}'.format(max(cbm_mean_latitude_err)))
 print('CBM Means Min Latitude Error: {:.6f}'.format(min(cbm_mean_latitude_err)))
 print('CBM Medians Max Latitude Error: {:.6f}'.format(max(cbm_median_latitude_err)))
 print('CBM Medians Min Latitude Error: {:.6f}'.format(min(cbm_median_latitude_err)))
 print('CBM Density Max Latitude Error: {:.6f}'.format(max(cbm_density_latitude_err)))
 print('CBM Density Min Latitude Error: {:.6f}'.format(min(cbm_density_latitude_err)))
+print('RANSAC Max Longitude Error: {:.6f}'.format(max(ransac_latitude_err)))
+print('RANSAC Min Longitude Error: {:.6f}'.format(min(ransac_latitude_err)))
 print('')
 sys.stdout.flush()
