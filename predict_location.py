@@ -630,7 +630,7 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, mo
 
         actual_and_pred_lngs = [actual_lng] + [mean_locations[place][1]] + [median_locations[place][1]] + [density_locations[place][1]] + [ransac_locations[place][1]]
         actual_and_pred_lats = [actual_lat] + [mean_locations[place][0]] + [median_locations[place][0]] + [density_locations[place][0]] + [ransac_locations[place][0]]
-        actual_and_pred_colors = ['w', 'm', 'c', mcolors.CSS4_COLORS['fuchsia'], mcolors.CSS4_COLORS['yellowgreen']]
+        actual_and_pred_colors = ['w', 'm', 'c', mcolors.CSS4_COLORS['fuchsia'], 'xkcd:chartreuse']
 
         guesses = map.scatter(lngs[place], lats[place], s=40, c=colors, latlon=True, zorder=10)
         actual_and_pred = map.scatter(actual_and_pred_lngs, actual_and_pred_lats, s=40, c=actual_and_pred_colors, latlon=True, zorder=10, marker='^')
@@ -639,14 +639,14 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, mo
 
         if mode == 'sun':
             guess_colors = ['g', 'r', mcolors.CSS4_COLORS['crimson'], 'k']
-            legend_labels = ['sunrise and sunset in frames', 'sunrise not in frames', 'sunset not in frames', 'sunrise and sunset not in frames', 'actual location', 'mean', 'median', 'gaussian kde']
+            legend_labels = ['sunrise and sunset in frames', 'sunrise not in frames', 'sunset not in frames', 'sunrise and sunset not in frames', 'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC']
 
             handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in guess_colors] + \
                          [plt.plot([], marker="^", ls="", color=color)[0] for color in actual_and_pred_colors]
         elif mode == 'season':
             guess_colors = ['b', 'y', 'r', mcolors.CSS4_COLORS['tan']]
-            legend_labels = ['winter', 'spring', 'summer', 'fall'
-                             'actual location', 'mean', 'median', 'gaussian kde']
+            legend_labels = ['winter', 'spring', 'summer', 'fall',
+                             'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC']
             handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in guess_colors] + \
                          [plt.plot([], marker="^", ls="", color=color)[0] for color in actual_and_pred_colors]
 
@@ -895,7 +895,7 @@ scatter(days_used, density_distances, None, 'gaussian kde', color=mcolors.CSS4_C
 scatter(days_used, cbm_mean_distances, 'mo', 'mean', cbm=True)
 scatter(days_used, cbm_median_distances, 'co', 'median', cbm=True)
 scatter(days_used, cbm_density_distances, None, 'gaussian kde', color=mcolors.CSS4_COLORS['fuchsia'], linestyle='None', marker='o', cbm=True)
-scatter(days_used, ransac_distances, None, 'RANSAC', color=mcolors.CSS4_COLORS['yellowgreen'], linestyle='None', marker='o', cbm=True)
+scatter(days_used, ransac_distances, None, 'RANSAC', color='xkcd:chartreuse', linestyle='None', marker='o', cbm=True)
 
 def bar(x, y, xlabel, ylabel, x_labels, title, filename):
     plt.figure(figsize=(24, 12))
