@@ -407,8 +407,9 @@ def ransac(data):
         max_inliers = -1
         max_idx = -1
         for i_idx, inlier in enumerate(inliers):
-            max_inliers = max(max_inliers, len(inlier))
-            max_idx = i_idx
+            if len(inlier) > max_inliers:
+                max_idx = i_idx
+                max_inliers = len(inlier)
 
         ransacs[place] = statistics.mean(inliers[max_idx])
 
