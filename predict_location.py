@@ -500,10 +500,10 @@ def kde(lats, lngs, median_locations):
         max_lng = max(np_lngs)
 
         bnds = ((min_lat, max_lat), (min_lng, max_lng))
-        res = minimize(kde_func_to_minimize, np.asarray(median_locations[key]), args=(kernel,), method='L-BFGS-B', bounds=bnds)
+        res = minimize(kde_func_to_minimize, np.asarray([math.radians(x) for x in median_locations[key]]), args=(kernel,), method='SLSQP', bounds=bnds)
 
         if res.success:
-            density_locations[key] = (res.x[0], res.x[1])
+            density_locations[key] = (math.degrees(res.x[0]), math.degrees(res.x[1]))
         else:
             #print('WARNING - scipy minimize function failed on location ' + key)
             #sys.stdout.flush()
@@ -1213,6 +1213,7 @@ for i in range(data.types['test']):
         black += 1
 
 print('Green / Sunrise Only / Sunset Only / Black: {}, {}, {}, {}'.format(green, sunrise_only, sunset_only, black))
+print('')
 sys.stdout.flush()
 
 print('Brock Means Avg. Distance Error: {:.6f}'.format(statistics.mean(mean_distances)))
@@ -1231,15 +1232,19 @@ print('')
 print('CBM Means Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_mean_distances)))
 print('CBM Medians Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_median_distances)))
 print('CBM Density Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_density_distances)))
+print('RANSAC Avg. Distance Error: {:.6f}'.format(statistics.mean(ransac_distances)))
 print('CBM Means Median Distance Error: {:.6f}'.format(statistics.median(cbm_mean_distances)))
 print('CBM Medians Median Distance Error: {:.6f}'.format(statistics.median(cbm_median_distances)))
 print('CBM Density Median Distance Error: {:.6f}'.format(statistics.median(cbm_density_distances)))
+print('RANSAC Median Distance Error: {:.6f}'.format(statistics.median(ransac_distances)))
 print('CBM Means Max Distance Error: {:.6f}'.format(max(cbm_mean_distances)))
 print('CBM Means Min Distance Error: {:.6f}'.format(min(cbm_mean_distances)))
 print('CBM Medians Max Distance Error: {:.6f}'.format(max(cbm_median_distances)))
 print('CBM Medians Min Distance Error: {:.6f}'.format(min(cbm_median_distances)))
 print('CBM Density Max Distance Error: {:.6f}'.format(max(cbm_density_distances)))
 print('CBM Density Min Distance Error: {:.6f}'.format(min(cbm_density_distances)))
+print('RANSAC Max Distance Error: {:.6f}'.format(max(ransac_distances)))
+print('RANSAC Min Distance Error: {:.6f}'.format(min(ransac_distances)))
 print('')
 print('Means Avg. Longitude Error: {:.6f}'.format(statistics.mean(mean_longitude_err)))
 print('Medians Avg. Longitude Error: {:.6f}'.format(statistics.mean(median_longitude_err)))
