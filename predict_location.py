@@ -500,10 +500,12 @@ def kde(lats, lngs, median_locations):
         max_lng = max(np_lngs)
 
         bnds = ((min_lat, max_lat), (min_lng, max_lng))
-        res = minimize(kde_func_to_minimize, np.asarray([math.radians(x) for x in median_locations[key]]), args=(kernel,), method='SLSQP', bounds=bnds)
+        res = minimize(kde_func_to_minimize, np.asarray([math.radians(x) for x in median_locations[key]]), args=(kernel,), method='L-BFGS-B', bounds=bnds, options={'maxiter':150})
 
         if res.success:
-            density_locations[key] = (math.degrees(res.x[0]), math.degrees(res.x[1]))
+            #density_locations[key] = (math.degrees(res.x[0]), math.degrees(res.x[1]))
+            best_latitude = math.degrees(res.x[0])
+            best_longitude = math.degrees(res.x[1])
         else:
             #print('WARNING - scipy minimize function failed on location ' + key)
             #sys.stdout.flush()
@@ -532,17 +534,6 @@ def kde(lats, lngs, median_locations):
                     best_longitude = math.degrees(longitude_search[ind])
                     best_latitude = math.degrees(latitude_search[i])
 
-                    if best_longitude > 180 or best_longitude < -180:
-                        print('WARNING - KDE returns out of bound longitude.')
-                        print(key)
-                        print(best_longitude)
-                    if best_latitude > 90 or best_latitude < -90:
-                        print('WARNING - KDE returns out of bound latitude.')
-                        print(key)
-                        print(best_latitude)
-                    sys.stdout.flush()
-
-
                 del curr_lat
                 del search_space
                 del density
@@ -550,7 +541,17 @@ def kde(lats, lngs, median_locations):
             del latitude_search
             del longitude_search
 
-            density_locations[key] = (best_latitude, best_longitude)
+        if best_longitude > 180 or best_longitude < -180:
+            print('WARNING - KDE returns out of bound longitude.')
+            print(key)
+            print(best_longitude)
+        if best_latitude > 90 or best_latitude < -90:
+            print('WARNING - KDE returns out of bound latitude.')
+            print(key)
+            print(best_latitude)
+        sys.stdout.flush()
+
+        density_locations[key] = (best_latitude, best_longitude)
 
     kernel_t1 = time.time()
     print('Calculating density time (m): ' + str((kernel_t1 - kernel_t0) / 60))
