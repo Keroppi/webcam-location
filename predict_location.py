@@ -390,18 +390,18 @@ for i in range(data.types['test']):
         lngs[days[i].place] = []
     lngs[days[i].place].append(longitudes[i])
 
-def ransac(data):
+def ransac(lats, lngs):
     ransacs = {}
 
-    for place in data:
-        guesses = data[place]
+    for place in lats:
+        guesses = list(zip(lats[place], lngs[place]))
 
         inliers = [[] for x in range(len(guesses))]
         for g_idx1, guess1 in enumerate(guesses):
             inliers[g_idx1].append(guess1)
 
             for g_idx2, guess2 in enumerate(guesses[:g_idx1] + guesses[g_idx1 + 1:]):
-                if math.fabs(guess1 - guess2) < constants.INLIER_THRESHOLD:
+                if compute_distance(guess1[0], guess1[1], guess2[0], guess2[1]) < constants.INLIER_THRESHOLD:
                     inliers[g_idx1].append(guess2)
 
         max_inliers = -1
@@ -411,16 +411,11 @@ def ransac(data):
                 max_idx = i_idx
                 max_inliers = len(inlier)
 
-        ransacs[place] = statistics.mean(inliers[max_idx])
+        ransacs[place] = (statistics.mean([x[0] for x in inliers[max_idx]]), statistics.mean([x[1] for x in inliers[max_idx]]))
 
     return ransacs
 
-ransac_lats = ransac(cbm_lats)
-ransac_lngs = ransac(lngs)
-ransac_locations = {}
-
-for place in ransac_lats:
-    ransac_locations[place] = (ransac_lats[place], ransac_lngs[place])
+ransac_locations = ransac(cbm_lats, lngs)
 
 # Collect intervals of each place.
 intervals = {}
@@ -1208,6 +1203,8 @@ sunrise_only = 0
 sunset_only = 0
 black = 0
 
+avg_interval = 0
+
 for i in range(data.types['test']):
     if days[i].sunrise_in_frames and days[i].sunset_in_frames:
         green += 1
@@ -1218,8 +1215,11 @@ for i in range(data.types['test']):
     else:
         black += 1
 
+    avg_interval += days[i].interval_min
+
 print('Green / Sunrise Only / Sunset Only / Black: {}, {}, {}, {}'.format(green, sunrise_only, sunset_only, black))
 print('')
+print('Average Interval (min): ' + str(avg_interval / len(test_loader.dataset)))
 sys.stdout.flush()
 
 print('Brock Means Avg. Distance Error: {:.6f}'.format(statistics.mean(mean_distances)))
