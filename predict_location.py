@@ -322,6 +322,15 @@ for d_idx, day_length in enumerate(day_lengths):
     # CBM Model
     cbm_lat = cbm(day_of_year, day_length_hours)
 
+    # Check if they're in different (north / south) hemispheres.
+    if (cbm_lat > 0 and days[d_idx].lat < 0) or (cbm_lat < 0 and days[d_idx].lat > 0):
+        theta = 0.2163108 + 2 * math.atan(0.9671396 * math.tan(0.00860 * (day_of_year - 186)))
+        phi = math.asin(0.39795 * math.cos(theta))
+        denominator = math.sin(phi)
+        print('WARNING - Different hemispheres')
+        print(days[d_idx].place)
+        print('Denominator value: ' + str(denominator))
+
     '''
     if random.randint(1, 100) < 5: 
         print('Lat')
@@ -426,7 +435,7 @@ for i in range(data.types['test']):
 
 # Average intervals for each place.
 for key in intervals:
-    intervals[key] = statistics.mean(intervals[key])
+    intervals[key] = statistics.median(intervals[key])
 
 # Collect breakdown of sunrise / sunset visible.
 sun_visibles = {}
@@ -834,7 +843,8 @@ for place in lats:
     ransac_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, ransac_pred_lng))
 
     if random.randint(1, 100) < 101:
-        if median_distance < 25 or density_distance < 25 or ransac_distance < 25:
+        if median_distance < 25 or density_distance < 25 or ransac_distance < 25 or \
+           cbm_median_distance < 25 or cbm_density_distance < 25:
             print('Under 25km!')
 
         print(place)
@@ -858,7 +868,7 @@ for place in lats:
         print('Median lat, lng: ' + str(cbm_median_pred_lat) + ', ' + str(cbm_median_pred_lng))
         print('Density lat, lng: ' + str(cbm_density_pred_lat) + ', ' + str(cbm_density_pred_lng))
         print('RANSAC lat, lng: ' + str(ransac_pred_lat) + ', ' + str(ransac_pred_lng))
-        print('Avg. Interval (min): ' + str(intervals[place]))
+        print('Median Interval (min): ' + str(intervals[place]))
         print('Sunrise / Sunset Visible Breakdown of Days: ' + str(sun_visibles[place]))
         print('')
         sys.stdout.flush()
@@ -866,12 +876,28 @@ for place in lats:
 # Plot Error vs Days Used
 def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker=None, cbm=False):
     plt.figure(figsize=(24,12))
+
+    days_used_means = {}
+    for d_idx, days in enumerate(days_used):
+
+        if days not in days_used_means:
+            days_used_means[days] = [0, 0]
+
+        days_used_means[days][0] += distances[d_idx]
+        days_used_means[days][1] += 1
+
+    for days in days_used_means:
+        days_used_means[days] = days_used_means[days][0] / days_used_means[days][1]
+
     if fmt is not None:
         days_err, = plt.plot(days_used, distances, fmt, markersize=3, label=label)
     else:
-        days_err, = plt.plot(days_used, distances, color=color, linestyle=linestyle, marker=marker, markersize=3, label='gaussian kde')
+        days_err, = plt.plot(days_used, distances, color=color, linestyle=linestyle, marker=marker, markersize=3, label=label)
 
-    plt.legend(handles=[days_err])
+    means_err, = plt.plot(list(days_used_means.keys()), list(days_used_means.values()), color='k', linestyle='-',
+                          marker='^', markersize=9, label='Trend')
+
+    plt.legend(handles=[days_err, means_err])
     plt.xlabel('# Days Used')
     plt.ylabel('Avg. Error (km)')
     plt.title('Avg. Error (km) Using ' + label[0].upper() + label[1:] + ' vs. # Days Used')
@@ -893,7 +919,7 @@ scatter(days_used, cbm_median_distances, 'co', 'median', cbm=True)
 scatter(days_used, cbm_density_distances, None, 'gaussian kde', color=mcolors.CSS4_COLORS['fuchsia'], linestyle='None', marker='o', cbm=True)
 scatter(days_used, ransac_distances, None, 'RANSAC', color='xkcd:chartreuse', linestyle='None', marker='o', cbm=True)
 
-def bar(x, y, xlabel, ylabel, x_labels, title, filename):
+def bar(x, y, ylabel, xlabel, x_labels, title, filename):
     plt.figure(figsize=(24, 12))
     x = np.arange(len(x))
     #y = bucket_distances
@@ -927,18 +953,18 @@ for i in range(data.types['test']):
 
 for bdIdx, distance_errs in enumerate(bucket_distances):
     if len(distance_errs) > 0:
-        bucket_distances[bdIdx] = statistics.mean(distance_errs)
+        bucket_distances[bdIdx] = statistics.median(distance_errs)
     else:
         bucket_distances[bdIdx] = 0
 
 for bdIdx, distance_errs in enumerate(cbm_bucket_distances):
     if len(distance_errs) > 0:
-        cbm_bucket_distances[bdIdx] = statistics.mean(distance_errs)
+        cbm_bucket_distances[bdIdx] = statistics.median(distance_errs)
     else:
         cbm_bucket_distances[bdIdx] = 0
 
-bar(buckets, bucket_distances, 'Avg. Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Avg. Error (km) Over All Days vs. Photo Interval (min)', 'interval.png')
-bar(buckets, cbm_bucket_distances, 'Avg. Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Avg. Error (km) Over All Days vs. Photo Interval (min)', 'cbm_interval.png')
+bar(buckets, bucket_distances, 'Median Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Median Error (km) Over All Days vs. Photo Interval (min)', 'interval.png')
+bar(buckets, cbm_bucket_distances, 'Median Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Median Error (km) Over All Days vs. Photo Interval (min)', 'cbm_interval.png')
 
 # Plot average distance error vs. sunrise, sunset available over ALL DAYS.
 sun_type_labels = ['Both', 'Sunrise Only', 'Sunset Only', 'Neither']
@@ -963,18 +989,18 @@ for i in range(data.types['test']):
 
 for sIdx, distance_errs in enumerate(sun_type_distances):
     if len(distance_errs) > 0:
-        sun_type_distances[sIdx] = statistics.mean(distance_errs)
+        sun_type_distances[sIdx] = statistics.median(distance_errs)
     else:
         sun_type_distances[sIdx] = 0
 
 for sIdx, distance_errs in enumerate(cbm_sun_type_distances):
     if len(distance_errs) > 0:
-        cbm_sun_type_distances[sIdx] = statistics.mean(distance_errs)
+        cbm_sun_type_distances[sIdx] = statistics.median(distance_errs)
     else:
         cbm_sun_type_distances[sIdx] = 0
 
-bar(sun_type_labels, sun_type_distances, 'Avg. Distance Error (km)', 'Sunrise and sunset in frame?', sun_type_labels, 'Avg. Error (km) Over All Days vs. Sunrise / Sunset In Frame', 'sun_in_frame.png')
-bar(sun_type_labels, cbm_sun_type_distances, 'Avg. Distance Error (km)', 'Sunrise and sunset in frame?', sun_type_labels, 'Avg. Error (km) Over All Days vs. Sunrise / Sunset In Frame', 'cbm_sun_in_frame.png')
+bar(sun_type_labels, sun_type_distances, 'Median Distance Error (km)', 'Sunrise and sunset in frame?', sun_type_labels, 'Median Error (km) Over All Days vs. Sunrise / Sunset In Frame', 'sun_in_frame.png')
+bar(sun_type_labels, cbm_sun_type_distances, 'Median Distance Error (km)', 'Sunrise and sunset in frame?', sun_type_labels, 'Median Error (km) Over All Days vs. Sunrise / Sunset In Frame', 'cbm_sun_in_frame.png')
 
 # Plot average distance error vs. season over ALL DAYS.
 season_labels = ['Winter', 'Spring', 'Summer', 'Fall']
@@ -999,18 +1025,18 @@ for i in range(data.types['test']):
 
 for sIdx, distance_errs in enumerate(season_distances):
     if len(distance_errs) > 0:
-        season_distances[sIdx] = statistics.mean(distance_errs)
+        season_distances[sIdx] = statistics.median(distance_errs)
     else:
         season_distances[sIdx] = 0
 
 for sIdx, distance_errs in enumerate(cbm_season_distances):
     if len(distance_errs) > 0:
-        cbm_season_distances[sIdx] = statistics.mean(distance_errs)
+        cbm_season_distances[sIdx] = statistics.median(distance_errs)
     else:
         cbm_season_distances[sIdx] = 0
 
-bar(season_labels, season_distances, 'Avg. Distance Error (km)', 'Season', season_labels, 'Avg. Error (km) Over All Days vs. Season', 'season.png')
-bar(season_labels, cbm_season_distances, 'Avg. Distance Error (km)', 'Season', season_labels, 'Avg. Error (km) Over All Days vs. Season', 'cbm_season.png')
+bar(season_labels, season_distances, 'Median Distance Error (km)', 'Season', season_labels, 'Median Error (km) Over All Days vs. Season', 'season.png')
+bar(season_labels, cbm_season_distances, 'Median Distance Error (km)', 'Season', season_labels, 'Median Error (km) Over All Days vs. Season', 'cbm_season.png')
 
 # Plot average distance error vs. intervals over ALL PLACES.
 # Only using CBM model for now.
@@ -1033,25 +1059,25 @@ for key in intervals:
 
 for bdIdx, distance_errs in enumerate(cbm_median_bucket_distances):
     if len(distance_errs) > 0:
-        cbm_median_bucket_distances[bdIdx] = statistics.mean(distance_errs)
+        cbm_median_bucket_distances[bdIdx] = statistics.median(distance_errs)
     else:
         cbm_median_bucket_distances[bdIdx] = 0
 
 for bdIdx, distance_errs in enumerate(cbm_density_bucket_distances):
     if len(distance_errs) > 0:
-        cbm_density_bucket_distances[bdIdx] = statistics.mean(distance_errs)
+        cbm_density_bucket_distances[bdIdx] = statistics.median(distance_errs)
     else:
         cbm_density_bucket_distances[bdIdx] = 0
 
 for bdIdx, distance_errs in enumerate(ransac_bucket_distances):
     if len(distance_errs) > 0:
-        ransac_bucket_distances[bdIdx] = statistics.mean(distance_errs)
+        ransac_bucket_distances[bdIdx] = statistics.median(distance_errs)
     else:
         ransac_bucket_distances[bdIdx] = 0
 
-bar(buckets, cbm_median_bucket_distances, 'Avg. Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Avg. Error (km) Over All Locations Using Median vs. Photo Interval (min)', 'cbm_interval_median_places.png')
-bar(buckets, cbm_density_bucket_distances, 'Avg. Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Avg. Error (km) Over All Locations Using Gaussian KDE vs. Photo Interval (min)', 'cbm_interval_density_places.png')
-bar(buckets, ransac_bucket_distances, 'Avg. Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Avg. Error (km) Over All Locations Using RANSAC vs. Photo Interval (min)', 'cbm_interval_ransac_places.png')
+bar(buckets, cbm_median_bucket_distances, 'Median Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Median Error (km) Over All Locations Using Median vs. Photo Interval (min)', 'cbm_interval_median_places.png')
+bar(buckets, cbm_density_bucket_distances, 'Median Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Median Error (km) Over All Locations Using Gaussian KDE vs. Photo Interval (min)', 'cbm_interval_density_places.png')
+bar(buckets, ransac_bucket_distances, 'Median Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Median Error (km) Over All Locations Using RANSAC vs. Photo Interval (min)', 'cbm_interval_ransac_places.png')
 
 # Plot average distance error vs. percentage of days with sunrise and sunset visible over ALL PLACES.
 # Only using CBM model for now.
@@ -1127,25 +1153,25 @@ for key in lats:
 
 for bdIdx, distance_errs in enumerate(cbm_median_lat_distances):
     if len(distance_errs) > 0:
-        cbm_median_lat_distances[bdIdx] = statistics.mean(distance_errs)
+        cbm_median_lat_distances[bdIdx] = statistics.median(distance_errs)
     else:
         cbm_median_lat_distances[bdIdx] = 0
 
 for bdIdx, distance_errs in enumerate(cbm_density_lat_distances):
     if len(distance_errs) > 0:
-        cbm_density_lat_distances[bdIdx] = statistics.mean(distance_errs)
+        cbm_density_lat_distances[bdIdx] = statistics.median(distance_errs)
     else:
         cbm_density_lat_distances[bdIdx] = 0
 
 for bdIdx, distance_errs in enumerate(ransac_lat_distances):
     if len(distance_errs) > 0:
-        ransac_lat_distances[bdIdx] = statistics.mean(distance_errs)
+        ransac_lat_distances[bdIdx] = statistics.median(distance_errs)
     else:
         ransac_lat_distances[bdIdx] = 0
 
-bar(buckets, cbm_median_lat_distances, 'Avg. Distance Error (km)', 'Latitude', bucket_labels, 'Avg. Error (km) Over All Locations Using Median vs. Latitude', 'cbm_lat_median_places.png')
-bar(buckets, cbm_density_lat_distances, 'Avg. Distance Error (km)', 'Latitude', bucket_labels, 'Avg. Error (km) Over All Locations Using Gaussian KDE vs. Latitude', 'cbm_lat_density_places.png')
-bar(buckets, ransac_lat_distances, 'Avg. Distance Error (km)', 'Latitude', bucket_labels, 'Avg. Error (km) Over All Locations Using RANSAC vs. Latitude', 'cbm_lat_ransac_places.png')
+bar(buckets, cbm_median_lat_distances, 'Median Distance Error (km)', 'Latitude', bucket_labels, 'Median Error (km) Over All Locations Using Median vs. Latitude', 'cbm_lat_median_places.png')
+bar(buckets, cbm_density_lat_distances, 'Median Distance Error (km)', 'Latitude', bucket_labels, 'Median Error (km) Over All Locations Using Gaussian KDE vs. Latitude', 'cbm_lat_density_places.png')
+bar(buckets, ransac_lat_distances, 'Median Distance Error (km)', 'Latitude', bucket_labels, 'Median Error (km) Over All Locations Using RANSAC vs. Latitude', 'cbm_lat_ransac_places.png')
 
 # Average distance error vs. longitude over ALL PLACES.
 buckets = list(range(-180, 180, 20)) # 20 degree buckets
@@ -1178,25 +1204,25 @@ for key in lngs:
 
 for bdIdx, distance_errs in enumerate(cbm_median_lng_distances):
     if len(distance_errs) > 0:
-        cbm_median_lng_distances[bdIdx] = statistics.mean(distance_errs)
+        cbm_median_lng_distances[bdIdx] = statistics.median(distance_errs)
     else:
         cbm_median_lng_distances[bdIdx] = 0
 
 for bdIdx, distance_errs in enumerate(cbm_density_lng_distances):
     if len(distance_errs) > 0:
-        cbm_density_lng_distances[bdIdx] = statistics.mean(distance_errs)
+        cbm_density_lng_distances[bdIdx] = statistics.median(distance_errs)
     else:
         cbm_density_lng_distances[bdIdx] = 0
 
 for bdIdx, distance_errs in enumerate(ransac_lng_distances):
     if len(distance_errs) > 0:
-        ransac_lng_distances[bdIdx] = statistics.mean(distance_errs)
+        ransac_lng_distances[bdIdx] = statistics.median(distance_errs)
     else:
         ransac_lng_distances[bdIdx] = 0
 
-bar(buckets, cbm_median_lng_distances, 'Avg. Distance Error (km)', 'Longitude', bucket_labels, 'Avg. Error (km) Over All Locations Using Median vs. Longitude', 'cbm_lng_median_places.png')
-bar(buckets, cbm_density_lng_distances, 'Avg. Distance Error (km)', 'Longitude', bucket_labels, 'Avg. Error (km) Over All Locations Using Gaussian KDE vs. Longitude', 'cbm_lng_density_places.png')
-bar(buckets, ransac_lng_distances, 'Avg. Distance Error (km)', 'Longitude', bucket_labels, 'Avg. Error (km) Over All Locations Using RANSAC vs. Longitude', 'cbm_lng_ransac_places.png')
+bar(buckets, cbm_median_lng_distances, 'Median Distance Error (km)', 'Longitude', bucket_labels, 'Median Error (km) Over All Locations Using Median vs. Longitude', 'cbm_lng_median_places.png')
+bar(buckets, cbm_density_lng_distances, 'Median Distance Error (km)', 'Longitude', bucket_labels, 'Median Error (km) Over All Locations Using Gaussian KDE vs. Longitude', 'cbm_lng_density_places.png')
+bar(buckets, ransac_lng_distances, 'Median Distance Error (km)', 'Longitude', bucket_labels, 'Median Error (km) Over All Locations Using RANSAC vs. Longitude', 'cbm_lng_ransac_places.png')
 
 green = 0
 sunrise_only = 0
