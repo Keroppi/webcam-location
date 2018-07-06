@@ -1017,16 +1017,16 @@ for i in range(data.types['test']):
 for sIdx, distance_errs in enumerate(sun_type_distances):
     if len(distance_errs) > 0:
         sun_type_distances[sIdx] = statistics.mean(distance_errs)
-        sun_type_stdevs[bdIdx] = statistics.stdev(distance_errs) #
-        sun_type_num_data_pts[bdIdx] += len(distance_errs) #
+        sun_type_stdevs[sIdx] = statistics.stdev(distance_errs) #
+        sun_type_num_data_pts[sIdx] += len(distance_errs) #
     else:
         sun_type_distances[sIdx] = 0
 
 for sIdx, distance_errs in enumerate(cbm_sun_type_distances):
     if len(distance_errs) > 0:
         cbm_sun_type_distances[sIdx] = statistics.mean(distance_errs)
-        cbm_sun_type_stdevs[bdIdx] = statistics.stdev(distance_errs) #
-        cbm_sun_type_num_data_pts[bdIdx] += len(distance_errs) #
+        cbm_sun_type_stdevs[sIdx] = statistics.stdev(distance_errs) #
+        cbm_sun_type_num_data_pts[sIdx] += len(distance_errs) #
     else:
         cbm_sun_type_distances[sIdx] = 0
 
@@ -1062,16 +1062,16 @@ for i in range(data.types['test']):
 for sIdx, distance_errs in enumerate(season_distances):
     if len(distance_errs) > 0:
         season_distances[sIdx] = statistics.median(distance_errs)
-        season_rmses[bdIdx] = median_rmse(distance_errs) #
-        season_num_data_pts[bdIdx] += len(distance_errs) #
+        season_rmses[sIdx] = median_rmse(distance_errs) #
+        season_num_data_pts[sIdx] += len(distance_errs) #
     else:
         season_distances[sIdx] = 0
 
 for sIdx, distance_errs in enumerate(cbm_season_distances):
     if len(distance_errs) > 0:
         cbm_season_distances[sIdx] = statistics.median(distance_errs)
-        cbm_season_rmses[bdIdx] = median_rmse(distance_errs) #
-        cbm_season_num_data_pts[bdIdx] += len(distance_errs) #
+        cbm_season_rmses[sIdx] = median_rmse(distance_errs) #
+        cbm_season_num_data_pts[sIdx] += len(distance_errs) #
     else:
         cbm_season_distances[sIdx] = 0
 
