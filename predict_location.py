@@ -328,9 +328,11 @@ for d_idx, day_length in enumerate(day_lengths):
         theta = 0.2163108 + 2 * math.atan(0.9671396 * math.tan(0.00860 * (day_of_year - 186)))
         phi = math.asin(0.39795 * math.cos(theta))
         denominator = math.sin(phi)
+        denominator1 = math.tan(phi)
         print('WARNING - Different hemispheres')
         print(days[d_idx].place)
-        print('Denominator value: ' + str(denominator))
+        print('Denominator (sin) value: ' + str(denominator))
+        print('Denominator (tan) value: ' + str(denominator1))
 
     '''
     if random.randint(1, 100) < 5: 
