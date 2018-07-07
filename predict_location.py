@@ -1036,8 +1036,8 @@ for sIdx, distance_errs in enumerate(cbm_sun_type_distances):
     else:
         cbm_sun_type_distances[sIdx] = 0
 
-#bar(sun_type_labels, sun_type_distances, 'Median Distance Error (km)', 'Sunrise and sunset in frame?', sun_type_labels, 'Median Error (km) Over All Days vs. Sunrise / Sunset In Frame', 'sun_in_frame.png', sun_type_rmses)
-bar(sun_type_labels, cbm_sun_type_distances, 'Avg. Distance Error (km)', 'Sunrise and sunset in frame?', sun_type_labels, 'Avg. Error (km) Over All Days vs. Sunrise / Sunset In Frame', 'cbm_sun_in_frame.png', cbm_sun_type_rmses)
+#bar(sun_type_labels, sun_type_distances, 'Median Distance Error (km)', 'Sunrise and sunset in frame?', sun_type_labels, 'Median Error (km) Over All Days vs. Sunrise / Sunset In Frame', 'sun_in_frame.png', sun_type_stdevs)
+bar(sun_type_labels, cbm_sun_type_distances, 'Avg. Distance Error (km)', 'Sunrise and sunset in frame?', sun_type_labels, 'Avg. Error (km) Over All Days vs. Sunrise / Sunset In Frame', 'cbm_sun_in_frame.png', cbm_sun_type_stdevs)
 print('SUN OVER ALL DAYS BUCKETS NUM DATA PTS: ' + str(cbm_sun_type_num_data_pts)) #
 
 # Plot average distance error vs. season over ALL DAYS.
