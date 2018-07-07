@@ -1017,7 +1017,10 @@ for i in range(data.types['test']):
 for sIdx, distance_errs in enumerate(sun_type_distances):
     if len(distance_errs) > 0:
         sun_type_distances[sIdx] = statistics.mean(distance_errs)
-        sun_type_stdevs[sIdx] = statistics.stdev(distance_errs) #
+        if len(distance_errs) >= 2:
+            sun_type_stdevs[sIdx] = statistics.stdev(distance_errs) #
+        else:
+            sun_type_stdevs[sIdx] = 0 #
         sun_type_num_data_pts[sIdx] += len(distance_errs) #
     else:
         sun_type_distances[sIdx] = 0
@@ -1025,7 +1028,10 @@ for sIdx, distance_errs in enumerate(sun_type_distances):
 for sIdx, distance_errs in enumerate(cbm_sun_type_distances):
     if len(distance_errs) > 0:
         cbm_sun_type_distances[sIdx] = statistics.mean(distance_errs)
-        cbm_sun_type_stdevs[sIdx] = statistics.stdev(distance_errs) #
+        if len(distance_errs) >= 2:
+            cbm_sun_type_stdevs[sIdx] = statistics.stdev(distance_errs) #
+        else:
+            cbm_sun_type_stdevs[sIdx] = 0 #
         cbm_sun_type_num_data_pts[sIdx] += len(distance_errs) #
     else:
         cbm_sun_type_distances[sIdx] = 0
