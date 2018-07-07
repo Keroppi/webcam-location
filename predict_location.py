@@ -3,7 +3,7 @@
 import matplotlib
 matplotlib.use('agg')
 
-import torch, torchvision, os, argparse, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, scipy, pickle
+import torch, torchvision, os, argparse, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, scipy, pickle, collections
 from sklearn.neighbors.kde import KernelDensity
 from scipy.optimize import minimize
 from sklearn.metrics import mean_squared_error
@@ -903,6 +903,8 @@ def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker
     else:
         days_err, = plt.plot(days_used, distances, color=color, linestyle=linestyle, marker=marker, markersize=3, label=label)
 
+    days_used_means = collections.OrderedDict(sorted(days_used_means.items()))
+
     means_err, = plt.plot(list(days_used_means.keys()), list(days_used_means.values()), color='k', linestyle='-',
                           marker='^', markersize=9, label='Trend')
 
@@ -938,7 +940,7 @@ def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None):
     x = np.arange(len(x))
     #y = bucket_distances
     width = 0.35
-    plt.bar(x, y, width, color='r', yerr=yerr)
+    plt.bar(x, y, width, color='r', yerr=[(0,) * len(x), tuple(yerr)])
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     ax = plt.gca()

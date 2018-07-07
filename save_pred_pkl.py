@@ -5,12 +5,15 @@ import torch, torchvision, argparse, os, datetime, time, math, pandas as pd, sys
 sys.path.append('/home/vli/webcam-location') # For importing .py files in the same directory on the cluster.
 import constants
 from webcam_dataset import WebcamData
-from webcam_dataset import Train, Test
-from custom_transforms import RandomResize, Resize, RandomPatch, Center, ToTensor
+from webcam_dataset import Test
+from custom_transforms import Resize, RandomPatch, Center, ToTensor
 from custom_model import WebcamLocation
 from torch.autograd import Variable
 
 from collections import namedtuple
+
+print('Starting save predictions.')
+sys.stdout.flush()
 
 Location = namedtuple('Location', ['lat', 'lng', 'sunrises', 'sunsets', 'mali_solar_noons'])
 

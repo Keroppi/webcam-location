@@ -8,7 +8,7 @@ deep learning:
 qsub -l gpu -l h_vmem=30G -q gpu.long.q@biwirender* -R y -j y -t 1 -o /srv/glusterfs/vli/job_logs ~/gpu.sh
 
 resume learning:
-qsub -l gpu -l h_vmem=40G -q gpu.long.q@biwirender* -R y -j y -t 1 -o /srv/glusterfs/vli/job_logs ~/sunrise_resume_gpu.sh
+qsub -l gpu -l h_vmem=40G -q gpu.middle.q@biwirender* -R y -j y -t 1 -o /srv/glusterfs/vli/job_logs ~/sunrise_resume_gpu.sh
 qsub -l gpu -l h_vmem=40G -q gpu.middle.q@biwirender* -R y -j y -t 2 -o /srv/glusterfs/vli/job_logs ~/sunset_resume_gpu.sh
 
 save cnn features:
@@ -18,7 +18,7 @@ learn from cnn features:
 qsub -l h_vmem=60G -q long.q@* -R y -j y -t 3 -pe multicore 8 -o /srv/glusterfs/vli/job_logs ~/use_cnn_features.sh
 
 predict location:
-qsub -l gpu -l h_vmem=40G -q gpu.middle.q@biwirender* -R y -j y -t 4 -o /srv/glusterfs/vli/job_logs ~/predict_location_from_model.sh
+qsub -l gpu -l h_vmem=40G -q gpu.long.q@biwirender* -R y -j y -t 4 -o /srv/glusterfs/vli/job_logs ~/predict_location_from_model.sh
 qsub -l h_vmem=12G -q long.q@* -R y -j y -t 4 -o /srv/glusterfs/vli/job_logs ~/predict_location_from_pred.sh
 
 Note: Try not to use biwirender02 - only 5 GB GPUs
