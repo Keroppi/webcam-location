@@ -4,6 +4,7 @@ import torch, torchvision, argparse, os, datetime, time, math, pandas as pd, sys
 
 sys.path.append('/home/vli/webcam-location') # For importing .py files in the same directory on the cluster.
 import constants
+from simple_day import SimpleDay
 from webcam_dataset import WebcamData
 from webcam_dataset import Test
 from custom_transforms import Resize, RandomPatch, Center, ToTensor
@@ -15,7 +16,7 @@ from collections import namedtuple
 print('Starting save predictions.')
 sys.stdout.flush()
 
-Location = namedtuple('Location', ['lat', 'lng', 'sunrises', 'sunsets', 'mali_solar_noons'])
+#Location = namedtuple('Location', ['lat', 'lng', 'sunrises', 'sunsets', 'mali_solar_noons'])
 
 parser = argparse.ArgumentParser(description='Save Sunrise / Sunset Predictions')
 parser.add_argument('--sunrise_path', default='', type=str, metavar='PATH',
@@ -99,15 +100,42 @@ for batch_idx, (input, _) in enumerate(test_loader):
 
     sunrise_idx = sunrise_model(input)
 
+    # Convert sunrise_idx into a local time.
     batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunrise_idx.size()[0]]
 
     for d_idx, day in enumerate(batch_days):
-        utc_sunrise = day.get_local_time(sunrise_idx[d_idx, 0].data[0]) - datetime.timedelta(seconds=days[d_idx].time_offset)
+        day.change_frames(sunrise_idx[d_idx, 0].data[0])
+
+    if batch_idx % constants.LOG_INTERVAL == 0:
+        print('Batch Index: {}'.format(batch_idx))
+        sys.stdout.flush()
+
+sunrise_predict_t1 = time.time()
+print('Sunrise prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
+sys.stdout.flush()
+
+sunrise_predict_t0 = time.time()
+for batch_idx, (input, _) in enumerate(test_loader):
+    input = Variable(input, volatile=True)
+
+    if torch.cuda.is_available():
+        input = input.cuda()
+
+    sunrise_idx = sunrise_model(input)
+
+    batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunrise_idx.size()[0]]
+
+    for d_idx, day in enumerate(batch_days):
+        local_sunrise = day.get_local_time(sunrise_idx[d_idx, 0].data[0]) # - datetime.timedelta(seconds=days[d_idx].time_offset)
 
         if day.place not in locations:
-            locations[day.place] = Location(day.lat, day.lng, [], [], [])
-        locations[day.place].sunrises.append(utc_sunrise)
-        locations[day.place].mali_solar_noons.append(day.mali_solar_noon)
+            #locations[day.place] = Location(day.lat, day.lng, [], [], [])
+            locations[day.place] = []
+
+        locations[day.place].append(SimpleDay(day.place, day.lat, day.lng, day.mali_solar_noon, day.time_offset, local_sunrise, None, day.sunrise_in_frames, day.sunset_in_frames, day.interval_min, day.season))
+
+        #locations[day.place].sunrises.append(utc_sunrise)
+        #locations[day.place].mali_solar_noons.append(day.mali_solar_noon)
 
     if batch_idx % constants.LOG_INTERVAL == 0:
         print('Batch Index: {}'.format(batch_idx))
@@ -119,8 +147,28 @@ sys.stdout.flush()
 
 # sunset
 
-#test_dataset.set_mode('sunset')
-#test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=constants.BATCH_SIZE, num_workers=constants.NUM_LOADER_WORKERS, pin_memory=pin_memory)
+sunset_predict_t0 = time.time()
+for batch_idx, (input, _) in enumerate(test_loader):
+    input = Variable(input, volatile=True)
+
+    if torch.cuda.is_available():
+        input = input.cuda()
+
+    sunset_idx = sunset_model(input)
+
+    # Convert sunset_idx into a local time.
+    batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunset_idx.size()[0]]
+
+    for d_idx, day in enumerate(batch_days):
+        day.change_frames(sunset_idx[d_idx, 0].data[0], mode='sunset') # VLI mode is only for print statements
+
+    if batch_idx % constants.LOG_INTERVAL == 0:
+        print('Batch Index: {}'.format(batch_idx))
+        sys.stdout.flush()
+
+sunset_predict_t1 = time.time()
+print('Sunset prediction time (min): {:.2f}'.format((sunset_predict_t1 - sunset_predict_t0) / 60))
+sys.stdout.flush()
 
 sunset_predict_t0 = time.time()
 for batch_idx, (input, target) in enumerate(test_loader):
@@ -134,12 +182,12 @@ for batch_idx, (input, target) in enumerate(test_loader):
     batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunset_idx.size()[0]]
 
     for d_idx, day in enumerate(batch_days):
-        utc_sunset = day.get_local_time(sunset_idx[d_idx, 0].data[0]) - datetime.timedelta(
-            seconds=days[d_idx].time_offset)
+        local_sunset = day.get_local_time(sunset_idx[d_idx, 0].data[0]) #- datetime.timedelta(seconds=days[d_idx].time_offset)
 
-        if day.place not in locations:
-            locations[day.place] = Location(day.lat, day.lng, [], [], [])
-        locations[day.place].sunsets.append(utc_sunset)
+        #if day.place not in locations:
+            #locations[day.place] = Location(day.lat, day.lng, [], [], [])
+        #locations[day.place].sunsets.append(utc_sunset)
+        locations[day.place][batch_idx * constants.BATCH_SIZE + d_idx].sunset = local_sunset
 
     if batch_idx % constants.LOG_INTERVAL == 0:
         print('Batch Index: {}'.format(batch_idx))
@@ -154,8 +202,11 @@ sys.stdout.flush()
 sorted_locations = {}
 for place in locations:
     location = locations[place]
-    sorted_lists = list(zip(*sorted(zip(location.sunrises, location.sunsets, location.mali_solar_noons))))
-    sorted_locations[place] = Location(locations[place].lat, locations[place].lng, sorted_lists[0], sorted_lists[1], sorted_lists[2])
+    #sorted_lists = list(zip(*sorted(zip(location.sunrises, location.sunsets, location.mali_solar_noons))))
+    #sorted_locations[place] = Location(locations[place].lat, locations[place].lng, sorted_lists[0], sorted_lists[1], sorted_lists[2])
 
-with open('/srv/glusterfs/vli/pred.pkl', 'wb') as f:
-    pickle.dump(sorted_locations, f)
+    locations[place].sort(key=lambda x: x.sunrise, reverse=False)
+
+with open(sunrise_dir + '/predictions/pred.pkl', 'wb') as f:
+    #pickle.dump(sorted_locations, f)
+    pickle.dump(locations, f)
