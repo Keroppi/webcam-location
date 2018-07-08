@@ -19,20 +19,20 @@ sys.stdout.flush()
 #Location = namedtuple('Location', ['lat', 'lng', 'sunrises', 'sunsets', 'mali_solar_noons'])
 
 parser = argparse.ArgumentParser(description='Save Sunrise / Sunset Predictions')
-parser.add_argument('--sunrise_path', default='', type=str, metavar='PATH',
+parser.add_argument('--sunrise_model', default='', type=str, metavar='PATH',
                     help='path to sunrise model (default: none)')
-parser.add_argument('--sunset_path', default='', type=str, metavar='PATH',
+parser.add_argument('--sunset_model', default='', type=str, metavar='PATH',
                     help='path to sunset model args (default: none)')
 args = parser.parse_args()
 
-if args.sunrise_path:
-    sunrise_dir = args.sunrise_path
+if args.sunrise_model:
+    sunrise_dir = args.sunrise_model
 else:
     print('No sunrise path given.')
     sys.exit(1)
 
-if args.sunset_path:
-    sunset_dir = args.sunset_path
+if args.sunset_model:
+    sunset_dir = args.sunset_model
 else:
     print('No sunset path given.')
     sys.exit(1)

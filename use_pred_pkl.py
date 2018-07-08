@@ -144,6 +144,11 @@ for d_idx, day_length in enumerate(day_lengths):
         numerator = math.cos(phi) * math.cos(-math.pi / 24 * (day_length_hours - 24))
         denominator1 = math.tan(phi)
         numerator1 = math.cos(-math.pi / 24 * (day_length_hours - 24))
+
+        EPSILON = 0.05
+        if math.fabs(denominator) < EPSILON or math.fabs(denominator1) < EPSILON:
+            cbm_lat *= -1
+
         print('WARNING - Different hemispheres')
         print(days[d_idx].place)
         print('Denominator (sin) value: ' + str(denominator))
@@ -699,32 +704,31 @@ for place in lats:
 def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker=None, cbm=False):
     plt.figure(figsize=(24,12))
 
-    days_used_means = {}
+    days_used_medians = {}
     for d_idx, days in enumerate(days_used):
 
-        if days not in days_used_means:
-            days_used_means[days] = [0, 0]
+        if days not in days_used_medians:
+            days_used_medians[days] = []
 
-        days_used_means[days][0] += distances[d_idx]
-        days_used_means[days][1] += 1
+        days_used_medians[days].append(distances[d_idx])
 
-    for days in days_used_means:
-        days_used_means[days] = days_used_means[days][0] / days_used_means[days][1]
+    for days in days_used_medians:
+        days_used_medians[days] = statistics.median(days_used_medians[days])
 
     if fmt is not None:
         days_err, = plt.plot(days_used, distances, fmt, markersize=3, label=label)
     else:
         days_err, = plt.plot(days_used, distances, color=color, linestyle=linestyle, marker=marker, markersize=3, label=label)
 
-    days_used_means = collections.OrderedDict(sorted(days_used_means.items()))
+    days_used_medians = collections.OrderedDict(sorted(days_used_medians.items()))
 
-    means_err, = plt.plot(list(days_used_means.keys()), list(days_used_means.values()), color='k', linestyle='-',
-                          marker='^', markersize=9, label='Trend')
+    means_err, = plt.plot(list(days_used_medians.keys()), list(days_used_medians.values()), color='k', linestyle='-',
+                          marker='^', markersize=9, label='Trend Using Median')
 
     plt.legend(handles=[days_err, means_err])
     plt.xlabel('# Days Used')
-    plt.ylabel('Avg. Error (km)')
-    plt.title('Avg. Error (km) Using ' + label[0].upper() + label[1:] + ' vs. # Days Used')
+    plt.ylabel('Error (km)')
+    plt.title('Error (km) Using ' + label[0].upper() + label[1:] + ' vs. # Days Used')
 
     if cbm:
         prefix = 'cbm_'
@@ -990,7 +994,7 @@ for bdIdx, distance_errs in enumerate(cbm_median_sun_type_distances):
     if len(distance_errs) > 0:
         cbm_median_sun_type_distances[bdIdx] = statistics.mean(distance_errs)
         cbm_median_sun_type_rmses[bdIdx] = median_rmse(distance_errs)  #
-        cbm_median_sun_type_num_data_pts[bdIdx] += 1 #
+        cbm_median_sun_type_num_data_pts[bdIdx] += len(distance_errs) #
     else:
         cbm_median_sun_type_distances[bdIdx] = 0
 
@@ -998,7 +1002,7 @@ for bdIdx, distance_errs in enumerate(cbm_density_sun_type_distances):
     if len(distance_errs) > 0:
         cbm_density_sun_type_distances[bdIdx] = statistics.mean(distance_errs)
         cbm_density_sun_type_rmses[bdIdx] = median_rmse(distance_errs)  #
-        cbm_density_sun_type_num_data_pts[bdIdx] += 1 #
+        cbm_density_sun_type_num_data_pts[bdIdx] += len(distance_errs) #
     else:
         cbm_density_sun_type_distances[bdIdx] = 0
 
@@ -1006,7 +1010,7 @@ for bdIdx, distance_errs in enumerate(ransac_sun_type_distances):
     if len(distance_errs) > 0:
         ransac_sun_type_distances[bdIdx] = statistics.mean(distance_errs)
         ransac_sun_type_rmses[bdIdx] = median_rmse(distance_errs)  #
-        ransac_sun_type_num_data_pts[bdIdx] += 1 #
+        ransac_sun_type_num_data_pts[bdIdx] += len(distance_errs) #
     else:
         ransac_sun_type_distances[bdIdx] = 0
 
@@ -1058,7 +1062,7 @@ for bdIdx, distance_errs in enumerate(cbm_median_lat_distances):
     if len(distance_errs) > 0:
         cbm_median_lat_distances[bdIdx] = statistics.median(distance_errs)
         cbm_median_lat_rmses[bdIdx] = median_rmse(distance_errs)  #
-        cbm_median_lat_num_data_pts[bdIdx] += 1 #
+        cbm_median_lat_num_data_pts[bdIdx] += len(distance_errs) #
     else:
         cbm_median_lat_distances[bdIdx] = 0
 
@@ -1066,7 +1070,7 @@ for bdIdx, distance_errs in enumerate(cbm_density_lat_distances):
     if len(distance_errs) > 0:
         cbm_density_lat_distances[bdIdx] = statistics.median(distance_errs)
         cbm_density_lat_rmses[bdIdx] = median_rmse(distance_errs)  #
-        cbm_density_lat_num_data_pts[bdIdx] += 1 #
+        cbm_density_lat_num_data_pts[bdIdx] += len(distance_errs) #
     else:
         cbm_density_lat_distances[bdIdx] = 0
 
@@ -1074,7 +1078,7 @@ for bdIdx, distance_errs in enumerate(ransac_lat_distances):
     if len(distance_errs) > 0:
         ransac_lat_distances[bdIdx] = statistics.median(distance_errs)
         ransac_lat_rmses[bdIdx] = median_rmse(distance_errs)  #
-        ransac_lat_num_data_pts[bdIdx] += 1 #
+        ransac_lat_num_data_pts[bdIdx] += len(distance_errs) #
     else:
         ransac_lat_distances[bdIdx] = 0
 
@@ -1126,7 +1130,7 @@ for bdIdx, distance_errs in enumerate(cbm_median_lng_distances):
     if len(distance_errs) > 0:
         cbm_median_lng_distances[bdIdx] = statistics.median(distance_errs)
         cbm_median_lng_rmses[bdIdx] = median_rmse(distance_errs)  #
-        cbm_median_lng_num_data_pts[bdIdx] += 1  #
+        cbm_median_lng_num_data_pts[bdIdx] += len(distance_errs)  #
     else:
         cbm_median_lng_distances[bdIdx] = 0
 
@@ -1134,7 +1138,7 @@ for bdIdx, distance_errs in enumerate(cbm_density_lng_distances):
     if len(distance_errs) > 0:
         cbm_density_lng_distances[bdIdx] = statistics.median(distance_errs)
         cbm_density_lng_rmses[bdIdx] = median_rmse(distance_errs)  #
-        cbm_density_lng_num_data_pts[bdIdx] += 1 #
+        cbm_density_lng_num_data_pts[bdIdx] += len(distance_errs) #
     else:
         cbm_density_lng_distances[bdIdx] = 0
 
@@ -1142,7 +1146,7 @@ for bdIdx, distance_errs in enumerate(ransac_lng_distances):
     if len(distance_errs) > 0:
         ransac_lng_distances[bdIdx] = statistics.median(distance_errs)
         ransac_lng_rmses[bdIdx] = median_rmse(distance_errs)  #
-        ransac_lng_num_data_pts[bdIdx] += 1 #
+        ransac_lng_num_data_pts[bdIdx] += len(distance_errs) #
     else:
         ransac_lng_distances[bdIdx] = 0
 
