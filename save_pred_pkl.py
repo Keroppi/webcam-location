@@ -170,6 +170,8 @@ sunset_predict_t1 = time.time()
 print('Sunset prediction time (min): {:.2f}'.format((sunset_predict_t1 - sunset_predict_t0) / 60))
 sys.stdout.flush()
 
+location_idx = {}
+
 sunset_predict_t0 = time.time()
 for batch_idx, (input, target) in enumerate(test_loader):
     input = Variable(input, volatile=True)
@@ -187,7 +189,12 @@ for batch_idx, (input, target) in enumerate(test_loader):
         #if day.place not in locations:
             #locations[day.place] = Location(day.lat, day.lng, [], [], [])
         #locations[day.place].sunsets.append(utc_sunset)
-        locations[day.place][batch_idx * constants.BATCH_SIZE + d_idx].sunset = local_sunset
+
+        if day.place not in location_idx:
+            location_idx[day.place] = 0
+
+        locations[day.place][location_idx[day.place]].sunset = local_sunset
+        location_idx[day.place] += 1
 
     if batch_idx % constants.LOG_INTERVAL == 0:
         print('Batch Index: {}'.format(batch_idx))
