@@ -214,6 +214,9 @@ for place in locations:
 
     locations[place].sort(key=lambda x: x.sunrise, reverse=False)
 
+if not os.path.isdir(sunrise_dir + '/predictions/'):
+    os.mkdir(sunrise_dir + '/predictions/')
+
 with open(sunrise_dir + '/predictions/pred.pkl', 'wb') as f:
     #pickle.dump(sorted_locations, f)
     pickle.dump(locations, f)

@@ -145,9 +145,9 @@ for d_idx, day_length in enumerate(day_lengths):
         denominator1 = math.tan(phi)
         numerator1 = math.cos(-math.pi / 24 * (day_length_hours - 24))
 
-        EPSILON = 0.05
-        if math.fabs(denominator) < EPSILON or math.fabs(denominator1) < EPSILON:
-            cbm_lat *= -1
+        #EPSILON = 0.05
+        #if math.fabs(denominator) < EPSILON or math.fabs(denominator1) < EPSILON:
+        #    cbm_lat *= -1
 
         print('WARNING - Different hemispheres')
         print(days[d_idx].place)
