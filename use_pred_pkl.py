@@ -581,6 +581,10 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, mo
         plt.legend(handlelist, legend_labels)
 
         plt.title(place)
+
+        if not os.path.isdir('/srv/glusterfs/vli/maps/' + mode + '/'):
+            os.mkdir('/srv/glusterfs/vli/maps/' + mode + '/')
+
         plt.savefig('/srv/glusterfs/vli/maps/' + mode + '/' + place + '.png')
         plt.close()
 
