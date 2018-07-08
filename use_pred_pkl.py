@@ -35,7 +35,7 @@ sunrises = []
 sunsets = []
 days = []
 for place in predictions:
-    days.append(predictions[place])
+    days += predictions[place]
 
     for d_idx, day in enumerate(predictions[place]):
         sunrises.append(predictions[place][d_idx].sunrise)
