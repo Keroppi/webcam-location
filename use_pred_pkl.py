@@ -36,8 +36,10 @@ sunsets = []
 days = []
 for place in predictions:
     days.append(predictions[place])
-    sunrises.append(predictions[place].sunrise)
-    sunsets.append(predictions[place].sunset)
+
+    for d_idx, day in enumerate(predictions[place]):
+        sunrises.append(predictions[place][d_idx].sunrise)
+        sunsets.append(predictions[place][d_idx].sunset)
 
 # Compute solar noon and day length.
 solar_noons = []
