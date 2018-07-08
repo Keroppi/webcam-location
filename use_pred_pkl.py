@@ -1181,6 +1181,7 @@ for i in range(len(days)):
 print('Green / Sunrise Only / Sunset Only / Black: {}, {}, {}, {}'.format(green, sunrise_only, sunset_only, black))
 print('')
 print('Average Interval (min): ' + str(avg_interval / len(days)))
+print('')
 sys.stdout.flush()
 
 print('Brock Means Avg. Distance Error: {:.6f}'.format(statistics.mean(mean_distances)))
