@@ -39,8 +39,23 @@ for place in sunrises:
         solar_noons[place] = []
         day_lengths[place] = []
 
-    for sunrise, sunset in zip(sunrises[place], sunsets[place]):
+    for idx, (sunrise, sunset) in enumerate(zip(sunrises[place], sunsets[place])):
+        # Threshold sunrise to be at earliest midnight.
+        if sunrise.date() < predictions[place][idx].sunrise.date():
+            sunrise = datetime.datetime.combine(sunrise, datetime.time.min)
+        # Threshold sunset to be at latest 2 AM the next day.
+        if sunset > datetime.datetime.combine(predictions[place][idx].sunrise.date() + datetime.timedelta(days=1), datetime.time(2, 0, 0)):
+            sunset = datetime.datetime.combine(predictions[place][idx].sunrise.date() + datetime.timedelta(days=1), datetime.time(2, 0, 0))
+
         solar_noon = (sunset - sunrise) / 2 + sunrise
+
+        # Latest solar noon in the world is in western China at 15:10, so truncate any time past ~15:14
+        if solar_noon.hour > 15 or (solar_noon.hour == 15 and solar_noon.minute >= 14):
+            solar_noon = solar_noon.replace(hour=15, minute=14, second=0, microsecond=0)
+        # Earliest solar noon in the world is in Greenland around 10:04 AM, so truncate any time before ~10 AM.
+        if solar_noon.hour < 10:
+            solar_noon = solar_noon.replace(hour=10, minute=0, second=0, microsecond=0)
+
         day_length = (sunset - sunrise).total_seconds()
 
         solar_noons[place].append(solar_noon)
@@ -83,7 +98,7 @@ for place in day_lengths:
     for idx, day_length in enumerate(day_lengths[place]):
         day_length_hours = day_length / 3600 # seconds to hours
 
-        ts = pd.Series(pd.to_datetime([str(predictions[place][idx].date)]))
+        ts = pd.Series(pd.to_datetime([str(predictions[place][idx].sunrise.date())]))
         day_of_year = int(ts.dt.dayofyear) # day_of_year from 1 to 365, inclusive
 
         # CBM Model
@@ -185,6 +200,7 @@ def compute_distance(lat1, lng1, lat2, lng2):  # Vincenty distance, returns km
         iterations += 1
         lamb = new_lamb
 
+errors = []
 for place in longitudes:
     # Use simple median as a guess.
     pred_lat = statistics.median(latitudes[place])
@@ -194,4 +210,7 @@ for place in longitudes:
     actual_lng = predictions[place][0].lng
 
     error = compute_distance(pred_lat, pred_lng, actual_lat, actual_lng) # km
+    errors.append(error)
     print(place + ': ' + str(error) + ' km')
+
+print('Min error (km): {}'.format(min(errors)))

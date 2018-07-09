@@ -95,14 +95,14 @@ for d_idx, solar_noon in enumerate(solar_noons):
     # What to do if outside [-180, 180] range?
     if lng < -180:
         lng += 360
-        print('WARNING - lng below -180')
-        print(days[d_idx].place)
-        sys.stdout.flush()
+        #print('WARNING - lng below -180')
+        #print(days[d_idx].place)
+        #sys.stdout.flush()
     elif lng > 180:
         lng -= 360
-        print('WARNING - lng over 180')
-        print(days[d_idx].place)
-        sys.stdout.flush()
+        #print('WARNING - lng over 180')
+        #print(days[d_idx].place)
+        #sys.stdout.flush()
 
     '''
     if random.randint(1, 100) < 5:
@@ -142,21 +142,21 @@ for d_idx, day_length in enumerate(day_lengths):
     if (cbm_lat > 0 and days[d_idx].lat < 0) or (cbm_lat < 0 and days[d_idx].lat > 0):
         theta = 0.2163108 + 2 * math.atan(0.9671396 * math.tan(0.00860 * (day_of_year - 186)))
         phi = math.asin(0.39795 * math.cos(theta))
-        denominator = math.sin(phi)
-        numerator = math.cos(phi) * math.cos(-math.pi / 24 * (day_length_hours - 24))
-        denominator1 = math.tan(phi)
-        numerator1 = math.cos(-math.pi / 24 * (day_length_hours - 24))
+        #denominator = math.sin(phi)
+        #numerator = math.cos(phi) * math.cos(-math.pi / 24 * (day_length_hours - 24))
+        #denominator1 = math.tan(phi)
+        #numerator1 = math.cos(-math.pi / 24 * (day_length_hours - 24))
 
         #EPSILON = 0.05
         #if math.fabs(denominator) < EPSILON or math.fabs(denominator1) < EPSILON:
         #    cbm_lat *= -1
 
-        print('WARNING - Different hemispheres')
-        print(days[d_idx].place)
-        print('Denominator (sin) value: ' + str(denominator))
-        print('Numerator (sin) value: ' + str(numerator))
-        print('Denominator (tan) value: ' + str(denominator1))
-        print('Numerator (tan) value: ' + str(numerator1))
+        #print('WARNING - Different hemispheres')
+        #print(days[d_idx].place)
+        #print('Denominator (sin) value: ' + str(denominator))
+        #print('Numerator (sin) value: ' + str(numerator))
+        #print('Denominator (tan) value: ' + str(denominator1))
+        #print('Numerator (tan) value: ' + str(numerator1))
 
     '''
     if random.randint(1, 100) < 5:

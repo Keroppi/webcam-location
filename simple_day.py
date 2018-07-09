@@ -3,7 +3,6 @@ import numpy as np, sys, PIL, math, time, datetime, random, statistics
 class SimpleDay():
     def __init__(self, place, lat, lng, mali_solar_noon, time_offset, sunrise, sunset, sunrise_in_frames, sunset_in_frames, interval_min, season):
         self.place = place  # Name of the location
-        self.date = sunrise.date() # The local date without time.
 
         self.lat = lat # Latitude
         self.lng = lng # Longitude
