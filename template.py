@@ -194,4 +194,4 @@ for place in longitudes:
     actual_lng = predictions[place][0].lng
 
     error = compute_distance(pred_lat, pred_lng, actual_lat, actual_lng) # km
-    print(place + ': ' + error + ' km')
+    print(place + ': ' + str(error) + ' km')
