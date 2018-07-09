@@ -215,3 +215,4 @@ for place in longitudes:
 
 print('')
 print('Min error (km): {}'.format(min(errors)))
+print('Avg error (km): {}'.format(statistics.mean(errors)))
