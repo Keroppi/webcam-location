@@ -86,6 +86,8 @@ else:
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=constants.BATCH_SIZE, num_workers=constants.NUM_LOADER_WORKERS, pin_memory=pin_memory)
 
 # Test Set
+print('# Test Examples: {}'.format(len(test_loader.dataset)))
+sys.stdout.flush()
 
 # sunrise
 

@@ -21,6 +21,6 @@ predict location:
 qsub -l gpu -l h_vmem=40G -q gpu.long.q@biwirender* -R y -j y -t 4 -o /srv/glusterfs/vli/job_logs ~/predict_location_from_model.sh
 qsub -l h_vmem=12G -q long.q@* -R y -j y -t 4 -o /srv/glusterfs/vli/job_logs ~/predict_location_from_pred.sh
 qsub -l gpu -l h_vmem=40G -q gpu.long.q@biwirender* -R y -j y -t 4 -o /srv/glusterfs/vli/job_logs ~/save_pred_pkl.sh
-qsub -l gpu -l h_vmem=40G -q gpu.long.q@biwirender* -R y -j y -t 4 -o /srv/glusterfs/vli/job_logs ~/use_pred_pkl.sh
+qsub -l h_vmem=40G -q long.q@* -R y -j y -t 4 -o /srv/glusterfs/vli/job_logs ~/use_pred_pkl.sh
 
 Note: Try not to use biwirender02 - only 5 GB GPUs
