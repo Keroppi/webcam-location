@@ -213,4 +213,11 @@ for place in longitudes:
     errors.append(error)
     print(place + ': ' + str(error) + ' km')
 
+print('')
 print('Min error (km): {}'.format(min(errors)))
+
+tot = 0
+for place in predictions:
+    tot += len(predictions[place])
+
+print(tot)
