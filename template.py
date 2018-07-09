@@ -186,9 +186,9 @@ def compute_distance(lat1, lng1, lat2, lng2):  # Vincenty distance, returns km
         lamb = new_lamb
 
 for place in longitudes:
-    # Use simple mean as a guess.
-    pred_lat = statistics.mean(latitudes[place])
-    pred_lng = statistics.mean(longitudes[place])
+    # Use simple median as a guess.
+    pred_lat = statistics.median(latitudes[place])
+    pred_lng = statistics.median(longitudes[place])
 
     actual_lat = predictions[place][0].lat
     actual_lng = predictions[place][0].lng
