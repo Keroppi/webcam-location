@@ -86,6 +86,11 @@ else:
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=constants.BATCH_SIZE, num_workers=constants.NUM_LOADER_WORKERS, pin_memory=pin_memory)
 
 # Test Set
+
+# When testing, use uniform frames to increase likelihood of grabbing sunrise and sunset.
+for day in days:
+    day.uniform_frames()
+
 print('# Test Examples: {}'.format(len(test_loader.dataset)))
 sys.stdout.flush()
 
@@ -135,7 +140,7 @@ for batch_idx, (input, _) in enumerate(test_loader):
             locations[day.place] = []
 
         locations[day.place].append(SimpleDay(day.place, day.lat, day.lng, day.mali_solar_noon, day.time_offset, local_sunrise, None, day.sunrise_in_frames, day.sunset_in_frames, day.interval_min, day.season))
-        day.random_frames()  # Reset the frames to be random instead of having a bias towards where sunrise is.
+        day.uniform_frames()  # Reset the frames to be random instead of having a bias towards where sunrise is.
 
         #locations[day.place].sunrises.append(utc_sunrise)
         #locations[day.place].mali_solar_noons.append(day.mali_solar_noon)

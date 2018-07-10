@@ -117,6 +117,17 @@ class Day():
 
         return (times, img_paths)
 
+    def uniform_subset(self, all_times, all_img_paths):
+        # Uniformly select IMAGES_PER_DAY images from times / images.
+        f = lambda m, n: [i * n // m + n // (2 * m) for i in range(m)]
+        subset_idx = f(constants.IMAGES_PER_DAY, len(all_times))
+        #subset_idx = np.random.choice(len(all_times), constants.IMAGES_PER_DAY, replace=False)
+        #subset_idx.sort()
+        times = [all_times[x] for x in subset_idx]
+        img_paths = [all_img_paths[x] for x in subset_idx]
+
+        return (times, img_paths)
+
     def change_frames(self, center_frame, mode='sunrise'): # Given a suggested frame idx, repick frames that are close to it.
         suggested_time = self.get_local_time(center_frame)
 
@@ -237,6 +248,10 @@ class Day():
 
     def random_frames(self):
         self.times, self.img_paths = self.random_subset(self.all_times, self.all_img_paths)
+        self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, self.sunrise, self.sunset)
+
+    def uniform_frames(self):
+        self.times, self.img_paths = self.uniform_subset(self.all_times, self.all_img_paths)
         self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, self.sunrise, self.sunset)
 
     def __init__(self, place, times, img_paths, sunrise, sunset, train_test_valid, lat, lng, time_offset, mali_solar_noon):

@@ -774,7 +774,7 @@ def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None):
     plt.close()
 
 # Plot average distance error vs. time interval OVER ALL DAYS.
-buckets = list(range(0, round(24 * 60 / constants.IMAGES_PER_DAY) + 5, 5)) # 5 minute intervals
+buckets = list(range(0, 30, 5)) # 5 minute intervals
 bucket_labels = [str(x) + '-' + str(x + 5) for x in buckets]
 bucket_labels[-1] = bucket_labels[-1] + '+'
 bucket_distances = [[] for x in range(len(buckets))]
@@ -815,7 +815,7 @@ bar(buckets, cbm_bucket_distances, 'Median Distance Error (km)', 'Minutes Betwee
 print('INTERVAL OVER ALL DAYS BUCKETS NUM DATA PTS: ' + str(cbm_bucket_num_data_pts)) #
 
 # Plot average distance error vs. sunrise, sunset available over ALL DAYS.
-sun_type_labels = ['Both', 'Sunrise Only', 'Sunset Only', 'Neither']
+sun_type_labels = ['Both', ' Either Sunrise Only or Sunset Only', 'Neither']
 sun_type_distances = [[] for x in range(len(sun_type_labels))]
 cbm_sun_type_distances = [[] for x in range(len(sun_type_labels))]
 sun_type_stdevs = [0 for x in range(len(sun_type_labels))] #
@@ -833,11 +833,11 @@ for i in range(len(days)):
         sun_type_distances[1].append(distance_err)
         cbm_sun_type_distances[1].append(cbm_distance_err)
     elif days[i].sunset_in_frames:
+        sun_type_distances[1].append(distance_err)
+        cbm_sun_type_distances[1].append(cbm_distance_err)
+    else:
         sun_type_distances[2].append(distance_err)
         cbm_sun_type_distances[2].append(cbm_distance_err)
-    else:
-        sun_type_distances[3].append(distance_err)
-        cbm_sun_type_distances[3].append(cbm_distance_err)
 
 for sIdx, distance_errs in enumerate(sun_type_distances):
     if len(distance_errs) > 0:
@@ -912,6 +912,10 @@ print('SEASON OVER ALL DAYS BUCKETS NUM DATA PTS: ' + str(cbm_season_num_data_pt
 
 # Plot average distance error vs. intervals over ALL PLACES.
 # Only using CBM model for now.
+buckets = list(range(0, 25, 3)) # 3 minute intervals
+bucket_labels = [str(x) + '-' + str(x + 3) for x in buckets]
+bucket_labels[-1] = bucket_labels[-1] + '+'
+
 cbm_median_bucket_distances = [[] for x in range(len(buckets))]
 cbm_density_bucket_distances = [[] for x in range(len(buckets))]
 ransac_bucket_distances = [[] for x in range(len(buckets))]
@@ -924,7 +928,7 @@ ransac_bucket_rmses = [0 for x in range(len(buckets))] #
 ransac_bucket_num_data_pts = [0] * len(buckets) #
 for key in intervals:
     for bIdx, bucket in enumerate(buckets):
-        if intervals[key] < bucket + 5:
+        if intervals[key] < bucket + 3:
             break
 
     cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
@@ -969,8 +973,8 @@ print('INTERVAL OVER ALL LOCATIONS (RANSAC) BUCKETS NUM DATA PTS: ' + str(ransac
 
 # Plot average distance error vs. percentage of days with sunrise and sunset visible over ALL PLACES.
 # Only using CBM model for now.
-buckets = list(range(0, 100, 10)) # 10% buckets
-bucket_labels = [str(x) + '-' + str(x + 10) for x in buckets]
+buckets = list(range(0, 100, 20)) # 20% buckets
+bucket_labels = [str(x) + '-' + str(x + 20) for x in buckets]
 cbm_median_sun_type_distances = [[] for x in range(len(buckets))]
 cbm_density_sun_type_distances = [[] for x in range(len(buckets))]
 ransac_sun_type_distances = [[] for x in range(len(buckets))]
@@ -984,7 +988,7 @@ ransac_sun_type_num_data_pts = [0] * len(buckets) #
 
 for key in intervals:
     for bIdx, bucket in enumerate(buckets):
-        if sun_visibles[key][0] * 100 < bucket + 10:
+        if sun_visibles[key][0] * 100 < bucket + 20:
             break
 
     cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
@@ -1028,8 +1032,8 @@ print('SUN OVER ALL LOCATIONS (DENSITY) BUCKETS NUM DATA PTS: ' + str(cbm_densit
 print('SUN OVER ALL LOCATIONS (RANSAC) BUCKETS NUM DATA PTS: ' + str(ransac_sun_type_num_data_pts)) #
 
 # Average distance error vs. latitude over ALL PLACES.
-buckets = list(range(-90, 90, 10)) # 10 degree buckets
-bucket_labels = [str(x) + '-' + str(x + 10) for x in buckets]
+buckets = list(range(-90, 90, 5)) # 5 degree buckets
+bucket_labels = [str(x) + '-' + str(x + 5) for x in buckets]
 
 cbm_median_lat_distances = [[] for x in range(len(buckets))]
 cbm_density_lat_distances = [[] for x in range(len(buckets))]
@@ -1048,11 +1052,11 @@ for key in lats:
     ransac_idx = len(buckets) - 1
 
     for bIdx, bucket in enumerate(buckets):
-        if cbm_median_locations[key][0] < bucket + 10:
+        if cbm_median_locations[key][0] < bucket + 5:
             median_idx = min(bIdx, median_idx)
-        if cbm_density_locations[key][0] < bucket + 10:
+        if cbm_density_locations[key][0] < bucket + 5:
             density_idx = min(bIdx, density_idx)
-        if ransac_locations[key][0] < bucket + 10:
+        if ransac_locations[key][0] < bucket + 5:
             ransac_idx = min(bIdx, ransac_idx)
 
     cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
@@ -1096,8 +1100,8 @@ print('LAT OVER ALL LOCATIONS (DENSITY) BUCKETS NUM DATA PTS: ' + str(cbm_densit
 print('LAT OVER ALL LOCATIONS (RANSAC) BUCKETS NUM DATA PTS: ' + str(ransac_lat_num_data_pts)) #
 
 # Average distance error vs. longitude over ALL PLACES.
-buckets = list(range(-180, 180, 20)) # 20 degree buckets
-bucket_labels = [str(x) + '-' + str(x + 20) for x in buckets]
+buckets = list(range(-180, 180, 10)) # 10 degree buckets
+bucket_labels = [str(x) + '-' + str(x + 10) for x in buckets]
 
 cbm_median_lng_distances = [[] for x in range(len(buckets))]
 cbm_density_lng_distances = [[] for x in range(len(buckets))]
@@ -1116,11 +1120,11 @@ for key in lngs:
     ransac_idx = len(buckets) - 1
 
     for bIdx, bucket in enumerate(buckets):
-        if cbm_median_locations[key][1] <= bucket + 20:
+        if cbm_median_locations[key][1] <= bucket + 10:
             median_idx = min(bIdx, median_idx)
-        if cbm_density_locations[key][1] <= bucket + 20:
+        if cbm_density_locations[key][1] <= bucket + 10:
             density_idx = min(bIdx, density_idx)
-        if ransac_locations[key][1] <= bucket + 20:
+        if ransac_locations[key][1] <= bucket + 10:
             ransac_idx = min(bIdx, ransac_idx)
 
     cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
