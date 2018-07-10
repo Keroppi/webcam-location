@@ -88,8 +88,12 @@ test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=constants.BAT
 # Test Set
 
 # When testing, use uniform frames to increase likelihood of grabbing sunrise and sunset.
+uniform_t0 = time.time()
 for day in days:
     day.uniform_frames()
+uniform_t1 = time.time()
+print('Getting uniform frames time (min): {:.2f}'.format((uniform_t1 - uniform_t0) / 60))
+sys.stdout.flush()
 
 print('# Test Examples: {}'.format(len(test_loader.dataset)))
 sys.stdout.flush()
