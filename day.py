@@ -128,7 +128,68 @@ class Day():
 
         return (times, img_paths)
 
-    def change_frames(self, center_frame, mode='sunrise'): # Given a suggested frame idx, repick frames that are close to it.
+    def change_frames_medium(self, center_frame, mode='sunrise'): # Given a suggested frame idx, uniformly pick from 65 frames that are closest to it.
+        suggested_time = self.get_local_time(center_frame)
+
+        start_idx = len(self.all_times) - 1
+        end_idx = len(self.all_times) - 1
+        for t_idx, time in enumerate(self.all_times):
+            if suggested_time < time:
+                start_idx = max(t_idx - 1, 0)
+                end_idx = t_idx
+                break
+
+        center_idx = round((start_idx + end_idx) / 2)
+        start_idx = center_idx - math.ceil(constants.IMAGES_PER_DAY * 1)
+        end_idx = center_idx + math.ceil(constants.IMAGES_PER_DAY * 1) # 65 frames
+
+        if start_idx < 0:
+            start_idx = 0
+            end_idx = min(math.ceil(2 * constants.IMAGES_PER_DAY), len(self.all_times) - 1)
+        if end_idx > len(self.all_times) - 1:
+            start_idx = max(len(self.all_times) - 1 - math.ceil(2 * constants.IMAGES_PER_DAY), 0)
+            end_idx = len(self.all_times) - 1
+
+        if mode == 'sunrise':
+            if self.sunrise_in_frames:
+                if not (self.sunrise_idx >= 0 and self.sunrise_idx <= constants.IMAGES_PER_DAY - 1):
+                    sunrise_before = False
+                else:
+                    sunrise_before = True
+        else:
+            if self.sunset_in_frames:
+                if not (self.sunset_idx >= 0 and self.sunset_idx <= constants.IMAGES_PER_DAY - 1):
+                    sunset_before = False
+                else:
+                    sunset_before = True
+
+        self.times, self.img_paths = self.uniform_subset(self.all_times[start_idx:end_idx + 1], self.all_img_paths[start_idx:end_idx + 1])
+        self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, self.sunrise, self.sunset)
+
+        if mode == 'sunrise':
+            if self.sunrise_in_frames:
+                if not (self.sunrise_idx >= 0 and self.sunrise_idx <= constants.IMAGES_PER_DAY - 1):
+                    if sunrise_before:
+                        print('CHANGE FRAMES 1 MADE SUNRISE WORSE') # Can count number of times this phrase appears.
+                    else:
+                        print('CHANGE FRAMES 1 DID NOT IMPROVE SUNRISE')
+                else:
+                    if not sunrise_before:
+                        print('CHANGE FRAMES 1 MADE SUNRISE BETTER')
+        else:
+            if self.sunset_in_frames:
+                if not (self.sunset_idx >= 0 and self.sunset_idx <= constants.IMAGES_PER_DAY - 1):
+                    if sunset_before:
+                        print('CHANGE FRAMES 1 MADE SUNSET WORSE')
+                    else:
+                        print('CHANGE FRAMES 1 DID NOT IMPROVE SUNSET')
+                else:
+                    if not sunset_before:
+                        print('CHANGE FRAMES 1 MADE SUNSET BETTER')
+
+        sys.stdout.flush()
+
+    def change_frames_fine(self, center_frame, mode='sunrise'): # Given a suggested frame idx, repick 32 frames that are closest to it.
         suggested_time = self.get_local_time(center_frame)
 
         start_idx = len(self.all_times) - 1
@@ -219,17 +280,17 @@ class Day():
             if self.sunrise_in_frames:
                 if not (self.sunrise_idx >= 0 and self.sunrise_idx <= constants.IMAGES_PER_DAY - 1):
                     if sunrise_before:
-                        print('CHANGE FRAMES MADE SUNRISE WORSE') # Can count number of times this phrase appears.
+                        print('CHANGE FRAMES 2 MADE SUNRISE WORSE') # Can count number of times this phrase appears.
                     else:
-                        print('CHANGE FRAMES DID NOT IMPROVE SUNRISE')
+                        print('CHANGE FRAMES 2 DID NOT IMPROVE SUNRISE')
                 else:
                     if not sunrise_before:
-                        print('CHANGE FRAMES MADE SUNRISE BETTER') # Can count number of times this phrase appears.
+                        print('CHANGE FRAMES 2 MADE SUNRISE BETTER') # Can count number of times this phrase appears.
         else:
             if self.sunset_in_frames:
                 if not (self.sunset_idx >= 0 and self.sunset_idx <= constants.IMAGES_PER_DAY - 1):
                     if sunset_before:
-                        print('CHANGE FRAMES MADE SUNSET WORSE') # Can count number of times this phrase appears.
+                        print('CHANGE FRAMES 2 MADE SUNSET WORSE') # Can count number of times this phrase appears.
                         #print(self.sunset)
                         #print(self.times[0])
                         #print(self.times[-1])
@@ -237,10 +298,10 @@ class Day():
                         #print(self.all_times[-1])
                         #print(self.all_times[center_idx])
                     else:
-                        print('CHANGE FRAMES DID NOT IMPROVE SUNSET')
+                        print('CHANGE FRAMES 2 DID NOT IMPROVE SUNSET')
                 else:
                     if not sunset_before:
-                        print('CHANGE FRAMES MADE SUNSET BETTER') # Can count number of times this phrase appears.
+                        print('CHANGE FRAMES 2 MADE SUNSET BETTER') # Can count number of times this phrase appears.
 
         sys.stdout.flush()
         ### END VLI
