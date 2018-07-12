@@ -140,31 +140,13 @@ for d_idx, day_length in enumerate(day_lengths):
 
     # Check if they're in different (north / south) hemispheres.
     if (cbm_lat > 0 and days[d_idx].lat < 0) or (cbm_lat < 0 and days[d_idx].lat > 0):
-        theta = 0.2163108 + 2 * math.atan(0.9671396 * math.tan(0.00860 * (day_of_year - 186)))
-        phi = math.asin(0.39795 * math.cos(theta))
-        #denominator = math.sin(phi)
-        #numerator = math.cos(phi) * math.cos(-math.pi / 24 * (day_length_hours - 24))
-        #denominator1 = math.tan(phi)
-        #numerator1 = math.cos(-math.pi / 24 * (day_length_hours - 24))
+        if math.fabs(day_length_hours - 12) < 0.5:
+            cbm_lat *= -1
 
-        #EPSILON = 0.05
-        #if math.fabs(denominator) < EPSILON or math.fabs(denominator1) < EPSILON:
-        #    cbm_lat *= -1
-
-        #print('WARNING - Different hemispheres')
-        #print(days[d_idx].place)
-        #print('Denominator (sin) value: ' + str(denominator))
-        #print('Numerator (sin) value: ' + str(numerator))
-        #print('Denominator (tan) value: ' + str(denominator1))
-        #print('Numerator (tan) value: ' + str(numerator1))
-
-    '''
-    if random.randint(1, 100) < 5:
-        print('Lat')
-        print(lat)
-        print('')
-        sys.stdout.flush()
-    '''
+    # Check if they're in different (north / south) hemispheres.
+    if (lat > 0 and days[d_idx].lat < 0) or (lat < 0 and days[d_idx].lat > 0):
+        if math.fabs(day_length_hours - 12) < 0.5:
+            lat *= -1
 
     latitudes.append(lat) # Only one day to predict latitude - could average across many days.
     cbm_latitudes.append(cbm_lat)  # Only one day to predict latitude - could average across many days.
@@ -912,8 +894,8 @@ print('SEASON OVER ALL DAYS BUCKETS NUM DATA PTS: ' + str(cbm_season_num_data_pt
 
 # Plot average distance error vs. intervals over ALL PLACES.
 # Only using CBM model for now.
-buckets = list(range(0, 25, 3)) # 3 minute intervals
-bucket_labels = [str(x) + '-' + str(x + 3) for x in buckets]
+buckets = list(range(0, 25, 5)) # 5 minute intervals
+bucket_labels = [str(x) + '-' + str(x + 5) for x in buckets]
 bucket_labels[-1] = bucket_labels[-1] + '+'
 
 cbm_median_bucket_distances = [[] for x in range(len(buckets))]
@@ -928,7 +910,7 @@ ransac_bucket_rmses = [0 for x in range(len(buckets))] #
 ransac_bucket_num_data_pts = [0] * len(buckets) #
 for key in intervals:
     for bIdx, bucket in enumerate(buckets):
-        if intervals[key] < bucket + 3:
+        if intervals[key] < bucket + 5:
             break
 
     cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
