@@ -128,7 +128,7 @@ class Day():
 
         return (times, img_paths)
 
-    def change_frames_medium(self, center_frame, mode='sunrise'): # Given a suggested frame idx, uniformly pick from 65 frames that are closest to it.
+    def change_frames_medium(self, center_frame, mode='sunrise'): # Given a suggested frame idx, uniformly pick from 97 frames that are closest to it.
         suggested_time = self.get_local_time(center_frame)
 
         start_idx = len(self.all_times) - 1
@@ -140,14 +140,14 @@ class Day():
                 break
 
         center_idx = round((start_idx + end_idx) / 2)
-        start_idx = center_idx - math.ceil(constants.IMAGES_PER_DAY * 1)
-        end_idx = center_idx + math.ceil(constants.IMAGES_PER_DAY * 1) # 65 frames
+        start_idx = center_idx - math.ceil(constants.IMAGES_PER_DAY * 1.5)
+        end_idx = center_idx + math.ceil(constants.IMAGES_PER_DAY * 1.5) # 97 frames
 
         if start_idx < 0:
             start_idx = 0
-            end_idx = min(math.ceil(2 * constants.IMAGES_PER_DAY), len(self.all_times) - 1)
+            end_idx = min(math.ceil(2 * 1.5 * constants.IMAGES_PER_DAY), len(self.all_times) - 1)
         if end_idx > len(self.all_times) - 1:
-            start_idx = max(len(self.all_times) - 1 - math.ceil(2 * constants.IMAGES_PER_DAY), 0)
+            start_idx = max(len(self.all_times) - 1 - math.ceil(2 * 1.5 * constants.IMAGES_PER_DAY), 0)
             end_idx = len(self.all_times) - 1
 
         if mode == 'sunrise':
