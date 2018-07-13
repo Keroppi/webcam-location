@@ -16,6 +16,8 @@ import matplotlib.pyplot as plt
 from matplotlib import colors as mcolors
 
 print('Starting predict location.')
+print('Bandwidth: {}'.format(constants.BANDWIDTH))
+print('RANSAC Inlier: {}'.format(constants.INLIER_THRESHOLD))
 sys.stdout.flush()
 
 parser = argparse.ArgumentParser(description='Predict Location')
