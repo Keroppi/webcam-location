@@ -143,12 +143,12 @@ for d_idx, day_length in enumerate(day_lengths):
     # Check if they're in different (north / south) hemispheres.
     if (cbm_lat > 0 and days[d_idx].lat < 0) or (cbm_lat < 0 and days[d_idx].lat > 0):
         if math.fabs(day_length_hours - 12) < 0.5:
-            cbm_lat *= -1
+            cbm_lat *= 1
 
     # Check if they're in different (north / south) hemispheres.
     if (lat > 0 and days[d_idx].lat < 0) or (lat < 0 and days[d_idx].lat > 0):
         if math.fabs(day_length_hours - 12) < 0.5:
-            lat *= -1
+            lat *= 1
 
     latitudes.append(lat) # Only one day to predict latitude - could average across many days.
     cbm_latitudes.append(cbm_lat)  # Only one day to predict latitude - could average across many days.
@@ -1180,6 +1180,47 @@ bar(buckets, ransac_lng_distances, 'Median Distance Error (km)', 'Longitude', bu
 print('LNG OVER ALL LOCATIONS (MEDIAN) BUCKETS NUM DATA PTS: ' + str(cbm_median_lng_num_data_pts)) #
 print('LNG OVER ALL LOCATIONS (DENSITY) BUCKETS NUM DATA PTS: ' + str(cbm_density_lng_num_data_pts)) #
 print('LNG OVER ALL LOCATIONS (RANSAC) BUCKETS NUM DATA PTS: ' + str(ransac_lng_num_data_pts)) #
+
+# Num locations vs. error using all methods.
+buckets = list(range(0, 5000, 100)) # 100 km buckets
+bucket_labels = [str(x) + '-' + str(x + 100) for x in buckets]
+bucket_labels[-1] = bucket_labels[-1] + '+'
+
+cbm_median_errors = [0] * len(buckets) #[[] for x in range(len(buckets))]
+cbm_density_errors = [0] * len(buckets) #[[] for x in range(len(buckets))]
+ransac_errors = [0] * len(buckets) #[[] for x in range(len(buckets))]
+
+cbm_median_error_rmses = [0 for x in range(len(buckets))]
+cbm_median_error_num_data_pts = [0] * len(buckets)
+cbm_density_error_rmses = [0 for x in range(len(buckets))]
+cbm_density_error_num_data_pts = [0] * len(buckets)
+ransac_error_rmses = [0 for x in range(len(buckets))]
+ransac_error_num_data_pts = [0] * len(buckets)
+
+for key in actual_locations:
+    cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
+    cbm_density_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_density_locations[key][0], cbm_density_locations[key][1])
+    ransac_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], ransac_locations[key][0], ransac_locations[key][1])
+
+    median_idx = len(buckets) - 1
+    density_idx = len(buckets) - 1
+    ransac_idx = len(buckets) - 1
+
+    for bIdx, bucket in enumerate(buckets):
+        if cbm_median_distance_err <= bucket + 100:
+            median_idx = min(bIdx, median_idx)
+        if cbm_density_distance_err <= bucket + 100:
+            density_idx = min(bIdx, density_idx)
+        if ransac_distance_err <= bucket + 100:
+            ransac_idx = min(bIdx, ransac_idx)
+
+    cbm_median_errors[median_idx] += 1
+    cbm_density_errors[density_idx] += 1
+    ransac_errors[ransac_idx] += 1
+
+bar(buckets, cbm_median_errors, '# of Places', 'Error (km)', bucket_labels, 'Histogram of Error (km) Using Median', 'cbm_error_median.png')
+bar(buckets, cbm_density_errors, '# of Places', 'Error (km)', bucket_labels, 'Histogram of Error (km) Using Gaussian KDE', 'cbm_error_density.png')
+bar(buckets, ransac_errors, '# of Places', 'Error (km)', bucket_labels, 'Histogram of Error (km) Using RANSAC', 'cbm_error_ransac.png')
 
 green = 0
 sunrise_only = 0
