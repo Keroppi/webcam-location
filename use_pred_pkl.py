@@ -3,7 +3,7 @@
 import matplotlib
 matplotlib.use('agg')
 
-import os, argparse, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, pickle, collections
+import os, argparse, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, pickle, collections, copy
 from sklearn.neighbors.kde import KernelDensity
 from scipy.optimize import minimize
 from sklearn.metrics import mean_squared_error
@@ -304,8 +304,16 @@ def compute_distance(lat1, lng1, lat2, lng2):  # km
         iterations += 1
         lamb = new_lamb
 
+actual_locations = {}
+for i in range(len(days)):
+    if actual_locations.get(days[i].place) is None:
+        actual_locations[days[i].place] = (days[i].lat, days[i].lng)
+    else:
+        continue
+
 def ransac(lats, lngs):
     ransacs = {}
+    inliers = {}
 
     for place in lats:
         guesses = list(zip(lats[place], lngs[place]))
@@ -325,11 +333,40 @@ def ransac(lats, lngs):
                 max_idx = i_idx
                 max_inliers = len(inlier)
 
+        inliers[place] = max_inliers
         ransacs[place] = (statistics.mean([x[0] for x in inliers[max_idx]]), statistics.mean([x[1] for x in inliers[max_idx]]))
 
-    return ransacs
+    return (ransacs, inliers)
 
-ransac_locations = ransac(cbm_lats, lngs)
+ransac_locations, inliers1 = ransac(cbm_lats, lngs)
+
+# Do RANSAC again but with the actual
+lats_with_actuals = copy.deepcopy(cbm_lats)
+lngs_with_actuals = copy.deepcopy(lngs)
+
+for place in actual_locations:
+    lats_with_actuals[place].append(actual_locations[place][0])
+    lngs_with_actuals[place].append(actual_locations[place][1])
+
+_, inliers2 = ransac(lats_with_actuals, lngs_with_actuals)
+
+
+without_actual = 0
+tied = 0
+actual_better = 0
+
+for place in inliers1:
+    if inliers1[place] < inliers2[place]:
+        actual_better += 1
+    elif inliers1[place] == inliers2[place]:
+        tied += 1
+    else:
+        without_actual += 1
+
+print('Less inliers with actual location: {}'.format(without_actual))
+print('Tied: {}'.format(tied))
+print('More inliers with actual location: {}'.format(actual_better))
+sys.stdout.flush()
 
 # Collect intervals of each place.
 intervals = {}
@@ -471,13 +508,6 @@ def kde(lats, lngs, median_locations):
 
 density_locations = kde(lats, lngs, median_locations)
 cbm_density_locations = kde(cbm_lats, lngs, cbm_median_locations)
-
-actual_locations = {}
-for i in range(len(days)):
-    if actual_locations.get(days[i].place) is None:
-        actual_locations[days[i].place] = (days[i].lat, days[i].lng)
-    else:
-        continue
 
 def plot_map(lats, lngs, mean_locations, median_locations, density_locations, mode='sun'):
     # Plot locations on a map.
