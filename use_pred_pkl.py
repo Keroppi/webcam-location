@@ -315,7 +315,7 @@ for i in range(len(days)):
 
 def ransac(lats, lngs):
     ransacs = {}
-    inliers = {}
+    inlier_dict = {}
 
     for place in lats:
         guesses = list(zip(lats[place], lngs[place]))
@@ -335,12 +335,13 @@ def ransac(lats, lngs):
                 max_idx = i_idx
                 max_inliers = len(inlier)
 
-        inliers[place] = max_inliers
+        inlier_dict[place] = max_inliers
         ransacs[place] = (statistics.mean([x[0] for x in inliers[max_idx]]), statistics.mean([x[1] for x in inliers[max_idx]]))
 
-    return (ransacs, inliers)
+    return (ransacs, inlier_dict)
 
-ransac_locations, inliers1 = ransac(cbm_lats, lngs)
+brock_ransac_locations, _ = ransac(lats, lngs)
+cbm_ransac_locations, inliers1 = ransac(cbm_lats, lngs)
 
 # Do RANSAC again but with the actual
 lats_with_actuals = copy.deepcopy(cbm_lats)
@@ -570,8 +571,8 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, mo
         #x_median,y_median = map([median_locations[place][1]], [median_locations[place][0]])
         #x_density,y_density = map([density_locations[place][1]], [density_locations[place][0]])
 
-        actual_and_pred_lngs = [actual_lng] + [mean_locations[place][1]] + [median_locations[place][1]] + [density_locations[place][1]] + [ransac_locations[place][1]]
-        actual_and_pred_lats = [actual_lat] + [mean_locations[place][0]] + [median_locations[place][0]] + [density_locations[place][0]] + [ransac_locations[place][0]]
+        actual_and_pred_lngs = [actual_lng] + [mean_locations[place][1]] + [median_locations[place][1]] + [density_locations[place][1]] + [cbm_ransac_locations[place][1]]
+        actual_and_pred_lats = [actual_lat] + [mean_locations[place][0]] + [median_locations[place][0]] + [density_locations[place][0]] + [cbm_ransac_locations[place][0]]
         actual_and_pred_colors = ['w', 'm', 'c', mcolors.CSS4_COLORS['fuchsia'], 'xkcd:chartreuse']
 
         guesses = map.scatter(lngs[place], lats[place], s=40, c=colors, latlon=True, zorder=10)
@@ -624,9 +625,13 @@ cbm_mean_latitude_err = []
 cbm_median_latitude_err = []
 cbm_density_latitude_err = []
 
-ransac_distances = []
-ransac_longitude_err = []
-ransac_latitude_err = []
+brock_ransac_distances = []
+brock_ransac_longitude_err = []
+brock_ransac_latitude_err = []
+
+cbm_ransac_distances = []
+cbm_ransac_longitude_err = []
+cbm_ransac_latitude_err = []
 
 #for i in range(len(days)):
 for place in lats:
@@ -649,6 +654,8 @@ for place in lats:
     median_pred_lng = median_locations[place][1]
     density_pred_lat = density_locations[place][0]
     density_pred_lng = density_locations[place][1]
+    brock_ransac_pred_lat = brock_ransac_locations[place][0]
+    brock_ransac_pred_lng = brock_ransac_locations[place][1]
 
     cbm_mean_pred_lat = cbm_mean_locations[place][0]
     cbm_mean_pred_lng = cbm_mean_locations[place][1]
@@ -656,8 +663,8 @@ for place in lats:
     cbm_median_pred_lng = cbm_median_locations[place][1]
     cbm_density_pred_lat = cbm_density_locations[place][0]
     cbm_density_pred_lng = cbm_density_locations[place][1]
-    ransac_pred_lat = ransac_locations[place][0]
-    ransac_pred_lng = ransac_locations[place][1]
+    cbm_ransac_pred_lat = cbm_ransac_locations[place][0]
+    cbm_ransac_pred_lng = cbm_ransac_locations[place][1]
 
     mean_distance = compute_distance(actual_lat, actual_lng, mean_pred_lat, mean_pred_lng)
     mean_distances.append(mean_distance)
@@ -684,14 +691,19 @@ for place in lats:
     cbm_median_latitude_err.append(compute_distance(actual_lat, actual_lng, cbm_median_pred_lat, actual_lng))
     cbm_density_latitude_err.append(compute_distance(actual_lat, actual_lng, cbm_density_pred_lat, actual_lng))
 
-    ransac_distance = compute_distance(actual_lat, actual_lng, ransac_pred_lat, ransac_pred_lng)
-    ransac_distances.append(ransac_distance)
-    ransac_latitude_err.append(compute_distance(actual_lat, actual_lng, ransac_pred_lat, actual_lng))
-    ransac_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, ransac_pred_lng))
+    cbm_ransac_distance = compute_distance(actual_lat, actual_lng, cbm_ransac_pred_lat, cbm_ransac_pred_lng)
+    cbm_ransac_distances.append(cbm_ransac_distance)
+    cbm_ransac_latitude_err.append(compute_distance(actual_lat, actual_lng, cbm_ransac_pred_lat, actual_lng))
+    cbm_ransac_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, cbm_ransac_pred_lng))
+
+    brock_ransac_distance = compute_distance(actual_lat, actual_lng, brock_ransac_pred_lat, brock_ransac_pred_lng)
+    brock_ransac_distances.append(brock_ransac_distance)
+    brock_ransac_latitude_err.append(compute_distance(actual_lat, actual_lng, brock_ransac_pred_lat, actual_lng))
+    brock_ransac_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, brock_ransac_pred_lng))
 
     if random.randint(1, 100) < 101:
-        if median_distance < 25 or density_distance < 25 or ransac_distance < 25 or \
-           cbm_median_distance < 25 or cbm_density_distance < 25:
+        if median_distance < 25 or density_distance < 25 or brock_ransac_distance < 25 or \
+           cbm_ransac_distance < 25 or cbm_median_distance < 25 or cbm_density_distance < 25:
             print('Under 25km!')
 
         print(place)
@@ -704,7 +716,7 @@ for place in lats:
         print('Using mean: ' + str(cbm_mean_distance))
         print('Using median: ' + str(cbm_median_distance))
         print('Using density: ' + str(cbm_density_distance))
-        print('Using RANSAC: ' + str(ransac_distance))
+        print('Using RANSAC: ' + str(cbm_ransac_distance))
         print('Actual lat, lng: ' + str(actual_lat) + ', ' + str(actual_lng))
         print('Brock Distance')
         print('Mean lat, lng: ' + str(mean_pred_lat) + ', ' + str(mean_pred_lng))
@@ -714,7 +726,7 @@ for place in lats:
         print('Mean lat, lng: ' + str(cbm_mean_pred_lat) + ', ' + str(cbm_mean_pred_lng))
         print('Median lat, lng: ' + str(cbm_median_pred_lat) + ', ' + str(cbm_median_pred_lng))
         print('Density lat, lng: ' + str(cbm_density_pred_lat) + ', ' + str(cbm_density_pred_lng))
-        print('RANSAC lat, lng: ' + str(ransac_pred_lat) + ', ' + str(ransac_pred_lng))
+        print('RANSAC lat, lng: ' + str(cbm_ransac_pred_lat) + ', ' + str(cbm_ransac_pred_lng))
         print('Median Interval (min): ' + str(intervals[place]))
         print('Sunrise / Sunset Visible Breakdown of Days: ' + str(sun_visibles[place]))
         print('')
@@ -765,7 +777,7 @@ scatter(days_used, density_distances, None, 'gaussian kde', color=mcolors.CSS4_C
 #scatter(days_used, cbm_mean_distances, 'mo', 'mean', cbm=True)
 scatter(days_used, cbm_median_distances, 'co', 'median', cbm=True)
 scatter(days_used, cbm_density_distances, None, 'gaussian kde', color=mcolors.CSS4_COLORS['fuchsia'], linestyle='None', marker='o', cbm=True)
-scatter(days_used, ransac_distances, None, 'RANSAC', color='xkcd:chartreuse', linestyle='None', marker='o', cbm=True)
+scatter(days_used, cbm_ransac_distances, None, 'RANSAC', color='xkcd:chartreuse', linestyle='None', marker='o', cbm=True)
 
 def median_rmse(data):
     median = statistics.median(data)
@@ -951,7 +963,7 @@ for key in intervals:
     cbm_density_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_density_locations[key][0], cbm_density_locations[key][1])
     cbm_density_bucket_distances[bIdx].append(cbm_density_distance_err)
 
-    ransac_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], ransac_locations[key][0], ransac_locations[key][1])
+    ransac_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_ransac_locations[key][0], cbm_ransac_locations[key][1])
     ransac_bucket_distances[bIdx].append(ransac_distance_err)
 
 for bdIdx, distance_errs in enumerate(cbm_median_bucket_distances):
@@ -1011,7 +1023,7 @@ for key in intervals:
     cbm_density_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_density_locations[key][0], cbm_density_locations[key][1])
     cbm_density_sun_type_distances[bIdx].append(cbm_density_distance_err)
 
-    ransac_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], ransac_locations[key][0], ransac_locations[key][1])
+    ransac_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_ransac_locations[key][0], cbm_ransac_locations[key][1])
     ransac_sun_type_distances[bIdx].append(ransac_distance_err)
 
 for bdIdx, distance_errs in enumerate(cbm_median_sun_type_distances):
@@ -1070,7 +1082,7 @@ for key in lats:
             median_idx = min(bIdx, median_idx)
         if cbm_density_locations[key][0] < bucket + 5:
             density_idx = min(bIdx, density_idx)
-        if ransac_locations[key][0] < bucket + 5:
+        if cbm_ransac_locations[key][0] < bucket + 5:
             ransac_idx = min(bIdx, ransac_idx)
 
     cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
@@ -1079,7 +1091,7 @@ for key in lats:
     cbm_density_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_density_locations[key][0], cbm_density_locations[key][1])
     cbm_density_lat_distances[density_idx].append(cbm_density_distance_err)
 
-    ransac_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], ransac_locations[key][0], ransac_locations[key][1])
+    ransac_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_ransac_locations[key][0], cbm_ransac_locations[key][1])
     ransac_lat_distances[ransac_idx].append(ransac_distance_err)
 
 for bdIdx, distance_errs in enumerate(cbm_median_lat_distances):
@@ -1138,7 +1150,7 @@ for key in lngs:
             median_idx = min(bIdx, median_idx)
         if cbm_density_locations[key][1] <= bucket + 10:
             density_idx = min(bIdx, density_idx)
-        if ransac_locations[key][1] <= bucket + 10:
+        if cbm_ransac_locations[key][1] <= bucket + 10:
             ransac_idx = min(bIdx, ransac_idx)
 
     cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
@@ -1147,7 +1159,7 @@ for key in lngs:
     cbm_density_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_density_locations[key][0], cbm_density_locations[key][1])
     cbm_density_lng_distances[density_idx].append(cbm_density_distance_err)
 
-    ransac_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], ransac_locations[key][0], ransac_locations[key][1])
+    ransac_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_ransac_locations[key][0], cbm_ransac_locations[key][1])
     ransac_lng_distances[ransac_idx].append(ransac_distance_err)
 
 for bdIdx, distance_errs in enumerate(cbm_median_lng_distances):
@@ -1200,7 +1212,7 @@ ransac_error_num_data_pts = [0] * len(buckets)
 for key in actual_locations:
     cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
     cbm_density_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_density_locations[key][0], cbm_density_locations[key][1])
-    ransac_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], ransac_locations[key][0], ransac_locations[key][1])
+    ransac_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_ransac_locations[key][0], cbm_ransac_locations[key][1])
 
     median_idx = len(buckets) - 1
     density_idx = len(buckets) - 1
@@ -1250,6 +1262,7 @@ sys.stdout.flush()
 print('Brock Means Avg. Distance Error: {:.6f}'.format(statistics.mean(mean_distances)))
 print('Brock Medians Avg. Distance Error: {:.6f}'.format(statistics.mean(median_distances)))
 print('Brock Density Avg. Distance Error: {:.6f}'.format(statistics.mean(density_distances)))
+print('Brock RANSAC Avg. Distance Error: {:.6f}'.format(statistics.mean(brock_ransac_distances)))
 print('Brock Means Median Distance Error: {:.6f}'.format(statistics.median(mean_distances)))
 print('Brock Medians Median Distance Error: {:.6f}'.format(statistics.median(median_distances)))
 print('Brock Density Median Distance Error: {:.6f}'.format(statistics.median(density_distances)))
@@ -1263,36 +1276,36 @@ print('')
 print('CBM Means Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_mean_distances)))
 print('CBM Medians Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_median_distances)))
 print('CBM Density Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_density_distances)))
-print('RANSAC Avg. Distance Error: {:.6f}'.format(statistics.mean(ransac_distances)))
+print('RANSAC Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_ransac_distances)))
 print('CBM Means Median Distance Error: {:.6f}'.format(statistics.median(cbm_mean_distances)))
 print('CBM Medians Median Distance Error: {:.6f}'.format(statistics.median(cbm_median_distances)))
 print('CBM Density Median Distance Error: {:.6f}'.format(statistics.median(cbm_density_distances)))
-print('RANSAC Median Distance Error: {:.6f}'.format(statistics.median(ransac_distances)))
+print('RANSAC Median Distance Error: {:.6f}'.format(statistics.median(cbm_ransac_distances)))
 print('CBM Means Max Distance Error: {:.6f}'.format(max(cbm_mean_distances)))
 print('CBM Means Min Distance Error: {:.6f}'.format(min(cbm_mean_distances)))
 print('CBM Medians Max Distance Error: {:.6f}'.format(max(cbm_median_distances)))
 print('CBM Medians Min Distance Error: {:.6f}'.format(min(cbm_median_distances)))
 print('CBM Density Max Distance Error: {:.6f}'.format(max(cbm_density_distances)))
 print('CBM Density Min Distance Error: {:.6f}'.format(min(cbm_density_distances)))
-print('RANSAC Max Distance Error: {:.6f}'.format(max(ransac_distances)))
-print('RANSAC Min Distance Error: {:.6f}'.format(min(ransac_distances)))
+print('RANSAC Max Distance Error: {:.6f}'.format(max(cbm_ransac_distances)))
+print('RANSAC Min Distance Error: {:.6f}'.format(min(cbm_ransac_distances)))
 print('')
 print('Means Avg. Longitude Error: {:.6f}'.format(statistics.mean(mean_longitude_err)))
 print('Medians Avg. Longitude Error: {:.6f}'.format(statistics.mean(median_longitude_err)))
 print('Density Avg. Longitude Error: {:.6f}'.format(statistics.mean(density_longitude_err)))
-print('RANSAC Avg. Longitude Error: {:.6f}'.format(statistics.mean(ransac_longitude_err)))
+print('RANSAC Avg. Longitude Error: {:.6f}'.format(statistics.mean(cbm_ransac_longitude_err)))
 print('Means Median Longitude Error: {:.6f}'.format(statistics.median(mean_longitude_err)))
 print('Medians Median Longitude Error: {:.6f}'.format(statistics.median(median_longitude_err)))
 print('Density Median Longitude Error: {:.6f}'.format(statistics.median(density_longitude_err)))
-print('RANSAC Median Longitude Error: {:.6f}'.format(statistics.median(ransac_longitude_err)))
+print('RANSAC Median Longitude Error: {:.6f}'.format(statistics.median(cbm_ransac_longitude_err)))
 print('Means Max Longitude Error: {:.6f}'.format(max(mean_longitude_err)))
 print('Means Min Longitude Error: {:.6f}'.format(min(mean_longitude_err)))
 print('Medians Max Longitude Error: {:.6f}'.format(max(median_longitude_err)))
 print('Medians Min Longitude Error: {:.6f}'.format(min(median_longitude_err)))
 print('Density Max Longitude Error: {:.6f}'.format(max(density_longitude_err)))
 print('Density Min Longitude Error: {:.6f}'.format(min(density_longitude_err)))
-print('RANSAC Max Longitude Error: {:.6f}'.format(max(ransac_longitude_err)))
-print('RANSAC Min Longitude Error: {:.6f}'.format(min(ransac_longitude_err)))
+print('RANSAC Max Longitude Error: {:.6f}'.format(max(cbm_ransac_longitude_err)))
+print('RANSAC Min Longitude Error: {:.6f}'.format(min(cbm_ransac_longitude_err)))
 print('')
 print('Brock Means Avg. Latitude Error: {:.6f}'.format(statistics.mean(mean_latitude_err)))
 print('Brock Medians Avg. Latitude Error: {:.6f}'.format(statistics.mean(median_latitude_err)))
@@ -1310,18 +1323,18 @@ print('')
 print('CBM Means Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_mean_latitude_err)))
 print('CBM Medians Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_median_latitude_err)))
 print('CBM Density Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_density_latitude_err)))
-print('RANSAC Avg. Latitude Error: {:.6f}'.format(statistics.mean(ransac_latitude_err)))
+print('RANSAC Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_ransac_latitude_err)))
 print('CBM Means Median Latitude Error: {:.6f}'.format(statistics.median(cbm_mean_latitude_err)))
 print('CBM Medians Median Latitude Error: {:.6f}'.format(statistics.median(cbm_median_latitude_err)))
 print('CBM Density Median Latitude Error: {:.6f}'.format(statistics.median(cbm_density_latitude_err)))
-print('RANSAC Median Latitude Error: {:.6f}'.format(statistics.median(ransac_latitude_err)))
+print('RANSAC Median Latitude Error: {:.6f}'.format(statistics.median(cbm_ransac_latitude_err)))
 print('CBM Means Max Latitude Error: {:.6f}'.format(max(cbm_mean_latitude_err)))
 print('CBM Means Min Latitude Error: {:.6f}'.format(min(cbm_mean_latitude_err)))
 print('CBM Medians Max Latitude Error: {:.6f}'.format(max(cbm_median_latitude_err)))
 print('CBM Medians Min Latitude Error: {:.6f}'.format(min(cbm_median_latitude_err)))
 print('CBM Density Max Latitude Error: {:.6f}'.format(max(cbm_density_latitude_err)))
 print('CBM Density Min Latitude Error: {:.6f}'.format(min(cbm_density_latitude_err)))
-print('RANSAC Max Longitude Error: {:.6f}'.format(max(ransac_latitude_err)))
-print('RANSAC Min Longitude Error: {:.6f}'.format(min(ransac_latitude_err)))
+print('RANSAC Max Longitude Error: {:.6f}'.format(max(cbm_ransac_latitude_err)))
+print('RANSAC Min Longitude Error: {:.6f}'.format(min(cbm_ransac_latitude_err)))
 print('')
 sys.stdout.flush()
