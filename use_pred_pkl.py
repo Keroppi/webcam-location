@@ -805,10 +805,14 @@ def median_rmse(data):
 
 def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None):
     plt.figure(figsize=(24, 12))
+
+    if yerr is not None:
+        yerr = [(0,) * len(x), tuple(yerr)] # Only keep top half of error line.
+
     x = np.arange(len(x))
     #y = bucket_distances
     width = 0.35
-    plt.bar(x, y, width, color='r', yerr=[(0,) * len(x), tuple(yerr)])
+    plt.bar(x, y, width, color='r', yerr=yerr)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     ax = plt.gca()
