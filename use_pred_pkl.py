@@ -1217,8 +1217,8 @@ print('LNG OVER ALL LOCATIONS (DENSITY) BUCKETS NUM DATA PTS: ' + str(cbm_densit
 print('LNG OVER ALL LOCATIONS (RANSAC) BUCKETS NUM DATA PTS: ' + str(ransac_lng_num_data_pts)) #
 
 # Num locations vs. error using all methods.
-buckets = list(range(0, 5000, 100)) # 100 km buckets
-bucket_labels = [str(x) + '-' + str(x + 100) for x in buckets]
+buckets = list(range(0, 3000, 100)) # 100 km buckets
+bucket_labels = [str(x // 100) + '-' + str((x + 100) // 100) for x in buckets]
 bucket_labels[-1] = bucket_labels[-1] + '+'
 
 cbm_median_errors = [0] * len(buckets) #[[] for x in range(len(buckets))]
@@ -1253,9 +1253,9 @@ for key in actual_locations:
     cbm_density_errors[density_idx] += 1
     ransac_errors[ransac_idx] += 1
 
-bar(buckets, cbm_median_errors, '# of Places', 'Error (km)', bucket_labels, 'Histogram of Error (km) Using Median', 'cbm_error_median.png')
-bar(buckets, cbm_density_errors, '# of Places', 'Error (km)', bucket_labels, 'Histogram of Error (km) Using Gaussian KDE', 'cbm_error_density.png')
-bar(buckets, ransac_errors, '# of Places', 'Error (km)', bucket_labels, 'Histogram of Error (km) Using RANSAC', 'cbm_error_ransac.png')
+bar(buckets, cbm_median_errors, '# of Places', 'Error (100 km)', bucket_labels, 'Histogram of Error (km) Using Median', 'cbm_error_median.png')
+bar(buckets, cbm_density_errors, '# of Places', 'Error (100 km)', bucket_labels, 'Histogram of Error (km) Using Gaussian KDE', 'cbm_error_density.png')
+bar(buckets, ransac_errors, '# of Places', 'Error (100 km)', bucket_labels, 'Histogram of Error (km) Using RANSAC', 'cbm_error_ransac.png')
 
 green = 0
 sunrise_only = 0
