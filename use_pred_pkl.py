@@ -15,6 +15,8 @@ from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
 from matplotlib import colors as mcolors
 
+import picos as pic
+
 print('Starting predict location.')
 print('Bandwidth: {}'.format(constants.BANDWIDTH))
 print('RANSAC Inlier: {}'.format(constants.INLIER_THRESHOLD))
@@ -319,6 +321,10 @@ def azimuthal_equidistant(lat, lng):
     lng = math.radians(lng)
 
     c = math.acos(math.cos(lat) * math.cos(lng))
+
+    if c == 0:
+        return (0, 0)
+
     k_prime = c / math.sin(c)
     x = k_prime * math.cos(lat) * math.sin(lng)
     y = k_prime * math.sin(lat)
@@ -331,6 +337,53 @@ def azimuthal_equidistant_inverse(x, y):
     lng = math.degrees(math.atan2(x * math.sin(c), (c * math.cos(c))))
 
     return (lat, lng)
+
+def particle_filter(lats, lngs):
+    bigM = 100
+
+    particle_locations = {}
+
+    for place in lats:
+        transformed_lats = []
+        transformed_lngs = []
+
+        # Create the 'prob' variable to contain the problem data
+        prob = pic.Problem()
+        x_star = prob.add_variable('x*', 2)  # (x, y) coordinate we're trying to find
+        z = []
+        b = [0] * len(lngs[place])
+
+        for idx, (lat, lng) in enumerate(zip(lats[place], lngs[place])):
+            x, y = azimuthal_equidistant(lat, lng)
+
+            transformed_lats.append(x)
+            transformed_lngs.append(y)
+
+            z.append([x, y])
+            b[idx] = prob.add_variable('b[{0}]'.format(idx), 1, vtype='binary')  # 0 if inlier, 1 if outlier
+
+        z = pic.new_param('z', tuple(z))
+
+        # print(z[0])
+        # print(z[1])
+        # print(z[0] - z[1])
+        # print((z[0] - z[1]).size)
+
+        prob.add_list_of_constraints(
+            [abs(z[i] - x_star) <= constants.AZIMUTHAL_INLIER_THRESHOLD + b[i] * bigM for i in range(0, len(lngs[place]))], 'i',
+            '1...N')
+
+        prob.set_objective('min', pic.sum(b, 'i', '1..N'))
+
+        #print(prob)
+        sol = prob.solve(solver='mosek', verbose=0)
+        #print(x_star)  # optimal value of x
+        #print(azimuthal_equidistant_inverse(x_star[0].value[0], x_star[1].value[0]))
+        particle_lat, particle_lng = azimuthal_equidistant_inverse(x_star[0].value[0], x_star[1].value[0])
+
+        particle_locations[place] = (particle_lat, particle_lng)
+
+    return particle_locations
 
 def ransac(lats, lngs):
     ransacs = {}

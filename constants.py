@@ -1,5 +1,5 @@
 CLUSTER = True
-LEARNING_SUNRISE = False # True for sunrise, False for sunset
+LEARNING_SUNRISE = True # True for sunrise, False for sunset
 DAYS_PER_MONTH = 'MAX'
 SIZE = ['small'] # 'large'
 #DATA_SOURCES = ['roundshot'] # 'panomax'
@@ -13,7 +13,8 @@ LOG_INTERVAL = 20
 SPLIT_TOTAL = 100
 SPLIT_TRAIN = 75 # 75% train
 SPLIT_TEST = 100 # 25% test, 0% validation
-BANDWIDTH = 0.125 # 0.2 - 453 #0.15 - BEST 436 # 0.1 - 438 # 0.05 # 0.2 # 0.25
+BANDWIDTH = 0.175 # 0.2 - 453 #0.15 - BEST 436 #0.125 - 433 #0.1 - 438 # 0.05 # 0.2 # 0.25
 CENTER = False
 LAMBDA = 1 # REGULARIZER
-INLIER_THRESHOLD = 350 # 500 - 499 # 400 - BEST 468 # 300 - 499 # km
+INLIER_THRESHOLD = 450 # 500 - 499 # 400 - BEST 468 #350 - 479 # 300 - 499 # km
+AZIMUTHAL_INLIER_THRESHOLD = 0.05497787143782138 # 350 km # 0.06283185307179587 # 400 km # 0.07068583470577036 # 450 km
