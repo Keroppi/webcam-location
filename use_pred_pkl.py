@@ -20,6 +20,8 @@ import picos as pic
 print('Starting predict location.')
 print('Bandwidth: {}'.format(constants.BANDWIDTH))
 print('RANSAC Inlier: {}'.format(constants.INLIER_THRESHOLD))
+print('Particle Inlier: {}'.format(constants.AZIMUTHAL_INLIER_THRESHOLD))
+print('Big-M: {}'.format(constants.BIGM))
 sys.stdout.flush()
 
 parser = argparse.ArgumentParser(description='Predict Location')
@@ -339,7 +341,7 @@ def azimuthal_equidistant_inverse(x, y):
     return (lat, lng)
 
 def particle_filter(lats, lngs):
-    bigM = 100
+    bigM = constants.BIGM
 
     particle_locations = {}
 
@@ -789,7 +791,7 @@ for place in lats:
 
     if random.randint(1, 100) < 101:
         if median_distance < 25 or density_distance < 25 or brock_ransac_distance < 25 or \
-           cbm_ransac_distance < 25 or cbm_median_distance < 25 or cbm_density_distance < 25:
+           cbm_ransac_distance < 25 or cbm_median_distance < 25 or cbm_density_distance < 25 or cbm_particle_distance < 25:
             print('Under 25km!')
 
         print(place)
@@ -1040,7 +1042,7 @@ cbm_bucket_num_data_pts = [0] * len(buckets)
 
 for i in range(len(days)):
     for bIdx, bucket in enumerate(buckets):
-        if day_lengths[i] < bucket + 1:
+        if day_lengths[i] / 3600 < bucket + 1:
             break
 
     #distance_err = compute_distance(days[i].lat, days[i].lng, latitudes[i], longitudes[i])
@@ -1400,8 +1402,9 @@ print('LNG OVER ALL LOCATIONS (RANSAC) BUCKETS NUM DATA PTS: ' + str(ransac_lng_
 print('LNG OVER ALL LOCATIONS (PARTICLE) BUCKETS NUM DATA PTS: ' + str(particle_lng_num_data_pts)) #
 
 # Num locations vs. error using all methods.
-buckets = list(range(0, 3000, 100)) # 100 km buckets
-bucket_labels = [str(x // 100) + '-' + str((x + 100) // 100) for x in buckets]
+bucket_size = 50
+buckets = list(range(0, 2000, bucket_size)) # 100 km buckets
+bucket_labels = [str(x // bucket_size) + '-' + str((x + bucket_size) // bucket_size) for x in buckets]
 bucket_labels[-1] = bucket_labels[-1] + '+'
 
 cbm_median_errors = [0] * len(buckets) #[[] for x in range(len(buckets))]
@@ -1431,13 +1434,13 @@ for key in actual_locations:
     particle_idx = len(buckets) - 1
 
     for bIdx, bucket in enumerate(buckets):
-        if cbm_median_distance_err <= bucket + 100:
+        if cbm_median_distance_err <= bucket + bucket_size:
             median_idx = min(bIdx, median_idx)
-        if cbm_density_distance_err <= bucket + 100:
+        if cbm_density_distance_err <= bucket + bucket_size:
             density_idx = min(bIdx, density_idx)
-        if ransac_distance_err <= bucket + 100:
+        if ransac_distance_err <= bucket + bucket_size:
             ransac_idx = min(bIdx, ransac_idx)
-        if particle_distance_err <= bucket + 100:
+        if particle_distance_err <= bucket + bucket_size:
             particle_idx = min(bIdx, particle_idx)
 
     cbm_median_errors[median_idx] += 1
