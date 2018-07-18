@@ -115,7 +115,31 @@ for batch_idx, (input, _) in enumerate(test_loader):
     batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunrise_idx.size()[0]]
 
     for d_idx, day in enumerate(batch_days):
-        day.change_frames_medium(sunrise_idx[d_idx, 0].data[0])
+        day.change_frames_medium(sunrise_idx[d_idx, 0].data[0], scale_factor=4.5, pass_idx=0)
+
+    if batch_idx % constants.LOG_INTERVAL == 0:
+        print('Batch Index: {}'.format(batch_idx))
+        sys.stdout.flush()
+
+sunrise_predict_t1 = time.time()
+print('Sunrise prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
+sys.stdout.flush()
+
+
+sunrise_predict_t0 = time.time()
+for batch_idx, (input, _) in enumerate(test_loader):
+    input = Variable(input, volatile=True)
+
+    if torch.cuda.is_available():
+        input = input.cuda()
+
+    sunrise_idx = sunrise_model(input)
+
+    # Convert sunrise_idx into a local time.
+    batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunrise_idx.size()[0]]
+
+    for d_idx, day in enumerate(batch_days):
+        day.change_frames_medium(sunrise_idx[d_idx, 0].data[0], scale_factor=1.5, pass_idx=1)
 
     if batch_idx % constants.LOG_INTERVAL == 0:
         print('Batch Index: {}'.format(batch_idx))
@@ -181,6 +205,7 @@ print('Sunrise testing prediction time (min): {:.2f}'.format((sunrise_predict_t1
 sys.stdout.flush()
 
 # sunset
+
 sunset_predict_t0 = time.time()
 for batch_idx, (input, _) in enumerate(test_loader):
     input = Variable(input, volatile=True)
@@ -194,7 +219,30 @@ for batch_idx, (input, _) in enumerate(test_loader):
     batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunset_idx.size()[0]]
 
     for d_idx, day in enumerate(batch_days):
-        day.change_frames_medium(sunset_idx[d_idx, 0].data[0], mode='sunset') # VLI mode is only for print statements
+        day.change_frames_medium(sunset_idx[d_idx, 0].data[0], mode='sunset', scale_factor=4.5, pass_idx=0) # VLI mode is only for print statements
+
+    if batch_idx % constants.LOG_INTERVAL == 0:
+        print('Batch Index: {}'.format(batch_idx))
+        sys.stdout.flush()
+
+sunset_predict_t1 = time.time()
+print('Sunset prediction time (min): {:.2f}'.format((sunset_predict_t1 - sunset_predict_t0) / 60))
+sys.stdout.flush()
+
+sunset_predict_t0 = time.time()
+for batch_idx, (input, _) in enumerate(test_loader):
+    input = Variable(input, volatile=True)
+
+    if torch.cuda.is_available():
+        input = input.cuda()
+
+    sunset_idx = sunset_model(input)
+
+    # Convert sunset_idx into a local time.
+    batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunset_idx.size()[0]]
+
+    for d_idx, day in enumerate(batch_days):
+        day.change_frames_medium(sunset_idx[d_idx, 0].data[0], mode='sunset', scale_factor=1.5, pass_idx=1) # VLI mode is only for print statements
 
     if batch_idx % constants.LOG_INTERVAL == 0:
         print('Batch Index: {}'.format(batch_idx))
