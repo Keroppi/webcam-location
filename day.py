@@ -317,7 +317,7 @@ class Day():
 
     def __init__(self, place, times, img_paths, sunrise, sunset, train_test_valid, lat, lng, time_offset, mali_solar_noon):
         # VLI
-        if len(times) > 220:
+        if len(times) > 400:
             print('Max times: {}'.format(len(times)))
             sys.stdout.flush()
 

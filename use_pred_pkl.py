@@ -645,8 +645,8 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
         #x_median,y_median = map([median_locations[place][1]], [median_locations[place][0]])
         #x_density,y_density = map([density_locations[place][1]], [density_locations[place][0]])
 
-        actual_and_pred_lngs = [actual_lng] + [mean_locations[place][1]] + [median_locations[place][1]] + [density_locations[place][1]] + [ransac_locations[place][1]] + [particle_locations[1]]
-        actual_and_pred_lats = [actual_lat] + [mean_locations[place][0]] + [median_locations[place][0]] + [density_locations[place][0]] + [ransac_locations[place][0]] + [particle_locations[0]]
+        actual_and_pred_lngs = [actual_lng] + [mean_locations[place][1]] + [median_locations[place][1]] + [density_locations[place][1]] + [ransac_locations[place][1]] + [particle_locations[place][1]]
+        actual_and_pred_lats = [actual_lat] + [mean_locations[place][0]] + [median_locations[place][0]] + [density_locations[place][0]] + [ransac_locations[place][0]] + [particle_locations[place][0]]
         actual_and_pred_colors = ['w', 'm', 'c', mcolors.CSS4_COLORS['fuchsia'], 'xkcd:chartreuse', 'xkcd:navy']
 
         guesses = map.scatter(lngs[place], lats[place], s=40, c=colors, latlon=True, zorder=10)
