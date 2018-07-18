@@ -14,10 +14,10 @@ class Day():
             return self.times[floor_idx] + (idx - floor_idx) * diff
         elif idx < 0:
             diff = self.times[-1] - self.times[0]
-            return self.times[0] + idx * diff / (constants.IMAGES_PER_DAY - 1) # UNDO SCALING?
+            return self.times[0] + idx * diff #/ (constants.IMAGES_PER_DAY - 1) # UNDO SCALING?
         else:
             diff = self.times[-1] - self.times[0]
-            return self.times[constants.IMAGES_PER_DAY - 1] + (idx - (constants.IMAGES_PER_DAY - 1)) * diff / (constants.IMAGES_PER_DAY - 1) # UNDO SCALING?
+            return self.times[constants.IMAGES_PER_DAY - 1] + (idx - (constants.IMAGES_PER_DAY - 1)) * diff #/ (constants.IMAGES_PER_DAY - 1) # UNDO SCALING?
 
     def get_sun_idx(self, times, sunrise, sunset):
         sunrise_idx = 0
@@ -45,11 +45,11 @@ class Day():
 
         if max_sunrise_idx is None: # Past the last image.
             sunrise_idx = constants.IMAGES_PER_DAY - 1
-            extra = (sunrise - times[-1]) / time_diff * (constants.IMAGES_PER_DAY - 1) # UNDO SCALING?
+            extra = (sunrise - times[-1]) / time_diff #* (constants.IMAGES_PER_DAY - 1) # UNDO SCALING?
             sunrise_idx += extra
         elif max_sunrise_idx == 0: # Before the first image.
             sunrise_idx = 0
-            extra = (sunrise - times[0]) / time_diff * (constants.IMAGES_PER_DAY - 1) # UNDO SCALING?
+            extra = (sunrise - times[0]) / time_diff #* (constants.IMAGES_PER_DAY - 1) # UNDO SCALING?
             sunrise_idx += extra
         else:
             remainder = (sunrise - times[max_sunrise_idx - 1]) / (times[max_sunrise_idx] - times[max_sunrise_idx - 1])
@@ -57,11 +57,11 @@ class Day():
 
         if max_sunset_idx is None:
             sunset_idx = constants.IMAGES_PER_DAY - 1
-            extra = (sunset - times[-1]) / time_diff * (constants.IMAGES_PER_DAY - 1) # UNDO SCALING?
+            extra = (sunset - times[-1]) / time_diff #* (constants.IMAGES_PER_DAY - 1) # UNDO SCALING?
             sunset_idx += extra
         elif max_sunset_idx == 0:
             sunset_idx = 0
-            extra = (sunset - times[0]) / time_diff * (constants.IMAGES_PER_DAY - 1) # UNDO SCALING?
+            extra = (sunset - times[0]) / time_diff #* (constants.IMAGES_PER_DAY - 1) # UNDO SCALING?
             sunset_idx += extra
         else:
             remainder = (sunset - times[max_sunset_idx - 1]) / (times[max_sunset_idx] - times[max_sunset_idx - 1])
@@ -316,6 +316,11 @@ class Day():
         self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, self.sunrise, self.sunset)
 
     def __init__(self, place, times, img_paths, sunrise, sunset, train_test_valid, lat, lng, time_offset, mali_solar_noon):
+        # VLI
+        if len(times) > 400:
+            print('Max times: {}'.format(len(times)))
+            sys.stdout.flush()
+
         self.all_times = times
         self.all_img_paths = img_paths
 

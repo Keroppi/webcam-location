@@ -312,11 +312,6 @@ def compute_distance(lat1, lng1, lat2, lng2):  # km
 
 actual_locations = {}
 for i in range(len(days)):
-    # VLI
-    if len(days[i].all_times) > 400:
-        print('Max times: {}'.format(len(days[i].all_times)))
-        sys.stdout.flush()
-
     if actual_locations.get(days[i].place) is None:
         actual_locations[days[i].place] = (days[i].lat, days[i].lng)
     else:
