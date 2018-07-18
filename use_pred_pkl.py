@@ -312,6 +312,11 @@ def compute_distance(lat1, lng1, lat2, lng2):  # km
 
 actual_locations = {}
 for i in range(len(days)):
+    # VLI
+    if len(days[i].all_times) > 400:
+        print('Max times: {}'.format(len(days[i].all_times)))
+        sys.stdout.flush()
+
     if actual_locations.get(days[i].place) is None:
         actual_locations[days[i].place] = (days[i].lat, days[i].lng)
     else:
@@ -381,7 +386,19 @@ def particle_filter(lats, lngs):
         sol = prob.solve(solver='mosek', verbose=0)
         #print(x_star)  # optimal value of x
         #print(azimuthal_equidistant_inverse(x_star[0].value[0], x_star[1].value[0]))
-        particle_lat, particle_lng = azimuthal_equidistant_inverse(x_star[0].value[0], x_star[1].value[0])
+        #particle_lat, particle_lng = azimuthal_equidistant_inverse(x_star[0].value[0], x_star[1].value[0])
+
+        # Find inliers and compute average point.
+        inlier_set = [b[i].value[0] < 0.5 for i in range(len(b))]
+        inlier_transformed_lats = [transformed_lats[idx] for idx, valid in enumerate(inlier_set) if valid]
+        inlier_transformed_lngs = [transformed_lngs[idx] for idx, valid in enumerate(inlier_set) if valid]
+        inlier_transformed_lats += [x_star[0].value[0]]
+        inlier_transformed_lngs += [x_star[1].value[0]]
+        transformed_particle_lat = statistics.mean(inlier_transformed_lats)
+        transformed_particle_lng = statistics.mean(inlier_transformed_lngs)
+
+        particle_lat, particle_lng = azimuthal_equidistant_inverse(transformed_particle_lat, transformed_particle_lng)
+        #print((particle_lat, particle_lng))
 
         particle_locations[place] = (particle_lat, particle_lng)
 
@@ -544,8 +561,8 @@ def kde(lats, lngs, median_locations):
             best_latitude = -91
 
             latitude_search = np.linspace(min_lat, max_lat,
-                                          num=4001)  # Worst case pi/4000 radians (0.045 degrees) step size.
-            longitude_search = np.linspace(min_lng, max_lng, num=8001)  # Worst case pi/4000 radians step size.
+                                          num=8001)  # Worst case pi/8000 radians (0.0225 degrees) step size.
+            longitude_search = np.linspace(min_lng, max_lng, num=16001)  # Worst case pi/8000 radians step size.
 
             for i in range(latitude_search.shape[0]):
                 curr_lat = np.array([latitude_search[i]] * longitude_search.shape[0])
