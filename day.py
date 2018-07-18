@@ -320,6 +320,7 @@ class Day():
         if len(times) > 800:
             print('Max times: {}'.format(len(times)))
             print(place)
+            print(times[0].date())
             sys.stdout.flush()
 
         self.all_times = times
