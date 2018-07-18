@@ -4,8 +4,8 @@ class SimpleDay():
     def __init__(self, place, lat, lng, mali_solar_noon, time_offset, sunrise, sunset, sunrise_in_frames, sunset_in_frames, interval_min, season):
         self.place = place  # Name of the location
 
-        self.lat = lat # Latitude
-        self.lng = lng # Longitude
+        self.lat = lat # Latitude (Actual)
+        self.lng = lng # Longitude (Actual)
 
         self.mali_solar_noon = mali_solar_noon # Solar noon in Mali that day at 0 degrees longitude.
 

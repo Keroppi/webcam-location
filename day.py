@@ -128,7 +128,7 @@ class Day():
 
         return (times, img_paths)
 
-    def change_frames_medium(self, center_frame, mode='sunrise'): # Given a suggested frame idx, uniformly pick from 97 frames that are closest to it.
+    def change_frames_medium(self, center_frame, mode='sunrise', scale_factor=1.5, pass_idx=1): # Given a suggested frame idx, uniformly pick from 97 frames that are closest to it.
         suggested_time = self.get_local_time(center_frame)
 
         start_idx = len(self.all_times) - 1
@@ -140,14 +140,14 @@ class Day():
                 break
 
         center_idx = round((start_idx + end_idx) / 2)
-        start_idx = center_idx - math.ceil(constants.IMAGES_PER_DAY * 1.5)
-        end_idx = center_idx + math.ceil(constants.IMAGES_PER_DAY * 1.5) # 97 frames
+        start_idx = center_idx - math.ceil(constants.IMAGES_PER_DAY * scale_factor)
+        end_idx = center_idx + math.ceil(constants.IMAGES_PER_DAY * scale_factor) # 97 frames if scale_factor = 1.5, # 289 frames if scale_factor = 4.5
 
         if start_idx < 0:
             start_idx = 0
-            end_idx = min(math.ceil(2 * 1.5 * constants.IMAGES_PER_DAY), len(self.all_times) - 1)
+            end_idx = min(math.ceil(2 * scale_factor * constants.IMAGES_PER_DAY), len(self.all_times) - 1)
         if end_idx > len(self.all_times) - 1:
-            start_idx = max(len(self.all_times) - 1 - math.ceil(2 * 1.5 * constants.IMAGES_PER_DAY), 0)
+            start_idx = max(len(self.all_times) - 1 - math.ceil(2 * scale_factor * constants.IMAGES_PER_DAY), 0)
             end_idx = len(self.all_times) - 1
 
         if mode == 'sunrise':
@@ -170,22 +170,22 @@ class Day():
             if self.sunrise_in_frames:
                 if not (self.sunrise_idx >= 0 and self.sunrise_idx <= constants.IMAGES_PER_DAY - 1):
                     if sunrise_before:
-                        print('CHANGE FRAMES 1 MADE SUNRISE WORSE') # Can count number of times this phrase appears.
+                        print('CHANGE FRAMES {} MADE SUNRISE WORSE'.format(pass_idx)) # Can count number of times this phrase appears.
                     else:
-                        print('CHANGE FRAMES 1 DID NOT IMPROVE SUNRISE')
+                        print('CHANGE FRAMES {} DID NOT IMPROVE SUNRISE'.format(pass_idx))
                 else:
                     if not sunrise_before:
-                        print('CHANGE FRAMES 1 MADE SUNRISE BETTER')
+                        print('CHANGE FRAMES {} MADE SUNRISE BETTER'.format(pass_idx))
         else:
             if self.sunset_in_frames:
                 if not (self.sunset_idx >= 0 and self.sunset_idx <= constants.IMAGES_PER_DAY - 1):
                     if sunset_before:
-                        print('CHANGE FRAMES 1 MADE SUNSET WORSE')
+                        print('CHANGE FRAMES {} MADE SUNSET WORSE'.format(pass_idx))
                     else:
-                        print('CHANGE FRAMES 1 DID NOT IMPROVE SUNSET')
+                        print('CHANGE FRAMES {} DID NOT IMPROVE SUNSET'.format(pass_idx))
                 else:
                     if not sunset_before:
-                        print('CHANGE FRAMES 1 MADE SUNSET BETTER')
+                        print('CHANGE FRAMES {} MADE SUNSET BETTER'.format(pass_idx))
 
         sys.stdout.flush()
 
