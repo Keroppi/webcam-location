@@ -127,7 +127,7 @@ if torch.cuda.is_available():
     train_loss_fn = train_loss_fn.cuda()
     test_loss_fn = test_loss_fn.cuda()
 
-optimizer = torch.optim.Adagrad(model.parameters(), lr=1e-3, weight_decay=0)
+optimizer = torch.optim.Adagrad(model.parameters(), lr=1e-4, weight_decay=0)
 
 if args.resume:  # Continue training a model - requires using --load_model_args option.
     if os.path.isfile(args.resume):

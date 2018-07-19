@@ -373,14 +373,3 @@ class Day():
                 self.season = 'spring'
             else:
                 self.season = 'summer'
-
-
-
-
-
-
-
-
-
-
-

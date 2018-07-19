@@ -387,8 +387,8 @@ def particle_filter(lats, lngs):
         inlier_set = [b[i].value[0] < 0.5 for i in range(len(b))]
         inlier_transformed_lats = [transformed_lats[idx] for idx, valid in enumerate(inlier_set) if valid]
         inlier_transformed_lngs = [transformed_lngs[idx] for idx, valid in enumerate(inlier_set) if valid]
-        inlier_transformed_lats += [x_star[0].value[0]]
-        inlier_transformed_lngs += [x_star[1].value[0]]
+        #inlier_transformed_lats += [x_star[0].value[0]]
+        #inlier_transformed_lngs += [x_star[1].value[0]]
         transformed_particle_lat = statistics.mean(inlier_transformed_lats)
         transformed_particle_lng = statistics.mean(inlier_transformed_lngs)
 
@@ -545,8 +545,8 @@ def kde(lats, lngs, median_locations):
             best_latitude = math.degrees(res.x[0])
             best_longitude = math.degrees(res.x[1])
         else:
-            #print('WARNING - scipy minimize function failed on location ' + key)
-            #sys.stdout.flush()
+            print('WARNING - scipy minimize function failed on location ' + key)
+            sys.stdout.flush()
 
             # Grid search for maximum density.
 
@@ -556,8 +556,8 @@ def kde(lats, lngs, median_locations):
             best_latitude = -91
 
             latitude_search = np.linspace(min_lat, max_lat,
-                                          num=8001)  # Worst case pi/8000 radians (0.0225 degrees) step size.
-            longitude_search = np.linspace(min_lng, max_lng, num=16001)  # Worst case pi/8000 radians step size.
+                                          num=16001)  # Worst case pi/16000 radians (0.01125 degrees) step size.
+            longitude_search = np.linspace(min_lng, max_lng, num=32001)  # Worst case pi/16000 radians step size.
 
             for i in range(latitude_search.shape[0]):
                 curr_lat = np.array([latitude_search[i]] * longitude_search.shape[0])
