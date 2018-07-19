@@ -1414,8 +1414,8 @@ print('LNG OVER ALL LOCATIONS (RANSAC) BUCKETS NUM DATA PTS: ' + str(ransac_lng_
 print('LNG OVER ALL LOCATIONS (PARTICLE) BUCKETS NUM DATA PTS: ' + str(particle_lng_num_data_pts)) #
 
 # Num locations vs. error using all methods.
-bucket_size = 50
-buckets = list(range(0, 2000, bucket_size)) # 100 km buckets
+bucket_size = 10 # 10 km buckets
+buckets = list(range(0, 800, bucket_size))
 bucket_labels = [str(x // bucket_size) + '-' + str((x + bucket_size) // bucket_size) for x in buckets]
 bucket_labels[-1] = bucket_labels[-1] + '+'
 
@@ -1460,10 +1460,10 @@ for key in actual_locations:
     ransac_errors[ransac_idx] += 1
     particle_errors[particle_idx] += 1
 
-bar(buckets, cbm_median_errors, '# of Places', 'Error (100 km)', bucket_labels, 'Histogram of Error (km) Using Median', 'cbm_error_median.png')
-bar(buckets, cbm_density_errors, '# of Places', 'Error (100 km)', bucket_labels, 'Histogram of Error (km) Using Gaussian KDE', 'cbm_error_density.png')
-bar(buckets, ransac_errors, '# of Places', 'Error (100 km)', bucket_labels, 'Histogram of Error (km) Using RANSAC', 'cbm_error_ransac.png')
-bar(buckets, particle_errors, '# of Places', 'Error (100 km)', bucket_labels, 'Histogram of Error (km) Using Particle Filter', 'cbm_error_particle.png')
+bar(buckets, cbm_median_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Median', 'cbm_error_median.png')
+bar(buckets, cbm_density_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Gaussian KDE', 'cbm_error_density.png')
+bar(buckets, ransac_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using RANSAC', 'cbm_error_ransac.png')
+bar(buckets, particle_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Particle Filter', 'cbm_error_particle.png')
 
 green = 0
 sunrise_only = 0

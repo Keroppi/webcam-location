@@ -19,6 +19,7 @@ BANDWIDTH = 0.125
             # 0.15 - 436
             # 0.125 - BEST 433
             # 0.1 - 438
+            # 0.05 - 490
 CENTER = False
 LAMBDA = 1 # REGULARIZER
 INLIER_THRESHOLD = 400 # km
@@ -27,8 +28,9 @@ INLIER_THRESHOLD = 400 # km
                    # 400 - BEST 468
                    # 350 - 479
                    # 300 - 499
+                   # 200 - 524
 AZIMUTHAL_INLIER_THRESHOLD = 0.06283185307179587 # 400 km - ?
-                             # 0.05497787143782138 # 350 km
+                             # 0.05497787143782138 # 350 km - 455
                              # 0.07068583470577036 # 450 km
 
 BIGM = 10000
