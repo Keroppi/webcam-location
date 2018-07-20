@@ -121,6 +121,8 @@ class Day():
         # Uniformly select IMAGES_PER_DAY images from times / images.
         f = lambda m, n: [i * n // m + n // (2 * m) for i in range(m)]
         subset_idx = f(constants.IMAGES_PER_DAY, len(all_times))
+        subset_idx[0] = 0
+        subset_idx[-1] = len(all_times) - 1
         #subset_idx = np.random.choice(len(all_times), constants.IMAGES_PER_DAY, replace=False)
         #subset_idx.sort()
         times = [all_times[x] for x in subset_idx]
