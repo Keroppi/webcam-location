@@ -32,5 +32,5 @@ INLIER_THRESHOLD = 400 # km
 AZIMUTHAL_INLIER_THRESHOLD = 0.06283185307179587 # 400 km - ?
                              # 0.05497787143782138 # 350 km - 455
                              # 0.07068583470577036 # 450 km
-
+MAHALANOBIS_INLIER_THRESHOLD = 1 # 1 stdev away
 BIGM = 100

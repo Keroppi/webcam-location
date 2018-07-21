@@ -3,8 +3,9 @@
 import matplotlib
 matplotlib.use('agg')
 
-import os, argparse, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, pickle, collections, copy
+import os, argparse, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, pickle, collections, copy, scipy
 from sklearn.neighbors.kde import KernelDensity
+from sklearn.mixture import GaussianMixture
 from scipy.optimize import minimize
 from sklearn.metrics import mean_squared_error
 
@@ -340,6 +341,75 @@ def azimuthal_equidistant_inverse(x, y):
 
     return (lat, lng)
 
+def gmm(lats, lngs):
+    locations = {}
+
+    for place in lats:
+        points = []
+        for lat, lng in zip(lats[place], lngs[place]):
+            x, y = azimuthal_equidistant(lat, lng)
+            points.append([x, y])
+
+        points = np.array(points)
+        #cov = np.cov(points)
+        #print(place)
+        #print(cov)
+
+        gmms = []
+        gmm1 = GaussianMixture(n_components=1, covariance_type='diag').fit(points)
+        gmm2 = GaussianMixture(n_components=2, covariance_type='diag').fit(points)
+        gmm3 = GaussianMixture(n_components=3, covariance_type='diag').fit(points)
+        gmms = [gmm1, gmm2, gmm3]
+
+        bics = []
+        bics.append(gmm1.bic(points))
+        bics.append(gmm2.bic(points))
+        bics.append(gmm3.bic(points))
+
+        # Pick # of clusters based on BIC.
+        bic, k_idx = min((val, idx) for (idx, val) in enumerate(bics))
+        gmm = gmms[k_idx]
+
+        print(place + ' - # clusters - ' + str(k_idx + 1))
+
+        if k_idx > 0: # If there is more than one cluster, pick cluster with most points.
+            classes = gmm.predict(points)
+            class_counts = collections.Counter(classes)
+
+            cluster_idx = -1
+            max_count = -1
+            for cluster in class_counts:
+                if max_count < class_counts[cluster]:
+                    max_count = class_counts[cluster]
+                    cluster_idx = cluster
+        else:
+            cluster_idx = 0
+
+        center = gmm.means_[cluster_idx, :]
+        cov = gmm.covariances_[cluster_idx, :, :]
+        cov_inv = np.linalg.inv(cov)
+
+        # Calculate Mahalanobis distance from mean to all points... reject points that are too far?
+        inliers = []
+        for row in range(points.shape[0]):
+            m_dist = scipy.spatial.distance.mahalanobis(center, points[row, :], cov_inv)
+
+            if m_dist < constants.MAHALANOBIS_INLIER_THRESHOLD:
+                inliers.append(points[row, :])
+            else:
+                print('Mahalanobis distance: {}'.format(m_dist))
+
+        inliers = np.array(inliers)
+        x_star = statistics.mean(inliers[:, 0])
+        y_star = statistics.mean(inliers[:, 1])
+
+        lat, lng = azimuthal_equidistant_inverse(x_star, y_star)
+        locations[place] = (lat, lng)
+
+    return locations
+
+cbm_gmm_locations = gmm(cbm_lats, lngs)
+
 def particle_filter(lats, lngs):
     bigM = constants.BIGM
 
@@ -441,7 +511,6 @@ for place in actual_locations:
 
 _, inliers2 = ransac(lats_with_actuals, lngs_with_actuals)
 
-
 without_actual = 0
 tied = 0
 actual_better = 0
@@ -487,7 +556,7 @@ for i in range(len(days)):
 
 # Turn into percentages for each place.
 for key in sun_visibles:
-    normalized = [x / sum(sun_visibles[key]) for x in sun_visibles[key]]
+    normalized = [x * 100 / sum(sun_visibles[key]) for x in sun_visibles[key]]
     sun_visibles[key] = normalized
 
 '''
@@ -600,8 +669,7 @@ def kde(lats, lngs, median_locations):
 density_locations = kde(lats, lngs, median_locations)
 cbm_density_locations = kde(cbm_lats, lngs, cbm_median_locations)
 
-
-def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ransac_locations, particle_locations, mode='sun'):
+def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ransac_locations, particle_locations, gmm_locations, mode='sun'):
     map_t0 = time.time()
 
     # Plot locations on a map.
@@ -662,9 +730,9 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
         #x_median,y_median = map([median_locations[place][1]], [median_locations[place][0]])
         #x_density,y_density = map([density_locations[place][1]], [density_locations[place][0]])
 
-        actual_and_pred_lngs = [actual_lng] + [mean_locations[place][1]] + [median_locations[place][1]] + [density_locations[place][1]] + [ransac_locations[place][1]] + [particle_locations[place][1]]
-        actual_and_pred_lats = [actual_lat] + [mean_locations[place][0]] + [median_locations[place][0]] + [density_locations[place][0]] + [ransac_locations[place][0]] + [particle_locations[place][0]]
-        actual_and_pred_colors = ['w', 'm', 'c', mcolors.CSS4_COLORS['fuchsia'], 'xkcd:chartreuse', 'xkcd:navy']
+        actual_and_pred_lngs = [actual_lng] + [mean_locations[place][1]] + [median_locations[place][1]] + [density_locations[place][1]] + [ransac_locations[place][1]] + [particle_locations[place][1]] + [gmm_locations[place][1]]
+        actual_and_pred_lats = [actual_lat] + [mean_locations[place][0]] + [median_locations[place][0]] + [density_locations[place][0]] + [ransac_locations[place][0]] + [particle_locations[place][0]] + [gmm_locations[place][0]]
+        actual_and_pred_colors = ['w', 'm', 'c', mcolors.CSS4_COLORS['fuchsia'], 'xkcd:chartreuse', 'xkcd:navy', 'xkcd:pink']
 
         guesses = map.scatter(lngs[place], lats[place], s=40, c=colors, latlon=True, zorder=10)
         actual_and_pred = map.scatter(actual_and_pred_lngs, actual_and_pred_lats, s=40, c=actual_and_pred_colors, latlon=True, zorder=10, marker='^')
@@ -674,14 +742,14 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
         if mode == 'sun':
             guess_colors = ['g', 'r', mcolors.CSS4_COLORS['crimson'], 'k']
             legend_labels = ['sunrise and sunset in frames', 'sunrise not in frames', 'sunset not in frames', 'sunrise and sunset not in frames',
-                             'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC', 'Particle Filter']
+                             'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC', 'Particle Filter', 'GMM']
 
             handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in guess_colors] + \
                          [plt.plot([], marker="^", ls="", color=color)[0] for color in actual_and_pred_colors]
         elif mode == 'season':
             guess_colors = ['b', 'y', 'r', mcolors.CSS4_COLORS['tan']]
             legend_labels = ['winter', 'spring', 'summer', 'fall',
-                             'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC', 'Particle Filter']
+                             'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC', 'Particle Filter', 'GMM']
             handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in guess_colors] + \
                          [plt.plot([], marker="^", ls="", color=color)[0] for color in actual_and_pred_colors]
 
@@ -698,8 +766,8 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
     map_t1 = time.time()
     print('Calculating map time (m): ' + str((map_t1 - map_t0) / 60))
 
-plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, 'sun')
-plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, 'season')
+plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, 'sun')
+plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, 'season')
 
 #finished_places = []
 days_used = []
@@ -731,6 +799,11 @@ cbm_ransac_latitude_err = []
 cbm_particle_distances = []
 cbm_particle_longitude_err = []
 cbm_particle_latitude_err = []
+
+cbm_gmm_distances = []
+cbm_gmm_longitude_err = []
+cbm_gmm_latitude_err = []
+
 
 #for i in range(len(days)):
 for place in lats:
@@ -766,6 +839,8 @@ for place in lats:
     cbm_ransac_pred_lng = cbm_ransac_locations[place][1]
     cbm_particle_pred_lat = cbm_particle_locations[place][0]
     cbm_particle_pred_lng = cbm_particle_locations[place][1]
+    cbm_gmm_pred_lat = cbm_gmm_locations[place][0]
+    cbm_gmm_pred_lng = cbm_gmm_locations[place][1]
 
     mean_distance = compute_distance(actual_lat, actual_lng, mean_pred_lat, mean_pred_lng)
     mean_distances.append(mean_distance)
@@ -807,9 +882,14 @@ for place in lats:
     cbm_particle_latitude_err.append(compute_distance(actual_lat, actual_lng, cbm_particle_pred_lat, actual_lng))
     cbm_particle_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, cbm_particle_pred_lng))
 
+    cbm_gmm_distance = compute_distance(actual_lat, actual_lng, cbm_gmm_pred_lat, cbm_gmm_pred_lng)
+    cbm_gmm_distances.append(cbm_gmm_distance)
+    cbm_gmm_latitude_err.append(compute_distance(actual_lat, actual_lng, cbm_gmm_pred_lat, actual_lng))
+    cbm_gmm_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, cbm_gmm_pred_lng))
+
     if random.randint(1, 100) < 101:
         if median_distance < 25 or density_distance < 25 or brock_ransac_distance < 25 or \
-           cbm_ransac_distance < 25 or cbm_median_distance < 25 or cbm_density_distance < 25 or cbm_particle_distance < 25:
+           cbm_ransac_distance < 25 or cbm_median_distance < 25 or cbm_density_distance < 25 or cbm_particle_distance < 25 or cbm_gmm_distance < 25:
             print('Under 25km!')
 
         print(place)
@@ -824,6 +904,7 @@ for place in lats:
         print('Using density: ' + str(cbm_density_distance))
         print('Using RANSAC: ' + str(cbm_ransac_distance))
         print('Using particle: ' + str(cbm_particle_distance))
+        print('Using GMM: ' + str(cbm_gmm_distance))
         print('Actual lat, lng: ' + str(actual_lat) + ', ' + str(actual_lng))
         print('Brock Distance')
         print('Mean lat, lng: ' + str(mean_pred_lat) + ', ' + str(mean_pred_lng))
@@ -834,6 +915,8 @@ for place in lats:
         print('Median lat, lng: ' + str(cbm_median_pred_lat) + ', ' + str(cbm_median_pred_lng))
         print('Density lat, lng: ' + str(cbm_density_pred_lat) + ', ' + str(cbm_density_pred_lng))
         print('RANSAC lat, lng: ' + str(cbm_ransac_pred_lat) + ', ' + str(cbm_ransac_pred_lng))
+        print('Particle lat, lng: ' + str(cbm_particle_pred_lat) + ', ' + str(cbm_particle_pred_lng))
+        print('GMM lat, lng: ' + str(cbm_gmm_pred_lat) + ', ' + str(cbm_gmm_pred_lng))
         print('Median Interval (min): ' + str(intervals[place]))
         print('Sunrise / Sunset Visible Breakdown of Days: ' + str(sun_visibles[place]))
         print('')
@@ -888,6 +971,7 @@ scatter(days_used, cbm_median_distances, 'co', 'median', cbm=True)
 scatter(days_used, cbm_density_distances, None, 'gaussian kde', color=mcolors.CSS4_COLORS['fuchsia'], linestyle='None', marker='o', cbm=True)
 scatter(days_used, cbm_ransac_distances, None, 'RANSAC', color='xkcd:chartreuse', linestyle='None', marker='o', cbm=True)
 scatter(days_used, cbm_particle_distances, None, 'particle filter', color='xkcd:navy', linestyle='None', marker='o', cbm=True)
+scatter(days_used, cbm_gmm_distances, None, 'GMM', color='xkcd:pink', linestyle='None', marker='o', cbm=True)
 
 scatter_t1 = time.time()
 print('Calculating scatter time (m): ' + str((scatter_t1 - scatter_t0) / 60))
@@ -1095,6 +1179,32 @@ for bdIdx, distance_errs in enumerate(cbm_bucket_distances):
 bar(buckets, cbm_bucket_distances, 'Median Distance Error (km)', 'Day Length Hours', bucket_labels, 'Median Error (km) Over All Days vs. Day Length Hours', 'cbm_day_length.png', cbm_bucket_rmses) #
 print('DAY LENGTH OVER ALL DAYS BUCKETS NUM DATA PTS: ' + str(cbm_bucket_num_data_pts)) #
 
+def plot_all_places(bucket_size, buckets, bucket_labels, locations, x_data, x_name, method_name, xlabel, ylabel, title, filename):
+    bucket_distances = [[] for x in range(len(buckets))]
+    bucket_rmses = [0] * len(buckets) # for x in range(len(buckets))]
+    bucket_num_data_pts = [0] * len(buckets)
+
+    for key in x_data:
+        for bIdx, bucket in enumerate(buckets):
+            if x_data[key] < bucket + bucket_size:
+                break
+
+        distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1],
+                                        locations[key][0], locations[key][1])
+        bucket_distances[bIdx].append(distance_err)
+
+    for bdIdx, distance_errs in enumerate(bucket_distances):
+        if len(distance_errs) > 0:
+            bucket_distances[bdIdx] = statistics.median(distance_errs)
+            bucket_rmses[bdIdx] = median_rmse(distance_errs)
+            bucket_num_data_pts[bdIdx] += len(distance_errs)
+        else:
+            bucket_distances[bdIdx] = 0
+
+    bar(buckets, bucket_distances, ylabel, xlabel, bucket_labels, title, filename, bucket_rmses)
+
+    print(x_name + ' OVER ALL LOCATIONS (' + method_name + ') BUCKETS NUM DATA PTS: ' + str(bucket_num_data_pts))
+
 # Plot average distance error vs. intervals over ALL PLACES.
 # Only using CBM model for now.
 bucket_size = 3 # 3 minute intervals
@@ -1102,10 +1212,28 @@ buckets = list(range(0, 33, bucket_size))
 bucket_labels = [str(x) + '-' + str(x + bucket_size) for x in buckets]
 bucket_labels[-1] = bucket_labels[-1] + '+'
 
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_median_locations, intervals, 'INTERVAL', 'MEDIAN',
+                'Minutes Between Frames', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Median vs. Photo Interval (min)', 'cbm_interval_median_places.png')
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_density_locations, intervals, 'INTERVAL', 'DENSITY',
+                'Minutes Between Frames', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Gaussian KDE vs. Photo Interval (min)', 'cbm_interval_density_places.png')
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_ransac_locations, intervals, 'INTERVAL', 'RANSAC',
+                'Minutes Between Frames', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using RANSAC vs. Photo Interval (min)', 'cbm_interval_ransac_places.png')
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_particle_locations, intervals, 'INTERVAL', 'PARTICLE',
+                'Minutes Between Frames', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Particle Filter vs. Photo Interval (min)', 'cbm_interval_particle_places.png')
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_gmm_locations, intervals, 'INTERVAL', 'GMM',
+                'Minutes Between Frames', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using GMM vs. Photo Interval (min)', 'cbm_interval_gmm_places.png')
+
+'''
 cbm_median_bucket_distances = [[] for x in range(len(buckets))]
 cbm_density_bucket_distances = [[] for x in range(len(buckets))]
 ransac_bucket_distances = [[] for x in range(len(buckets))]
 particle_bucket_distances = [[] for x in range(len(buckets))]
+gmm_bucket_distances = [[] for x in range(len(buckets))]
 
 cbm_median_bucket_rmses = [0 for x in range(len(buckets))]
 cbm_median_bucket_num_data_pts = [0] * len(buckets)
@@ -1115,6 +1243,9 @@ ransac_bucket_rmses = [0 for x in range(len(buckets))]
 ransac_bucket_num_data_pts = [0] * len(buckets)
 particle_bucket_rmses = [0 for x in range(len(buckets))]
 particle_bucket_num_data_pts = [0] * len(buckets)
+gmm_bucket_rmses = [0 for x in range(len(buckets))]
+gmm_bucket_num_data_pts = [0] * len(buckets)
+
 for key in intervals:
     for bIdx, bucket in enumerate(buckets):
         if intervals[key] < bucket + bucket_size:
@@ -1132,6 +1263,9 @@ for key in intervals:
     particle_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_particle_locations[key][0], cbm_particle_locations[key][1])
     particle_bucket_distances[bIdx].append(particle_distance_err)
 
+    gmm_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1],
+                                             cbm_gmm_locations[key][0], cbm_gmm_locations[key][1])
+    gmm_bucket_distances[bIdx].append(gmm_distance_err)
 
 for bdIdx, distance_errs in enumerate(cbm_median_bucket_distances):
     if len(distance_errs) > 0:
@@ -1165,20 +1299,49 @@ for bdIdx, distance_errs in enumerate(particle_bucket_distances):
     else:
         particle_bucket_distances[bdIdx] = 0
 
+for bdIdx, distance_errs in enumerate(gmm_bucket_distances):
+    if len(distance_errs) > 0:
+        gmm_bucket_distances[bdIdx] = statistics.median(distance_errs)
+        gmm_bucket_rmses[bdIdx] = median_rmse(distance_errs)
+        gmm_bucket_num_data_pts[bdIdx] += len(distance_errs)
+    else:
+        gmm_bucket_distances[bdIdx] = 0
+
 bar(buckets, cbm_median_bucket_distances, 'Median Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Median Error (km) Over All Locations Using Median vs. Photo Interval (min)', 'cbm_interval_median_places.png', cbm_median_bucket_rmses)
 bar(buckets, cbm_density_bucket_distances, 'Median Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Median Error (km) Over All Locations Using Gaussian KDE vs. Photo Interval (min)', 'cbm_interval_density_places.png', cbm_density_bucket_rmses)
 bar(buckets, ransac_bucket_distances, 'Median Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Median Error (km) Over All Locations Using RANSAC vs. Photo Interval (min)', 'cbm_interval_ransac_places.png', ransac_bucket_rmses)
 bar(buckets, particle_bucket_distances, 'Median Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Median Error (km) Over All Locations Using Particle Filter vs. Photo Interval (min)', 'cbm_interval_particle_places.png', particle_bucket_rmses)
+bar(buckets, gmm_bucket_distances, 'Median Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Median Error (km) Over All Locations Using GMM vs. Photo Interval (min)', 'cbm_interval_gmm_places.png', gmm_bucket_rmses)
 print('INTERVAL OVER ALL LOCATIONS (MEDIAN) BUCKETS NUM DATA PTS: ' + str(cbm_median_bucket_num_data_pts))
 print('INTERVAL OVER ALL LOCATIONS (DENSITY) BUCKETS NUM DATA PTS: ' + str(cbm_density_bucket_num_data_pts))
 print('INTERVAL OVER ALL LOCATIONS (RANSAC) BUCKETS NUM DATA PTS: ' + str(ransac_bucket_num_data_pts))
 print('INTERVAL OVER ALL LOCATIONS (PARTICLE) BUCKETS NUM DATA PTS: ' + str(particle_bucket_num_data_pts))
+print('INTERVAL OVER ALL LOCATIONS (PARTICLE) BUCKETS NUM DATA PTS: ' + str(gmm_bucket_num_data_pts))
+'''
 
 # Plot average distance error vs. percentage of days with sunrise and sunset visible over ALL PLACES.
 # Only using CBM model for now.
 bucket_size = 25
 buckets = list(range(0, 100, bucket_size)) # 25% buckets
 bucket_labels = [str(x) + '-' + str(x + bucket_size) for x in buckets]
+
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_median_locations, sun_visibles, 'SUN', 'MEDIAN',
+                '% of Days With Both Sunrise and Sunset Visible', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Median vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_median_places.png')
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_density_locations, sun_visibles, 'SUN', 'DENSITY',
+                '% of Days With Both Sunrise and Sunset Visible', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Gaussian KDE vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_density_places.png')
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_ransac_locations, sun_visibles, 'SUN', 'RANSAC',
+                '% of Days With Both Sunrise and Sunset Visible', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using RANSAC vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_ransac_places.png')
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_particle_locations, sun_visibles, 'SUN', 'PARTICLE',
+                '% of Days With Both Sunrise and Sunset Visible', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Particle Filter vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_particle_places.png')
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_gmm_locations, sun_visibles, 'SUN', 'GMM',
+                '% of Days With Both Sunrise and Sunset Visible', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using GMM vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_gmm_places.png')
+
+'''
 cbm_median_sun_type_distances = [[] for x in range(len(buckets))]
 cbm_density_sun_type_distances = [[] for x in range(len(buckets))]
 ransac_sun_type_distances = [[] for x in range(len(buckets))]
@@ -1193,7 +1356,7 @@ ransac_sun_type_num_data_pts = [0] * len(buckets)
 particle_sun_type_rmses = [0 for x in range(len(buckets))]
 particle_sun_type_num_data_pts = [0] * len(buckets)
 
-for key in intervals:
+for key in sun_visibles:
     for bIdx, bucket in enumerate(buckets):
         if sun_visibles[key][0] * 100 < bucket + bucket_size:
             break
@@ -1251,15 +1414,18 @@ print('SUN OVER ALL LOCATIONS (MEDIAN) BUCKETS NUM DATA PTS: ' + str(cbm_median_
 print('SUN OVER ALL LOCATIONS (DENSITY) BUCKETS NUM DATA PTS: ' + str(cbm_density_sun_type_num_data_pts)) #
 print('SUN OVER ALL LOCATIONS (RANSAC) BUCKETS NUM DATA PTS: ' + str(ransac_sun_type_num_data_pts)) #
 print('SUN OVER ALL LOCATIONS (PARTICLE) BUCKETS NUM DATA PTS: ' + str(particle_sun_type_num_data_pts)) #
+'''
 
 # Average distance error vs. latitude over ALL PLACES.
-buckets = list(range(-90, 90, 5)) # 5 degree buckets
-bucket_labels = [str(x) + '-' + str(x + 5) for x in buckets]
+bucket_size = 5 # 5 degree buckets
+buckets = list(range(-90, 90, bucket_size))
+bucket_labels = [str(x) + '-' + str(x + bucket_size) for x in buckets]
 
 cbm_median_lat_distances = [[] for x in range(len(buckets))]
 cbm_density_lat_distances = [[] for x in range(len(buckets))]
 ransac_lat_distances = [[] for x in range(len(buckets))]
 particle_lat_distances = [[] for x in range(len(buckets))]
+gmm_lat_distances = [[] for x in range(len(buckets))]
 
 cbm_median_lat_rmses = [0 for x in range(len(buckets))]
 cbm_median_lat_num_data_pts = [0] * len(buckets)
@@ -1269,22 +1435,27 @@ ransac_lat_rmses = [0 for x in range(len(buckets))]
 ransac_lat_num_data_pts = [0] * len(buckets)
 particle_lat_rmses = [0 for x in range(len(buckets))]
 particle_lat_num_data_pts = [0] * len(buckets)
+gmm_lat_rmses = [0 for x in range(len(buckets))]
+gmm_lat_num_data_pts = [0] * len(buckets)
 
 for key in lats:
     median_idx = len(buckets) - 1
     density_idx = len(buckets) - 1
     ransac_idx = len(buckets) - 1
     particle_idx = len(buckets) - 1
+    gmm_idx = len(buckets) - 1
 
     for bIdx, bucket in enumerate(buckets):
-        if cbm_median_locations[key][0] < bucket + 5:
+        if cbm_median_locations[key][0] < bucket + bucket_size:
             median_idx = min(bIdx, median_idx)
-        if cbm_density_locations[key][0] < bucket + 5:
+        if cbm_density_locations[key][0] < bucket + bucket_size:
             density_idx = min(bIdx, density_idx)
-        if cbm_ransac_locations[key][0] < bucket + 5:
+        if cbm_ransac_locations[key][0] < bucket + bucket_size:
             ransac_idx = min(bIdx, ransac_idx)
-        if cbm_particle_locations[key][0] < bucket + 5:
+        if cbm_particle_locations[key][0] < bucket + bucket_size:
             particle_idx = min(bIdx, particle_idx)
+        if cbm_gmm_locations[key][0] < bucket + bucket_size:
+            gmm_idx = min(bIdx, gmm_idx)
 
     cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
     cbm_median_lat_distances[median_idx].append(cbm_median_distance_err)
@@ -1298,6 +1469,11 @@ for key in lats:
     particle_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_particle_locations[key][0],
                                            cbm_particle_locations[key][1])
     particle_lat_distances[particle_idx].append(particle_distance_err)
+
+    gmm_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1],
+                                             cbm_gmm_locations[key][0],
+                                             cbm_gmm_locations[key][1])
+    gmm_lat_distances[gmm_idx].append(gmm_distance_err)
 
 for bdIdx, distance_errs in enumerate(cbm_median_lat_distances):
     if len(distance_errs) > 0:
@@ -1331,23 +1507,35 @@ for bdIdx, distance_errs in enumerate(particle_lat_distances):
     else:
         particle_lat_distances[bdIdx] = 0
 
+for bdIdx, distance_errs in enumerate(gmm_lat_distances):
+    if len(distance_errs) > 0:
+        gmm_lat_distances[bdIdx] = statistics.median(distance_errs)
+        gmm_lat_rmses[bdIdx] = median_rmse(distance_errs)  #
+        gmm_lat_num_data_pts[bdIdx] += len(distance_errs) #
+    else:
+        gmm_lat_distances[bdIdx] = 0
+
 bar(buckets, cbm_median_lat_distances, 'Median Distance Error (km)', 'Latitude', bucket_labels, 'Median Error (km) Over All Locations Using Median vs. Latitude', 'cbm_lat_median_places.png', cbm_median_lat_rmses)
 bar(buckets, cbm_density_lat_distances, 'Median Distance Error (km)', 'Latitude', bucket_labels, 'Median Error (km) Over All Locations Using Gaussian KDE vs. Latitude', 'cbm_lat_density_places.png', cbm_density_lat_rmses)
 bar(buckets, ransac_lat_distances, 'Median Distance Error (km)', 'Latitude', bucket_labels, 'Median Error (km) Over All Locations Using RANSAC vs. Latitude', 'cbm_lat_ransac_places.png', ransac_lat_rmses)
 bar(buckets, particle_lat_distances, 'Median Distance Error (km)', 'Latitude', bucket_labels, 'Median Error (km) Over All Locations Using Particle Filter vs. Latitude', 'cbm_lat_particle_places.png', particle_lat_rmses)
+bar(buckets, gmm_lat_distances, 'Median Distance Error (km)', 'Latitude', bucket_labels, 'Median Error (km) Over All Locations Using GMM vs. Latitude', 'cbm_lat_gmm_places.png', gmm_lat_rmses)
 print('LAT OVER ALL LOCATIONS (MEDIAN) BUCKETS NUM DATA PTS: ' + str(cbm_median_lat_num_data_pts))
 print('LAT OVER ALL LOCATIONS (DENSITY) BUCKETS NUM DATA PTS: ' + str(cbm_density_lat_num_data_pts))
 print('LAT OVER ALL LOCATIONS (RANSAC) BUCKETS NUM DATA PTS: ' + str(ransac_lat_num_data_pts))
 print('LAT OVER ALL LOCATIONS (PARTICLE) BUCKETS NUM DATA PTS: ' + str(particle_lat_num_data_pts))
+print('LAT OVER ALL LOCATIONS (GMM) BUCKETS NUM DATA PTS: ' + str(gmm_lat_num_data_pts))
 
 # Average distance error vs. longitude over ALL PLACES.
-buckets = list(range(-180, 180, 10)) # 10 degree buckets
-bucket_labels = [str(x) + '-' + str(x + 10) for x in buckets]
+bucket_size = 10 # 10 degree buckets
+buckets = list(range(-180, 180, bucket_size))
+bucket_labels = [str(x) + '-' + str(x + bucket_size) for x in buckets]
 
 cbm_median_lng_distances = [[] for x in range(len(buckets))]
 cbm_density_lng_distances = [[] for x in range(len(buckets))]
 ransac_lng_distances = [[] for x in range(len(buckets))]
 particle_lng_distances = [[] for x in range(len(buckets))]
+gmm_lng_distances = [[] for x in range(len(buckets))]
 
 cbm_median_lng_rmses = [0 for x in range(len(buckets))]
 cbm_median_lng_num_data_pts = [0] * len(buckets)
@@ -1357,22 +1545,27 @@ ransac_lng_rmses = [0 for x in range(len(buckets))]
 ransac_lng_num_data_pts = [0] * len(buckets)
 particle_lng_rmses = [0 for x in range(len(buckets))]
 particle_lng_num_data_pts = [0] * len(buckets)
+gmm_lng_rmses = [0 for x in range(len(buckets))]
+gmm_lng_num_data_pts = [0] * len(buckets)
 
 for key in lngs:
     median_idx = len(buckets) - 1
     density_idx = len(buckets) - 1
     ransac_idx = len(buckets) - 1
     particle_idx = len(buckets) - 1
+    gmm_idx = len(buckets) - 1
 
     for bIdx, bucket in enumerate(buckets):
-        if cbm_median_locations[key][1] <= bucket + 10:
+        if cbm_median_locations[key][1] <= bucket + bucket_size:
             median_idx = min(bIdx, median_idx)
-        if cbm_density_locations[key][1] <= bucket + 10:
+        if cbm_density_locations[key][1] <= bucket + bucket_size:
             density_idx = min(bIdx, density_idx)
-        if cbm_ransac_locations[key][1] <= bucket + 10:
+        if cbm_ransac_locations[key][1] <= bucket + bucket_size:
             ransac_idx = min(bIdx, ransac_idx)
-        if cbm_particle_locations[key][1] <= bucket + 10:
+        if cbm_particle_locations[key][1] <= bucket + bucket_size:
             particle_idx = min(bIdx, particle_idx)
+        if cbm_gmm_locations[key][1] <= bucket + bucket_size:
+            gmm_idx = min(bIdx, gmm_idx)
 
     cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
     cbm_median_lng_distances[median_idx].append(cbm_median_distance_err)
@@ -1385,6 +1578,10 @@ for key in lngs:
 
     particle_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_particle_locations[key][0], cbm_particle_locations[key][1])
     particle_lng_distances[particle_idx].append(particle_distance_err)
+
+    gmm_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1],
+                                             cbm_gmm_locations[key][0], cbm_gmm_locations[key][1])
+    gmm_lng_distances[gmm_idx].append(gmm_distance_err)
 
 for bdIdx, distance_errs in enumerate(cbm_median_lng_distances):
     if len(distance_errs) > 0:
@@ -1418,14 +1615,24 @@ for bdIdx, distance_errs in enumerate(particle_lng_distances):
     else:
         particle_lng_distances[bdIdx] = 0
 
+for bdIdx, distance_errs in enumerate(gmm_lng_distances):
+    if len(distance_errs) > 0:
+        gmm_lng_distances[bdIdx] = statistics.median(distance_errs)
+        gmm_lng_rmses[bdIdx] = median_rmse(distance_errs)  #
+        gmm_lng_num_data_pts[bdIdx] += len(distance_errs) #
+    else:
+        gmm_lng_distances[bdIdx] = 0
+
 bar(buckets, cbm_median_lng_distances, 'Median Distance Error (km)', 'Longitude', bucket_labels, 'Median Error (km) Over All Locations Using Median vs. Longitude', 'cbm_lng_median_places.png', cbm_median_lng_rmses)
 bar(buckets, cbm_density_lng_distances, 'Median Distance Error (km)', 'Longitude', bucket_labels, 'Median Error (km) Over All Locations Using Gaussian KDE vs. Longitude', 'cbm_lng_density_places.png', cbm_density_lng_rmses)
 bar(buckets, ransac_lng_distances, 'Median Distance Error (km)', 'Longitude', bucket_labels, 'Median Error (km) Over All Locations Using RANSAC vs. Longitude', 'cbm_lng_ransac_places.png', ransac_lng_rmses)
 bar(buckets, particle_lng_distances, 'Median Distance Error (km)', 'Longitude', bucket_labels, 'Median Error (km) Over All Locations Using Particle Filter vs. Longitude', 'cbm_lng_particle_places.png', particle_lng_rmses)
-print('LNG OVER ALL LOCATIONS (MEDIAN) BUCKETS NUM DATA PTS: ' + str(cbm_median_lng_num_data_pts)) #
-print('LNG OVER ALL LOCATIONS (DENSITY) BUCKETS NUM DATA PTS: ' + str(cbm_density_lng_num_data_pts)) #
-print('LNG OVER ALL LOCATIONS (RANSAC) BUCKETS NUM DATA PTS: ' + str(ransac_lng_num_data_pts)) #
-print('LNG OVER ALL LOCATIONS (PARTICLE) BUCKETS NUM DATA PTS: ' + str(particle_lng_num_data_pts)) #
+bar(buckets, gmm_lng_distances, 'Median Distance Error (km)', 'Longitude', bucket_labels, 'Median Error (km) Over All Locations Using GMM vs. Longitude', 'cbm_lng_gmm_places.png', gmm_lng_rmses)
+print('LNG OVER ALL LOCATIONS (MEDIAN) BUCKETS NUM DATA PTS: ' + str(cbm_median_lng_num_data_pts))
+print('LNG OVER ALL LOCATIONS (DENSITY) BUCKETS NUM DATA PTS: ' + str(cbm_density_lng_num_data_pts))
+print('LNG OVER ALL LOCATIONS (RANSAC) BUCKETS NUM DATA PTS: ' + str(ransac_lng_num_data_pts))
+print('LNG OVER ALL LOCATIONS (PARTICLE) BUCKETS NUM DATA PTS: ' + str(particle_lng_num_data_pts))
+print('LNG OVER ALL LOCATIONS (GMM) BUCKETS NUM DATA PTS: ' + str(gmm_lng_num_data_pts))
 
 # Num locations vs. error using all methods.
 bucket_size = 50 # 50 km buckets
@@ -1437,6 +1644,7 @@ cbm_median_errors = [0] * len(buckets) #[[] for x in range(len(buckets))]
 cbm_density_errors = [0] * len(buckets)
 ransac_errors = [0] * len(buckets)
 particle_errors = [0] * len(buckets)
+gmm_errors = [0] * len(buckets)
 
 cbm_median_error_rmses = [0 for x in range(len(buckets))]
 cbm_median_error_num_data_pts = [0] * len(buckets)
@@ -1446,6 +1654,8 @@ ransac_error_rmses = [0 for x in range(len(buckets))]
 ransac_error_num_data_pts = [0] * len(buckets)
 particle_error_rmses = [0 for x in range(len(buckets))]
 particle_error_num_data_pts = [0] * len(buckets)
+gmm_error_rmses = [0 for x in range(len(buckets))]
+gmm_error_num_data_pts = [0] * len(buckets)
 
 for key in actual_locations:
     cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
@@ -1454,10 +1664,14 @@ for key in actual_locations:
     particle_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1],
                                            cbm_particle_locations[key][0], cbm_particle_locations[key][1])
 
+    gmm_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1],
+                                        cbm_gmm_locations[key][0], cbm_gmm_locations[key][1])
+
     median_idx = len(buckets) - 1
     density_idx = len(buckets) - 1
     ransac_idx = len(buckets) - 1
     particle_idx = len(buckets) - 1
+    gmm_idx = len(buckets) - 1
 
     for bIdx, bucket in enumerate(buckets):
         if cbm_median_distance_err <= bucket + bucket_size:
@@ -1468,16 +1682,20 @@ for key in actual_locations:
             ransac_idx = min(bIdx, ransac_idx)
         if particle_distance_err <= bucket + bucket_size:
             particle_idx = min(bIdx, particle_idx)
+        if gmm_distance_err <= bucket + bucket_size:
+            gmm_idx = min(bIdx, gmm_idx)
 
     cbm_median_errors[median_idx] += 1
     cbm_density_errors[density_idx] += 1
     ransac_errors[ransac_idx] += 1
     particle_errors[particle_idx] += 1
+    gmm_errors[gmm_idx] += 1
 
 bar(buckets, cbm_median_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Median', 'cbm_error_median.png')
 bar(buckets, cbm_density_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Gaussian KDE', 'cbm_error_density.png')
 bar(buckets, ransac_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using RANSAC', 'cbm_error_ransac.png')
 bar(buckets, particle_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Particle Filter', 'cbm_error_particle.png')
+bar(buckets, gmm_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using GMM', 'cbm_error_gmm.png')
 
 green = 0
 sunrise_only = 0
@@ -1523,11 +1741,13 @@ print('CBM Medians Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_media
 print('CBM Density Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_density_distances)))
 print('RANSAC Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_ransac_distances)))
 print('Particle Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_particle_distances)))
+print('GMM Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_gmm_distances)))
 print('CBM Means Median Distance Error: {:.6f}'.format(statistics.median(cbm_mean_distances)))
 print('CBM Medians Median Distance Error: {:.6f}'.format(statistics.median(cbm_median_distances)))
 print('CBM Density Median Distance Error: {:.6f}'.format(statistics.median(cbm_density_distances)))
 print('RANSAC Median Distance Error: {:.6f}'.format(statistics.median(cbm_ransac_distances)))
 print('Particle Median Distance Error: {:.6f}'.format(statistics.median(cbm_particle_distances)))
+print('GMM Median Distance Error: {:.6f}'.format(statistics.median(cbm_gmm_distances)))
 print('CBM Means Max Distance Error: {:.6f}'.format(max(cbm_mean_distances)))
 print('CBM Means Min Distance Error: {:.6f}'.format(min(cbm_mean_distances)))
 print('CBM Medians Max Distance Error: {:.6f}'.format(max(cbm_median_distances)))
@@ -1538,17 +1758,21 @@ print('RANSAC Max Distance Error: {:.6f}'.format(max(cbm_ransac_distances)))
 print('RANSAC Min Distance Error: {:.6f}'.format(min(cbm_ransac_distances)))
 print('Particle Max Distance Error: {:.6f}'.format(max(cbm_particle_distances)))
 print('Particle Min Distance Error: {:.6f}'.format(min(cbm_particle_distances)))
+print('GMM Max Distance Error: {:.6f}'.format(max(cbm_gmm_distances)))
+print('GMM Min Distance Error: {:.6f}'.format(min(cbm_gmm_distances)))
 print('')
 print('Means Avg. Longitude Error: {:.6f}'.format(statistics.mean(mean_longitude_err)))
 print('Medians Avg. Longitude Error: {:.6f}'.format(statistics.mean(median_longitude_err)))
 print('Density Avg. Longitude Error: {:.6f}'.format(statistics.mean(density_longitude_err)))
 print('RANSAC Avg. Longitude Error: {:.6f}'.format(statistics.mean(cbm_ransac_longitude_err)))
 print('Particle Avg. Longitude Error: {:.6f}'.format(statistics.mean(cbm_particle_longitude_err)))
+print('GMM Avg. Longitude Error: {:.6f}'.format(statistics.mean(cbm_gmm_longitude_err)))
 print('Means Median Longitude Error: {:.6f}'.format(statistics.median(mean_longitude_err)))
 print('Medians Median Longitude Error: {:.6f}'.format(statistics.median(median_longitude_err)))
 print('Density Median Longitude Error: {:.6f}'.format(statistics.median(density_longitude_err)))
 print('RANSAC Median Longitude Error: {:.6f}'.format(statistics.median(cbm_ransac_longitude_err)))
 print('Particle Median Longitude Error: {:.6f}'.format(statistics.median(cbm_particle_longitude_err)))
+print('GMM Median Longitude Error: {:.6f}'.format(statistics.median(cbm_gmm_longitude_err)))
 print('Means Max Longitude Error: {:.6f}'.format(max(mean_longitude_err)))
 print('Means Min Longitude Error: {:.6f}'.format(min(mean_longitude_err)))
 print('Medians Max Longitude Error: {:.6f}'.format(max(median_longitude_err)))
@@ -1559,6 +1783,8 @@ print('RANSAC Max Longitude Error: {:.6f}'.format(max(cbm_ransac_longitude_err))
 print('RANSAC Min Longitude Error: {:.6f}'.format(min(cbm_ransac_longitude_err)))
 print('Particle Max Longitude Error: {:.6f}'.format(max(cbm_particle_longitude_err)))
 print('Particle Min Longitude Error: {:.6f}'.format(min(cbm_particle_longitude_err)))
+print('GMM Max Longitude Error: {:.6f}'.format(max(cbm_gmm_longitude_err)))
+print('GMM Min Longitude Error: {:.6f}'.format(min(cbm_gmm_longitude_err)))
 print('')
 print('Brock Means Avg. Latitude Error: {:.6f}'.format(statistics.mean(mean_latitude_err)))
 print('Brock Medians Avg. Latitude Error: {:.6f}'.format(statistics.mean(median_latitude_err)))
@@ -1578,11 +1804,13 @@ print('CBM Medians Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_media
 print('CBM Density Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_density_latitude_err)))
 print('RANSAC Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_ransac_latitude_err)))
 print('Particle Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_particle_latitude_err)))
+print('GMM Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_gmm_latitude_err)))
 print('CBM Means Median Latitude Error: {:.6f}'.format(statistics.median(cbm_mean_latitude_err)))
 print('CBM Medians Median Latitude Error: {:.6f}'.format(statistics.median(cbm_median_latitude_err)))
 print('CBM Density Median Latitude Error: {:.6f}'.format(statistics.median(cbm_density_latitude_err)))
 print('RANSAC Median Latitude Error: {:.6f}'.format(statistics.median(cbm_ransac_latitude_err)))
 print('Particle Median Latitude Error: {:.6f}'.format(statistics.median(cbm_particle_latitude_err)))
+print('GMM Median Latitude Error: {:.6f}'.format(statistics.median(cbm_gmm_latitude_err)))
 print('CBM Means Max Latitude Error: {:.6f}'.format(max(cbm_mean_latitude_err)))
 print('CBM Means Min Latitude Error: {:.6f}'.format(min(cbm_mean_latitude_err)))
 print('CBM Medians Max Latitude Error: {:.6f}'.format(max(cbm_median_latitude_err)))
@@ -1593,5 +1821,7 @@ print('RANSAC Max Longitude Error: {:.6f}'.format(max(cbm_ransac_latitude_err)))
 print('RANSAC Min Longitude Error: {:.6f}'.format(min(cbm_ransac_latitude_err)))
 print('Particle Max Longitude Error: {:.6f}'.format(max(cbm_particle_latitude_err)))
 print('Particle Min Longitude Error: {:.6f}'.format(min(cbm_particle_latitude_err)))
+print('GMM Max Longitude Error: {:.6f}'.format(max(cbm_gmm_latitude_err)))
+print('GMM Min Longitude Error: {:.6f}'.format(min(cbm_gmm_latitude_err)))
 print('')
 sys.stdout.flush()
