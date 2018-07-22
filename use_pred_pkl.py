@@ -361,9 +361,6 @@ def gaussian_mixture(lats, lngs):
         gmm3 = GaussianMixture(n_components=3, covariance_type='diag').fit(points)
         gmms = [gmm1, gmm2, gmm3]
 
-        print(points.shape)
-        print(points)
-
         bics = []
         bics.append(gmm1.bic(points))
         bics.append(gmm2.bic(points))
@@ -388,11 +385,8 @@ def gaussian_mixture(lats, lngs):
         else:
             cluster_idx = 0
 
-        print(gmm.means_.shape)
-        print(gmm.covariances_.shape)
-        print(gmm.covariances_)
         center = gmm.means_[cluster_idx, :]
-        cov = gmm.covariances_[cluster_idx, :, :]
+        cov = np.diag(gmm.covariances_[cluster_idx, :])
         cov_inv = np.linalg.inv(cov)
 
         # Calculate Mahalanobis distance from mean to all points... reject points that are too far?
