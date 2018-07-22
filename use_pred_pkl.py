@@ -385,6 +385,8 @@ def gaussian_mixture(lats, lngs):
         else:
             cluster_idx = 0
 
+        print(gmm.means_.shape)
+        print(gmm.covariances_.shape)
         center = gmm.means_[cluster_idx, :]
         cov = gmm.covariances_[cluster_idx, :, :]
         cov_inv = np.linalg.inv(cov)
