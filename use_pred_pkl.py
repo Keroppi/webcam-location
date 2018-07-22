@@ -358,13 +358,13 @@ def gaussian_mixture(lats, lngs):
         gmms = []
         gmm1 = GaussianMixture(n_components=1, covariance_type='diag').fit(points)
         gmm2 = GaussianMixture(n_components=2, covariance_type='diag').fit(points)
-        gmm3 = GaussianMixture(n_components=3, covariance_type='diag').fit(points)
-        gmms = [gmm1, gmm2, gmm3]
+        #gmm3 = GaussianMixture(n_components=3, covariance_type='diag').fit(points)
+        gmms = [gmm1, gmm2] #, gmm3]
 
         bics = []
         bics.append(gmm1.bic(points))
         bics.append(gmm2.bic(points))
-        bics.append(gmm3.bic(points))
+        #bics.append(gmm3.bic(points))
 
         # Pick # of clusters based on BIC.
         bic, k_idx = min((val, idx) for (idx, val) in enumerate(bics))
@@ -399,9 +399,17 @@ def gaussian_mixture(lats, lngs):
             else:
                 print('Mahalanobis distance: {}'.format(m_dist))
 
-        inliers = np.array(inliers)
-        x_star = statistics.mean(inliers[:, 0])
-        y_star = statistics.mean(inliers[:, 1])
+        print(len(inliers))
+        if len(inliers) > 0:
+            inliers = np.array(inliers)
+
+            x_star = statistics.mean(inliers[:, 0])
+            y_star = statistics.mean(inliers[:, 1])
+        else:
+            print('WARNING - No inliers found with GMM!')
+            x_star = center[0]
+            y_star = center[1]
+
 
         lat, lng = azimuthal_equidistant_inverse(x_star, y_star)
         locations[place] = (lat, lng)
