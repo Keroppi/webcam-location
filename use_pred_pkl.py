@@ -1187,15 +1187,19 @@ for bdIdx, distance_errs in enumerate(cbm_bucket_distances):
 bar(buckets, cbm_bucket_distances, 'Median Distance Error (km)', 'Day Length Hours', bucket_labels, 'Median Error (km) Over All Days vs. Day Length Hours', 'cbm_day_length.png', cbm_bucket_rmses) #
 print('DAY LENGTH OVER ALL DAYS BUCKETS NUM DATA PTS: ' + str(cbm_bucket_num_data_pts)) #
 
-def plot_all_places(bucket_size, buckets, bucket_labels, locations, x_data, x_name, method_name, xlabel, ylabel, title, filename):
+def plot_all_places(bucket_size, buckets, bucket_labels, locations, x_data, x_name, method_name, xlabel, ylabel, title, filename, sub_idx=None):
     bucket_distances = [[] for x in range(len(buckets))]
     bucket_rmses = [0] * len(buckets) # for x in range(len(buckets))]
     bucket_num_data_pts = [0] * len(buckets)
 
     for key in x_data:
         for bIdx, bucket in enumerate(buckets):
-            if x_data[key] < bucket + bucket_size:
-                break
+            if sub_idx is None:
+                if x_data[key] < bucket + bucket_size:
+                    break
+            else:
+                if x_data[key][sub_idx] < bucket + bucket_size:
+                    break
 
         distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1],
                                         locations[key][0], locations[key][1])
@@ -1324,7 +1328,7 @@ print('INTERVAL OVER ALL LOCATIONS (MEDIAN) BUCKETS NUM DATA PTS: ' + str(cbm_me
 print('INTERVAL OVER ALL LOCATIONS (DENSITY) BUCKETS NUM DATA PTS: ' + str(cbm_density_bucket_num_data_pts))
 print('INTERVAL OVER ALL LOCATIONS (RANSAC) BUCKETS NUM DATA PTS: ' + str(ransac_bucket_num_data_pts))
 print('INTERVAL OVER ALL LOCATIONS (PARTICLE) BUCKETS NUM DATA PTS: ' + str(particle_bucket_num_data_pts))
-print('INTERVAL OVER ALL LOCATIONS (PARTICLE) BUCKETS NUM DATA PTS: ' + str(gmm_bucket_num_data_pts))
+print('INTERVAL OVER ALL LOCATIONS (GMM) BUCKETS NUM DATA PTS: ' + str(gmm_bucket_num_data_pts))
 '''
 
 # Plot average distance error vs. percentage of days with sunrise and sunset visible over ALL PLACES.
@@ -1335,19 +1339,19 @@ bucket_labels = [str(x) + '-' + str(x + bucket_size) for x in buckets]
 
 plot_all_places(bucket_size, buckets, bucket_labels,
                 cbm_median_locations, sun_visibles, 'SUN', 'MEDIAN',
-                '% of Days With Both Sunrise and Sunset Visible', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Median vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_median_places.png')
+                '% of Days With Both Sunrise and Sunset Visible', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Median vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_median_places.png', 0)
 plot_all_places(bucket_size, buckets, bucket_labels,
                 cbm_density_locations, sun_visibles, 'SUN', 'DENSITY',
-                '% of Days With Both Sunrise and Sunset Visible', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Gaussian KDE vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_density_places.png')
+                '% of Days With Both Sunrise and Sunset Visible', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Gaussian KDE vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_density_places.png', 0)
 plot_all_places(bucket_size, buckets, bucket_labels,
                 cbm_ransac_locations, sun_visibles, 'SUN', 'RANSAC',
-                '% of Days With Both Sunrise and Sunset Visible', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using RANSAC vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_ransac_places.png')
+                '% of Days With Both Sunrise and Sunset Visible', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using RANSAC vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_ransac_places.png', 0)
 plot_all_places(bucket_size, buckets, bucket_labels,
                 cbm_particle_locations, sun_visibles, 'SUN', 'PARTICLE',
-                '% of Days With Both Sunrise and Sunset Visible', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Particle Filter vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_particle_places.png')
+                '% of Days With Both Sunrise and Sunset Visible', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Particle Filter vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_particle_places.png', 0)
 plot_all_places(bucket_size, buckets, bucket_labels,
                 cbm_gmm_locations, sun_visibles, 'SUN', 'GMM',
-                '% of Days With Both Sunrise and Sunset Visible', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using GMM vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_gmm_places.png')
+                '% of Days With Both Sunrise and Sunset Visible', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using GMM vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_gmm_places.png', 0)
 
 '''
 cbm_median_sun_type_distances = [[] for x in range(len(buckets))]
@@ -1429,6 +1433,23 @@ bucket_size = 5 # 5 degree buckets
 buckets = list(range(-90, 90, bucket_size))
 bucket_labels = [str(x) + '-' + str(x + bucket_size) for x in buckets]
 
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_median_locations, cbm_median_locations, 'LAT', 'MEDIAN',
+                'Latitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Median vs. Latitude', 'cbm_lat_median_places.png', 0)
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_density_locations, cbm_density_locations, 'LAT', 'DENSITY',
+                'Latitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Gaussian KDE vs. Latitude', 'cbm_lat_density_places.png', 0)
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_ransac_locations, cbm_ransac_locations, 'LAT', 'RANSAC',
+                'Latitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using RANSAC vs. Latitude', 'cbm_lat_ransac_places.png', 0)
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_particle_locations, cbm_particle_locations, 'LAT', 'PARTICLE',
+                'Latitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Particle Filter vs. Latitude', 'cbm_lat_particle_places.png', 0)
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_gmm_locations, cbm_gmm_locations, 'LAT', 'GMM',
+                'Latitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using GMM vs. Latitude', 'cbm_lat_gmm_places.png', 0)
+
+'''
 cbm_median_lat_distances = [[] for x in range(len(buckets))]
 cbm_density_lat_distances = [[] for x in range(len(buckets))]
 ransac_lat_distances = [[] for x in range(len(buckets))]
@@ -1533,12 +1554,32 @@ print('LAT OVER ALL LOCATIONS (DENSITY) BUCKETS NUM DATA PTS: ' + str(cbm_densit
 print('LAT OVER ALL LOCATIONS (RANSAC) BUCKETS NUM DATA PTS: ' + str(ransac_lat_num_data_pts))
 print('LAT OVER ALL LOCATIONS (PARTICLE) BUCKETS NUM DATA PTS: ' + str(particle_lat_num_data_pts))
 print('LAT OVER ALL LOCATIONS (GMM) BUCKETS NUM DATA PTS: ' + str(gmm_lat_num_data_pts))
+'''
 
 # Average distance error vs. longitude over ALL PLACES.
 bucket_size = 10 # 10 degree buckets
 buckets = list(range(-180, 180, bucket_size))
 bucket_labels = [str(x) + '-' + str(x + bucket_size) for x in buckets]
 
+
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_median_locations, cbm_median_locations, 'LNG', 'MEDIAN',
+                'Longitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Median vs. Longitude', 'cbm_lng_median_places.png', 1)
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_density_locations, cbm_density_locations, 'LNG', 'DENSITY',
+                'Longitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Gaussian KDE vs. Longitude', 'cbm_lng_density_places.png', 1)
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_ransac_locations, cbm_ransac_locations, 'LNG', 'RANSAC',
+                'Longitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using RANSAC vs. Longitude', 'cbm_lng_ransac_places.png', 1)
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_particle_locations, cbm_particle_locations, 'LNG', 'PARTICLE',
+                'Longitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Particle Filter vs. Longitude', 'cbm_lng_particle_places.png', 1)
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_gmm_locations, cbm_gmm_locations, 'LNG', 'GMM',
+                'Longitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using GMM vs. Longitude', 'cbm_lng_gmm_places.png', 1)
+
+
+'''
 cbm_median_lng_distances = [[] for x in range(len(buckets))]
 cbm_density_lng_distances = [[] for x in range(len(buckets))]
 ransac_lng_distances = [[] for x in range(len(buckets))]
@@ -1641,6 +1682,7 @@ print('LNG OVER ALL LOCATIONS (DENSITY) BUCKETS NUM DATA PTS: ' + str(cbm_densit
 print('LNG OVER ALL LOCATIONS (RANSAC) BUCKETS NUM DATA PTS: ' + str(ransac_lng_num_data_pts))
 print('LNG OVER ALL LOCATIONS (PARTICLE) BUCKETS NUM DATA PTS: ' + str(particle_lng_num_data_pts))
 print('LNG OVER ALL LOCATIONS (GMM) BUCKETS NUM DATA PTS: ' + str(gmm_lng_num_data_pts))
+'''
 
 # Num locations vs. error using all methods.
 bucket_size = 50 # 50 km buckets
