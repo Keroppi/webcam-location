@@ -1,12 +1,12 @@
 CLUSTER = True
-LEARNING_SUNRISE = True # True for sunrise, False for sunset
+LEARNING_SUNRISE = False # True for sunrise, False for sunset
 DAYS_PER_MONTH = 'MAX'
 SIZE = ['small'] # 'large'
 #DATA_SOURCES = ['roundshot'] # 'panomax'
 IMAGES_PER_DAY = 32
 PATCH_SIZE = (128, 128) # height, width
 NUM_CHANNELS = 3 # RGB or YCbCr
-BATCH_SIZE = 150
+BATCH_SIZE = 140
 NUM_LOADER_WORKERS = 4
 EPOCHS = 200
 LOG_INTERVAL = 20
