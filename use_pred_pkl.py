@@ -362,6 +362,7 @@ def gaussian_mixture(lats, lngs):
         gmms = [gmm1, gmm2, gmm3]
 
         print(points.shape)
+        print(points)
 
         bics = []
         bics.append(gmm1.bic(points))
@@ -389,6 +390,7 @@ def gaussian_mixture(lats, lngs):
 
         print(gmm.means_.shape)
         print(gmm.covariances_.shape)
+        print(gmm.covariances_)
         center = gmm.means_[cluster_idx, :]
         cov = gmm.covariances_[cluster_idx, :, :]
         cov_inv = np.linalg.inv(cov)
