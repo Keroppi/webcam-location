@@ -361,6 +361,8 @@ def gaussian_mixture(lats, lngs):
         gmm3 = GaussianMixture(n_components=3, covariance_type='diag').fit(points)
         gmms = [gmm1, gmm2, gmm3]
 
+        print(points.shape)
+
         bics = []
         bics.append(gmm1.bic(points))
         bics.append(gmm2.bic(points))
