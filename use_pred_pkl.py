@@ -341,7 +341,7 @@ def azimuthal_equidistant_inverse(x, y):
 
     return (lat, lng)
 
-def gmm(lats, lngs):
+def gaussian_mixture(lats, lngs):
     locations = {}
 
     for place in lats:
@@ -408,7 +408,7 @@ def gmm(lats, lngs):
 
     return locations
 
-cbm_gmm_locations = gmm(cbm_lats, lngs)
+cbm_gmm_locations = gaussian_mixture(cbm_lats, lngs)
 
 def particle_filter(lats, lngs):
     bigM = constants.BIGM

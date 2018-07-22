@@ -318,13 +318,6 @@ class Day():
         self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, self.sunrise, self.sunset)
 
     def __init__(self, place, times, img_paths, sunrise, sunset, train_test_valid, lat, lng, time_offset, mali_solar_noon):
-        # VLI
-        if len(times) > 800:
-            print('Max times: {}'.format(len(times)))
-            print(place)
-            print(times[0].date())
-            sys.stdout.flush()
-
         self.all_times = times
         self.all_img_paths = img_paths
 
