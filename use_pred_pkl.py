@@ -382,7 +382,8 @@ def gaussian_mixture(lats, lngs):
         aic, k_idx2 = min((val, idx) for (idx, val) in enumerate(aics))
 
         # Only choose 2 clusters if both AIC and BIC agree.
-        gmm = gmms[min(k_idx1, k_idx2)]
+        k_idx = min(k_idx1, k_idx2)
+        gmm = gmms[k_idx]
 
         #print(place + ' - # clusters - ' + str(k_idx + 1))
 
