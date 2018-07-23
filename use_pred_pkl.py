@@ -23,6 +23,7 @@ print('Bandwidth: {}'.format(constants.BANDWIDTH))
 print('RANSAC Inlier: {}'.format(constants.INLIER_THRESHOLD))
 print('Particle Inlier: {}'.format(constants.AZIMUTHAL_INLIER_THRESHOLD))
 print('Big-M: {}'.format(constants.BIGM))
+print('Mahalanobis: {}'.format(constants.MAHALANOBIS_INLIER_THRESHOLD))
 sys.stdout.flush()
 
 parser = argparse.ArgumentParser(description='Predict Location')
@@ -357,13 +358,13 @@ def gaussian_mixture(lats, lngs):
 
         gmms = []
         gmm1 = GaussianMixture(n_components=1, covariance_type='diag').fit(points)
-        gmm2 = GaussianMixture(n_components=2, covariance_type='diag').fit(points)
+        #gmm2 = GaussianMixture(n_components=2, covariance_type='diag').fit(points)
         #gmm3 = GaussianMixture(n_components=3, covariance_type='diag').fit(points)
-        gmms = [gmm1, gmm2] #, gmm3]
+        gmms = [gmm1]#, gmm2, gmm3]
 
         bics = []
         bics.append(gmm1.bic(points))
-        bics.append(gmm2.bic(points))
+        #bics.append(gmm2.bic(points))
         #bics.append(gmm3.bic(points))
 
         # Pick # of clusters based on BIC.
@@ -387,6 +388,13 @@ def gaussian_mixture(lats, lngs):
 
         center = gmm.means_[cluster_idx, :]
         cov = np.diag(gmm.covariances_[cluster_idx, :])
+
+        # VLI
+        if k_idx == 0:
+            print('COV MATRIX BELOW')
+            print(cov) # Set covariance_prior_ using BayesianGMM?
+            print(cov[0, 0] / cov[1, 1])
+
         cov_inv = np.linalg.inv(cov)
 
         # Calculate Mahalanobis distance from mean to all points... reject points that are too far?
@@ -396,10 +404,10 @@ def gaussian_mixture(lats, lngs):
 
             if m_dist < constants.MAHALANOBIS_INLIER_THRESHOLD:
                 inliers.append(points[row, :])
-            else:
-                print('Mahalanobis distance: {}'.format(m_dist))
+            #else:
+            #    print('Mahalanobis distance: {}'.format(m_dist))
 
-        print(len(inliers))
+        #print(len(inliers))
         if len(inliers) > 0:
             inliers = np.array(inliers)
 
