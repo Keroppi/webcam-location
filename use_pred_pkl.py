@@ -343,6 +343,7 @@ def azimuthal_equidistant_inverse(x, y):
     return (lat, lng)
 
 def gaussian_mixture(lats, lngs):
+    cov_avg = np.zeros((2, 2))
     locations = {}
 
     for place in lats:
@@ -389,6 +390,8 @@ def gaussian_mixture(lats, lngs):
         center = gmm.means_[cluster_idx, :]
         cov = np.diag(gmm.covariances_[cluster_idx, :])
 
+        cov_avg += cov
+
         # VLI
         if k_idx == 0:
             print('COV MATRIX BELOW')
@@ -421,6 +424,10 @@ def gaussian_mixture(lats, lngs):
 
         lat, lng = azimuthal_equidistant_inverse(x_star, y_star)
         locations[place] = (lat, lng)
+
+    cov_avg /= len(lats)
+    print('COV AVG')
+    print(cov_avg)
 
     return locations
 
