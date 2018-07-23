@@ -358,7 +358,7 @@ def gaussian_mixture(lats, lngs):
         #print(place)
         #print(cov)
 
-        mean_covariance = np.array([[0.01018481, 0.], [0., 0.13424137]])
+        mean_covariance = np.array([0.01018481, 0.13424137])
 
         gmms = []
         gmm1 = BayesianGaussianMixture(n_components=1, covariance_type='diag', covariance_prior=mean_covariance).fit(points)
