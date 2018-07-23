@@ -6,6 +6,7 @@ matplotlib.use('agg')
 import os, argparse, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, pickle, collections, copy, scipy
 from sklearn.neighbors.kde import KernelDensity
 from sklearn.mixture import GaussianMixture
+from sklearn.mixture import BayesianGaussianMixture
 from scipy.optimize import minimize
 from sklearn.metrics import mean_squared_error
 
@@ -357,15 +358,17 @@ def gaussian_mixture(lats, lngs):
         #print(place)
         #print(cov)
 
+        mean_covariance = np.array([[0.01018481, 0.], [0., 0.13424137]])
+
         gmms = []
-        gmm1 = GaussianMixture(n_components=1, covariance_type='diag').fit(points)
-        #gmm2 = GaussianMixture(n_components=2, covariance_type='diag').fit(points)
+        gmm1 = BayesianGaussianMixture(n_components=1, covariance_type='diag', covariance_prior=mean_covariance).fit(points)
+        gmm2 = BayesianGaussianMixture(n_components=2, covariance_type='diag', covariance_prior=mean_covariance).fit(points)
         #gmm3 = GaussianMixture(n_components=3, covariance_type='diag').fit(points)
-        gmms = [gmm1]#, gmm2, gmm3]
+        gmms = [gmm1, gmm2] #, gmm3]
 
         bics = []
         bics.append(gmm1.bic(points))
-        #bics.append(gmm2.bic(points))
+        bics.append(gmm2.bic(points))
         #bics.append(gmm3.bic(points))
 
         # Pick # of clusters based on BIC.
@@ -392,11 +395,10 @@ def gaussian_mixture(lats, lngs):
 
         cov_avg += cov
 
-        # VLI
-        if k_idx == 0:
-            print('COV MATRIX BELOW')
-            print(cov) # Set covariance_prior_ using BayesianGMM?
-            print(cov[0, 0] / cov[1, 1])
+        #if k_idx == 0:
+        #    print('COV MATRIX BELOW')
+        #    print(cov) # Set covariance_prior_ using BayesianGMM?
+        #    print(cov[0, 0] / cov[1, 1])
 
         cov_inv = np.linalg.inv(cov)
 
