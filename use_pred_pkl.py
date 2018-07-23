@@ -6,7 +6,7 @@ matplotlib.use('agg')
 import os, argparse, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, pickle, collections, copy, scipy
 from sklearn.neighbors.kde import KernelDensity
 from sklearn.mixture import GaussianMixture
-from sklearn.mixture import BayesianGaussianMixture
+#from sklearn.mixture import BayesianGaussianMixture
 from scipy.optimize import minimize
 from sklearn.metrics import mean_squared_error
 
@@ -344,7 +344,7 @@ def azimuthal_equidistant_inverse(x, y):
     return (lat, lng)
 
 def gaussian_mixture(lats, lngs):
-    cov_avg = np.zeros((2, 2))
+    #cov_avg = np.zeros((2, 2))
     locations = {}
 
     for place in lats:
@@ -358,11 +358,11 @@ def gaussian_mixture(lats, lngs):
         #print(place)
         #print(cov)
 
-        mean_covariance = np.array([0.01018481, 0.13424137])
+        mean_covariance = np.array([0.01018481, 0.13424137]) # if using BayesianGMM for covariance_prior_
 
         gmms = []
-        gmm1 = BayesianGaussianMixture(n_components=1, covariance_type='diag', covariance_prior=mean_covariance).fit(points)
-        gmm2 = BayesianGaussianMixture(n_components=2, covariance_type='diag', covariance_prior=mean_covariance).fit(points)
+        gmm1 = GaussianMixture(n_components=1, covariance_type='diag').fit(points)
+        gmm2 = GaussianMixture(n_components=2, covariance_type='diag').fit(points)
         #gmm3 = GaussianMixture(n_components=3, covariance_type='diag').fit(points)
         gmms = [gmm1, gmm2] #, gmm3]
 
@@ -371,11 +371,20 @@ def gaussian_mixture(lats, lngs):
         bics.append(gmm2.bic(points))
         #bics.append(gmm3.bic(points))
 
-        # Pick # of clusters based on BIC.
-        bic, k_idx = min((val, idx) for (idx, val) in enumerate(bics))
-        gmm = gmms[k_idx]
+        aics = []
+        aics.append(gmm1.aic(points))
+        aics.append(gmm2.aic(points))
 
-        print(place + ' - # clusters - ' + str(k_idx + 1))
+        # Pick # of clusters based on BIC.
+        bic, k_idx1 = min((val, idx) for (idx, val) in enumerate(bics))
+
+        # Pick # of clusters based on AIC.
+        aic, k_idx2 = min((val, idx) for (idx, val) in enumerate(aics))
+
+        # Only choose 2 clusters if both AIC and BIC agree.
+        gmm = gmms[min(k_idx1, k_idx2)]
+
+        #print(place + ' - # clusters - ' + str(k_idx + 1))
 
         if k_idx > 0: # If there is more than one cluster, pick cluster with most points.
             classes = gmm.predict(points)
@@ -393,7 +402,7 @@ def gaussian_mixture(lats, lngs):
         center = gmm.means_[cluster_idx, :]
         cov = np.diag(gmm.covariances_[cluster_idx, :])
 
-        cov_avg += cov
+        #cov_avg += cov
 
         #if k_idx == 0:
         #    print('COV MATRIX BELOW')
@@ -427,9 +436,9 @@ def gaussian_mixture(lats, lngs):
         lat, lng = azimuthal_equidistant_inverse(x_star, y_star)
         locations[place] = (lat, lng)
 
-    cov_avg /= len(lats)
-    print('COV AVG')
-    print(cov_avg)
+    #cov_avg /= len(lats)
+    #print('COV AVG')
+    #print(cov_avg)
 
     return locations
 
