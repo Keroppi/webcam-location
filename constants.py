@@ -13,7 +13,7 @@ LOG_INTERVAL = 20
 SPLIT_TOTAL = 100
 SPLIT_TRAIN = 75 # 75% train
 SPLIT_TEST = 100 # 25% test, 0% validation
-BANDWIDTH = 0.3
+BANDWIDTH = 0.05
             # 0.2 - 453
             # 0.175 - 450
             # 0.15 - 436
@@ -21,11 +21,12 @@ BANDWIDTH = 0.3
             # 0.1 - 438
             # 0.05 - 490
 
+            ## 0.3 - 416
             ## 0.2 - 383
             ## 0.125 - 396
 CENTER = False
 LAMBDA = 1 # REGULARIZER
-INLIER_THRESHOLD = 500 # km
+INLIER_THRESHOLD = 600 # km
                    # 500 - 499
                    # 450 - 490
                    # 400 - BEST 468, 387
@@ -34,8 +35,10 @@ INLIER_THRESHOLD = 500 # km
                    # 200 - 524
 
                    ## 400 - 469
-                   ## 500 -
-AZIMUTHAL_INLIER_THRESHOLD = 0.07853981633974483 # 500 km
+                   ## 500 - 402
+                   ## 600 -
+AZIMUTHAL_INLIER_THRESHOLD = 0.09407324668249435 # 600 km
+                             # 0.07853981633974483 # 500 km
                              # 0.0470366233412471 # 300 km
                              # 0.05497787143782138 # 350 km - 455
                              # 0.06283185307179587 # 400 km - ?, 356
@@ -43,6 +46,8 @@ AZIMUTHAL_INLIER_THRESHOLD = 0.07853981633974483 # 500 km
 
                              ## 300 - 466
                              ## 400 - 420
-                             ## 500 -
-MAHALANOBIS_INLIER_THRESHOLD = 1 ## 1 - 426 without Bayesian with 2 clusters, 372 with 1 cluster,
+                             ## 500 - 391
+                             ## 600 -
+MAHALANOBIS_INLIER_THRESHOLD = 0.5
+                               ## 1 - 426 without Bayesian with 2 BIC clusters, 372 with 1 cluster, 426 with 2 clusters (AIC and BIC)
 BIGM = 100

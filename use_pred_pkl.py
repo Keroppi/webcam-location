@@ -362,18 +362,19 @@ def gaussian_mixture(lats, lngs):
 
         gmms = []
         gmm1 = GaussianMixture(n_components=1, covariance_type='diag').fit(points)
-        gmm2 = GaussianMixture(n_components=2, covariance_type='diag').fit(points)
+        #gmm2 = GaussianMixture(n_components=2, covariance_type='diag').fit(points)
         #gmm3 = GaussianMixture(n_components=3, covariance_type='diag').fit(points)
-        gmms = [gmm1, gmm2] #, gmm3]
+        gmms = [gmm1] #, gmm2, gmm3]
 
         bics = []
         bics.append(gmm1.bic(points))
-        bics.append(gmm2.bic(points))
+        #bics.append(gmm2.bic(points))
         #bics.append(gmm3.bic(points))
 
         aics = []
         aics.append(gmm1.aic(points))
-        aics.append(gmm2.aic(points))
+        #aics.append(gmm2.aic(points))
+        #aics.append(gmm3.aic(points))
 
         # Pick # of clusters based on BIC.
         bic, k_idx1 = min((val, idx) for (idx, val) in enumerate(bics))
@@ -709,7 +710,7 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
     # Plot locations on a map.
     for place in lats:
-        if len(lats[place]) < 80: # Need at least 80 points.
+        if len(lats[place]) < 100: # Need at least 100 points.
             continue
 
         min_lat = max(min(lats[place]) - 1, -90)
