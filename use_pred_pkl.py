@@ -1038,7 +1038,7 @@ def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None):
 
 # Plot average distance error vs. time interval OVER ALL DAYS.
 bucket_size = 5 # minute intervals
-buckets = list(range(0, 50, bucket_size))
+buckets = list(range(0, 35, bucket_size))
 bucket_labels = [str(x) + '-' + str(x + bucket_size) for x in buckets]
 bucket_labels[-1] = bucket_labels[-1] + '+'
 bucket_distances = [[] for x in range(len(buckets))]
@@ -1248,7 +1248,7 @@ def plot_all_places(bucket_size, buckets, bucket_labels, locations, x_data, x_na
 # Plot average distance error vs. intervals over ALL PLACES.
 # Only using CBM model for now.
 bucket_size = 3 # 3 minute intervals
-buckets = list(range(0, 33, bucket_size))
+buckets = list(range(0, 27, bucket_size))
 bucket_labels = [str(x) + '-' + str(x + bucket_size) for x in buckets]
 bucket_labels[-1] = bucket_labels[-1] + '+'
 
@@ -1713,7 +1713,7 @@ print('LNG OVER ALL LOCATIONS (GMM) BUCKETS NUM DATA PTS: ' + str(gmm_lng_num_da
 '''
 
 # Num locations vs. error using all methods.
-bucket_size = 50 # 50 km buckets
+bucket_size = 100 # 100 km buckets
 buckets = list(range(0, 2000, bucket_size))
 bucket_labels = [str(x // bucket_size) + '-' + str((x + bucket_size) // bucket_size) for x in buckets]
 bucket_labels[-1] = bucket_labels[-1] + '+'
