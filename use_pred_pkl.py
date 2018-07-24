@@ -1247,8 +1247,8 @@ def plot_all_places(bucket_size, buckets, bucket_labels, locations, x_data, x_na
 
 # Plot average distance error vs. intervals over ALL PLACES.
 # Only using CBM model for now.
-bucket_size = 3 # 3 minute intervals
-buckets = list(range(0, 27, bucket_size))
+bucket_size = 1 # minute intervals
+buckets = list(range(0, 23, bucket_size))
 bucket_labels = [str(x) + '-' + str(x + bucket_size) for x in buckets]
 bucket_labels[-1] = bucket_labels[-1] + '+'
 
