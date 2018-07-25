@@ -13,9 +13,9 @@ LOG_INTERVAL = 20
 SPLIT_TOTAL = 100
 SPLIT_TRAIN = 75 # 75% train
 SPLIT_TEST = 100 # 25% test, 0% validation
-BANDWIDTH = 0.175
+BANDWIDTH = 0.075
             # 0.2 - 453, 398
-            # 0.175 - 450
+            # 0.175 - 450, 395
             # 0.15 - 436, 357
             # 0.125 - BEST 433, 335 in fixed outside
             # 0.1 - 438, 337
@@ -31,7 +31,7 @@ CENTER = False
 LAMBDA = 1 # REGULARIZER
 INLIER_THRESHOLD = 500 # km
                    # 800 - ?, 343
-                   # 500 - 499
+                   # 500 - 499, 362
                    # 450 - 490, 358
                    # 400 - BEST 468, 387
                    # 350 - 479
@@ -43,13 +43,13 @@ INLIER_THRESHOLD = 500 # km
                    ## 600 - 368
                    ## 700 - 347
                    ## 800 - 365
-AZIMUTHAL_INLIER_THRESHOLD = 0.10978120995044331 # 700 km - ?,
+AZIMUTHAL_INLIER_THRESHOLD = 0.1411098700237413 # 900 km - ?,
+                             # 0.05497787143782138 # 350 km - 455
+                             # 0.10978120995044331 # 700 km - ?, 340
                              # 0.09407324668249435 # 600 km - ?, 331
                              # 0.07853981633974483 # 500 km - ?, 349
                              # 0.0470366233412471 # 300 km - ?, 377
                              # 0.12566370614359174 # 800 km - ?, 337
-                             # 0.07853981633974483 # 500 km
-                             # 0.05497787143782138 # 350 km - 455
                              # 0.06283185307179587 # 400 km - ?, 356
                              # 0.07068583470577036 # 450 km
 
@@ -62,6 +62,7 @@ AZIMUTHAL_INLIER_THRESHOLD = 0.10978120995044331 # 700 km - ?,
 MAHALANOBIS_INLIER_THRESHOLD = 1.25
                                # 2 - ?, 461 1 cluster
                                # 1.5 - ?, 435
+                               # 1.25 - ?, 400
                                # 1 - ?, 404 1 cluster
                                # 0.5 - ?, 522 with 1 cluster
 
