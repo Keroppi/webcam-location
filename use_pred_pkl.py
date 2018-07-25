@@ -218,10 +218,7 @@ for i in range(len(days)):
     lngs[days[i].place].append(longitudes[i])
 
 
-def compute_haversine_distance(lat1, lng1, lat2, lng2):  # kilometers
-    # Haversine formula for computing distance.
-    # https://www.movable-type.co.uk/scripts/latlong.html
-
+def compute_haversine_distance(lat1, lng1, lat2, lng2): # km
     radius_of_earth = 6371  # km
     actual_lat_rad = math.radians(lat1)
     pred_lat_rad = math.radians(lat2)
@@ -235,20 +232,20 @@ def compute_haversine_distance(lat1, lng1, lat2, lng2):  # kilometers
     return distance
 
 
-def compute_distance(lat1, lng1, lat2, lng2):  # km
-    if lng1 == -180:  #
-        lng1 = 180  #
+def compute_distance(lat1, lng1, lat2, lng2): # km
+    if lng1 == -180:
+        lng1 = 180
 
     lat1_rad = math.radians(lat1)
     lat2_rad = math.radians(lat2)
-    lng1_rad = math.radians(lng1)  #
-    lng2_rad = math.radians(lng2)  #
+    lng1_rad = math.radians(lng1)
+    lng2_rad = math.radians(lng2)
 
-    a = 6378.137  # km
-    b = 6356.752314245  # km
+    a = 6378.137 # km
+    b = 6356.752314245 # km
     f = 1 / 298.257223563
 
-    L = lng2_rad - lng1_rad  # math.radians(lng2 - lng1) #
+    L = lng2_rad - lng1_rad
 
     tanU1 = (1 - f) * math.tan(lat1_rad)
     cosU1 = 1 / math.sqrt((1 + tanU1 * tanU1))
@@ -267,7 +264,7 @@ def compute_distance(lat1, lng1, lat2, lng2):  # km
 
         sin_sigma = math.sqrt(math.pow(cosU2 * sin_lambda, 2) + math.pow(cosU1 * sinU2 - sinU1 * cosU2 * cos_lambda, 2))
 
-        if sin_sigma == 0:  #
+        if sin_sigma == 0:
             iterations += 1001  # coincident points #
 
         cos_sigma = sinU1 * sinU2 + cosU1 * cosU2 * cos_lambda
@@ -276,22 +273,22 @@ def compute_distance(lat1, lng1, lat2, lng2):  # km
         sin_alpha = cosU1 * cosU2 * sin_lambda / sin_sigma
         cos_sq_alpha = 1 - math.pow(sin_alpha, 2)
 
-        if cos_sq_alpha != 0:  #
+        if cos_sq_alpha != 0:
             cos_2_sigma_m = cos_sigma - 2 * sinU1 * sinU2 / cos_sq_alpha  #
         else:  # Equatorial line #
-            cos_2_sigma_m = 0  #
+            cos_2_sigma_m = 0
 
         C = f / 16 * cos_sq_alpha * (4 + f * (4 - 3 * cos_sq_alpha))
         new_lamb = L + (1 - C) * f * sin_alpha * (
             sigma + C * sin_sigma * (cos_2_sigma_m + C * cos_sigma * (-1 + 2 * math.pow(cos_2_sigma_m, 2))))
 
-        if antimeridian:  #
-            iteration_check = math.fabs(new_lamb) - math.pi  #
-        else:  #
-            iteration_check = math.fabs(new_lamb)  #
+        if antimeridian:
+            iteration_check = math.fabs(new_lamb) - math.pi
+        else:
+            iteration_check = math.fabs(new_lamb)
 
-        if iteration_check > math.pi:  #
-            iterations += 1001  #
+        if iteration_check > math.pi:
+            iterations += 1001
 
         if iterations > 1000:
             print('WARNING - Vincenty distance did not converge.')
@@ -1247,8 +1244,8 @@ def plot_all_places(bucket_size, buckets, bucket_labels, locations, x_data, x_na
 
 # Plot average distance error vs. intervals over ALL PLACES.
 # Only using CBM model for now.
-bucket_size = 1 # minute intervals
-buckets = list(range(0, 23, bucket_size))
+bucket_size = 5 # minute intervals
+buckets = list(range(0, 30, bucket_size))
 bucket_labels = [str(x) + '-' + str(x + bucket_size) for x in buckets]
 bucket_labels[-1] = bucket_labels[-1] + '+'
 
