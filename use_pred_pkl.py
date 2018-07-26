@@ -149,13 +149,13 @@ for d_idx, day_length in enumerate(day_lengths):
 
     # Check if they're in different (north / south) hemispheres.
     if (cbm_lat > 0 and days[d_idx].lat < 0) or (cbm_lat < 0 and days[d_idx].lat > 0):
-        if math.fabs(day_length_hours - 12) < 0.5:
-            cbm_lat *= -1
+        #if math.fabs(day_length_hours - 12) < 0.5:
+        cbm_lat *= -1
 
     # Check if they're in different (north / south) hemispheres.
     if (lat > 0 and days[d_idx].lat < 0) or (lat < 0 and days[d_idx].lat > 0):
-        if math.fabs(day_length_hours - 12) < 0.5:
-            lat *= -1
+        #if math.fabs(day_length_hours - 12) < 0.5:
+        lat *= -1
 
     latitudes.append(lat) # Only one day to predict latitude - could average across many days.
     cbm_latitudes.append(cbm_lat)  # Only one day to predict latitude - could average across many days.

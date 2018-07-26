@@ -100,6 +100,7 @@ sys.stdout.flush()
 
 # sunrise
 
+passes = 0
 locations = {}
 
 sunrise_predict_t0 = time.time()
@@ -121,6 +122,7 @@ for batch_idx, (input, _) in enumerate(test_loader):
         print('Batch Index: {}'.format(batch_idx))
         sys.stdout.flush()
 
+passes += 1
 sunrise_predict_t1 = time.time()
 print('Sunrise prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
 sys.stdout.flush()
@@ -145,6 +147,7 @@ for batch_idx, (input, _) in enumerate(test_loader):
         print('Batch Index: {}'.format(batch_idx))
         sys.stdout.flush()
 
+passes += 1
 sunrise_predict_t1 = time.time()
 print('Sunrise prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
 sys.stdout.flush()
@@ -168,6 +171,7 @@ for batch_idx, (input, _) in enumerate(test_loader):
         print('Batch Index: {}'.format(batch_idx))
         sys.stdout.flush()
 
+passes += 1
 sunrise_predict_t1 = time.time()
 print('Sunrise prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
 sys.stdout.flush()
@@ -200,6 +204,7 @@ for batch_idx, (input, _) in enumerate(test_loader):
         print('Batch Index: {}'.format(batch_idx))
         sys.stdout.flush()
 
+passes += 1
 sunrise_predict_t1 = time.time()
 print('Sunrise testing prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
 sys.stdout.flush()
@@ -322,6 +327,6 @@ for place in locations:
 if not os.path.isdir(sunrise_dir + '/predictions/'):
     os.mkdir(sunrise_dir + '/predictions/')
 
-with open(sunrise_dir + '/predictions/pred.pkl', 'wb') as f:
+with open(sunrise_dir + '/predictions/{}_pred.pkl'.format(passes), 'wb') as f:
     #pickle.dump(sorted_locations, f)
     pickle.dump(locations, f)
