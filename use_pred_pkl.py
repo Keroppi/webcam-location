@@ -948,7 +948,7 @@ for place in lats:
     cbm_gmm_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, cbm_gmm_pred_lng))
 
     cbm_particle_m_distance = compute_distance(actual_lat, actual_lng, cbm_particle_m_pred_lat, cbm_particle_m_pred_lng)
-    cbm_particle_m_distances.append(cbm_gmm_distance)
+    cbm_particle_m_distances.append(cbm_particle_m_distance)
     cbm_particle_m_latitude_err.append(compute_distance(actual_lat, actual_lng, cbm_particle_m_pred_lat, actual_lng))
     cbm_particle_m_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, cbm_particle_m_pred_lng))
 

@@ -317,6 +317,24 @@ class Day():
         self.times, self.img_paths = self.uniform_subset(self.all_times, self.all_img_paths)
         self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, self.sunrise, self.sunset)
 
+
+    def reverse_images(self):
+        self.all_img_paths = list(reversed(self.all_img_paths))
+
+    def reverse_get_local_time(self, idx):
+        idx = constants.IMAGES_PER_DAY - 1 - idx # check if this is true !!!
+        return self.get_local_time(idx)
+
+        #19:30 sunset
+        #17:00, 18:00, 20:00 - 1.75 idx normally
+        # 20, 18, 17 - reverse outputs 0.25 -> 3 - 1 - 0.25 = 1.75
+
+    def reverse_change_frames_medium(self):
+        pass
+
+    def reverse_change_frames_fine(self):
+        pass
+
     def __init__(self, place, times, img_paths, sunrise, sunset, train_test_valid, lat, lng, time_offset, mali_solar_noon):
         self.all_times = times
         self.all_img_paths = img_paths
