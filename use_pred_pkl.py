@@ -25,7 +25,8 @@ print('Bandwidth: {}'.format(constants.BANDWIDTH))
 print('RANSAC Inlier: {}'.format(constants.INLIER_THRESHOLD))
 print('Particle Inlier: {}'.format(constants.AZIMUTHAL_INLIER_THRESHOLD))
 print('Big-M: {}'.format(constants.BIGM))
-print('Mahalanobis: {}'.format(constants.MAHALANOBIS_INLIER_THRESHOLD))
+print('GMM Mahalanobis: {}'.format(constants.MAHALANOBIS_INLIER_THRESHOLD))
+print('Particle Mahalanobis: {}'.format(constants.AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD))
 sys.stdout.flush()
 
 parser = argparse.ArgumentParser(description='Predict Location')
@@ -510,11 +511,11 @@ def particle_filter(lats, lngs, mahalanobis=False):
         transformed_particle_lat = statistics.mean(inlier_transformed_lats)
         transformed_particle_lng = statistics.mean(inlier_transformed_lngs)
 
-        if mahalanobis: # Revert scaling.
-            guess = np.array([[transformed_particle_lat, transformed_particle_lng]])
-            guess = scaler.inverse_transform(guess)
-            transformed_particle_lat = guess[:, 0]
-            transformed_particle_lng = guess[:, 1]
+        #if mahalanobis: # Revert scaling.
+        #    guess = np.array([[transformed_particle_lat, transformed_particle_lng]])
+        #    guess = scaler.inverse_transform(guess)
+        #    transformed_particle_lat = guess[:, 0]
+        #    transformed_particle_lng = guess[:, 1]
 
         particle_lat, particle_lng = azimuthal_equidistant_inverse(transformed_particle_lat, transformed_particle_lng)
         #print((particle_lat, particle_lng))
