@@ -6,6 +6,7 @@ matplotlib.use('agg')
 import os, argparse, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, pickle, collections, copy, scipy
 from sklearn.neighbors.kde import KernelDensity
 from sklearn.mixture import GaussianMixture
+from sklearn.preprocessing import StandardScaler
 #from sklearn.mixture import BayesianGaussianMixture
 from scipy.optimize import minimize
 from sklearn.metrics import mean_squared_error
@@ -443,7 +444,7 @@ def gaussian_mixture(lats, lngs):
 
 cbm_gmm_locations = gaussian_mixture(cbm_lats, lngs)
 
-def particle_filter(lats, lngs):
+def particle_filter(lats, lngs, mahalanobis=False):
     bigM = constants.BIGM
 
     particle_locations = {}
@@ -455,7 +456,7 @@ def particle_filter(lats, lngs):
         # Create the 'prob' variable to contain the problem data
         prob = pic.Problem()
         x_star = prob.add_variable('x*', 2)  # (x, y) coordinate we're trying to find
-        z = []
+        z = [] # data points
         b = [0] * len(lngs[place])
 
         for idx, (lat, lng) in enumerate(zip(lats[place], lngs[place])):
@@ -467,6 +468,15 @@ def particle_filter(lats, lngs):
             z.append([x, y])
             b[idx] = prob.add_variable('b[{0}]'.format(idx), 1, vtype='binary')  # 0 if inlier, 1 if outlier
 
+        if mahalanobis:
+            z = np.array(z)
+            scaler = StandardScaler()
+
+            scaler.fit(z)
+            z = scaler.transform(z)
+            z = np.ndarray.tolist(z)
+
+
         z = pic.new_param('z', tuple(z))
 
         # print(z[0])
@@ -474,8 +484,13 @@ def particle_filter(lats, lngs):
         # print(z[0] - z[1])
         # print((z[0] - z[1]).size)
 
+        if not mahalanobis:
+            epsilon = constants.AZIMUTHAL_INLIER_THRESHOLD
+        else:
+            epsilon = constants.AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD
+
         prob.add_list_of_constraints(
-            [abs(z[i] - x_star) <= constants.AZIMUTHAL_INLIER_THRESHOLD + b[i] * bigM for i in range(0, len(lngs[place]))], 'i',
+            [abs(z[i] - x_star) <= epsilon + b[i] * bigM for i in range(0, len(lngs[place]))], 'i',
             '1...N')
 
         prob.set_objective('min', pic.sum(b, 'i', '1..N'))
@@ -495,6 +510,12 @@ def particle_filter(lats, lngs):
         transformed_particle_lat = statistics.mean(inlier_transformed_lats)
         transformed_particle_lng = statistics.mean(inlier_transformed_lngs)
 
+        if mahalanobis: # Revert scaling.
+            guess = np.array([[transformed_particle_lat, transformed_particle_lng]])
+            guess = scaler.inverse_transform(guess)
+            transformed_particle_lat = guess[:, 0]
+            transformed_particle_lng = guess[:, 1]
+
         particle_lat, particle_lng = azimuthal_equidistant_inverse(transformed_particle_lat, transformed_particle_lng)
         #print((particle_lat, particle_lng))
 
@@ -503,6 +524,7 @@ def particle_filter(lats, lngs):
     return particle_locations
 
 cbm_particle_locations = particle_filter(cbm_lats, lngs)
+cbm_particle_mahalanobis_locations = particle_filter(cbm_lats, lngs, True)
 
 def ransac(lats, lngs):
     ransacs = {}
@@ -702,7 +724,7 @@ def kde(lats, lngs, median_locations):
 density_locations = kde(lats, lngs, median_locations)
 cbm_density_locations = kde(cbm_lats, lngs, cbm_median_locations)
 
-def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ransac_locations, particle_locations, gmm_locations, mode='sun'):
+def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ransac_locations, particle_locations, gmm_locations, particle_mahalanobis_locations, mode='sun'):
     map_t0 = time.time()
 
     # Plot locations on a map.
@@ -763,9 +785,9 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
         #x_median,y_median = map([median_locations[place][1]], [median_locations[place][0]])
         #x_density,y_density = map([density_locations[place][1]], [density_locations[place][0]])
 
-        actual_and_pred_lngs = [actual_lng] + [mean_locations[place][1]] + [median_locations[place][1]] + [density_locations[place][1]] + [ransac_locations[place][1]] + [particle_locations[place][1]] + [gmm_locations[place][1]]
-        actual_and_pred_lats = [actual_lat] + [mean_locations[place][0]] + [median_locations[place][0]] + [density_locations[place][0]] + [ransac_locations[place][0]] + [particle_locations[place][0]] + [gmm_locations[place][0]]
-        actual_and_pred_colors = ['w', 'm', 'c', mcolors.CSS4_COLORS['fuchsia'], 'xkcd:chartreuse', 'xkcd:navy', 'xkcd:pink']
+        actual_and_pred_lngs = [actual_lng] + [mean_locations[place][1]] + [median_locations[place][1]] + [density_locations[place][1]] + [ransac_locations[place][1]] + [particle_locations[place][1]] + [gmm_locations[place][1]] + [particle_mahalanobis_locations[place][1]]
+        actual_and_pred_lats = [actual_lat] + [mean_locations[place][0]] + [median_locations[place][0]] + [density_locations[place][0]] + [ransac_locations[place][0]] + [particle_locations[place][0]] + [gmm_locations[place][0]] + [particle_mahalanobis_locations[place][0]]
+        actual_and_pred_colors = ['w', 'm', 'c', mcolors.CSS4_COLORS['fuchsia'], 'xkcd:chartreuse', 'xkcd:navy', 'xkcd:pink', 'xkcd:azure']
 
         guesses = map.scatter(lngs[place], lats[place], s=40, c=colors, latlon=True, zorder=10)
         actual_and_pred = map.scatter(actual_and_pred_lngs, actual_and_pred_lats, s=40, c=actual_and_pred_colors, latlon=True, zorder=10, marker='^')
@@ -775,14 +797,14 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
         if mode == 'sun':
             guess_colors = ['g', 'r', mcolors.CSS4_COLORS['crimson'], 'k']
             legend_labels = ['sunrise and sunset in frames', 'sunrise not in frames', 'sunset not in frames', 'sunrise and sunset not in frames',
-                             'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC', 'Particle Filter', 'GMM']
+                             'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC', 'Particle Filter', 'GMM', 'Particle Filter with Mahalanobis Dist.']
 
             handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in guess_colors] + \
                          [plt.plot([], marker="^", ls="", color=color)[0] for color in actual_and_pred_colors]
         elif mode == 'season':
             guess_colors = ['b', 'y', 'r', mcolors.CSS4_COLORS['tan']]
             legend_labels = ['winter', 'spring', 'summer', 'fall',
-                             'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC', 'Particle Filter', 'GMM']
+                             'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC', 'Particle Filter', 'GMM', 'Particle Filter with Mahalanobis Dist.']
             handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in guess_colors] + \
                          [plt.plot([], marker="^", ls="", color=color)[0] for color in actual_and_pred_colors]
 
@@ -799,8 +821,8 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
     map_t1 = time.time()
     print('Calculating map time (m): ' + str((map_t1 - map_t0) / 60))
 
-plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, 'sun')
-plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, 'season')
+plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, 'sun')
+plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, 'season')
 
 #finished_places = []
 days_used = []
@@ -837,6 +859,9 @@ cbm_gmm_distances = []
 cbm_gmm_longitude_err = []
 cbm_gmm_latitude_err = []
 
+cbm_particle_m_distances = []
+cbm_particle_m_longitude_err = []
+cbm_particle_m_latitude_err = []
 
 #for i in range(len(days)):
 for place in lats:
@@ -874,6 +899,8 @@ for place in lats:
     cbm_particle_pred_lng = cbm_particle_locations[place][1]
     cbm_gmm_pred_lat = cbm_gmm_locations[place][0]
     cbm_gmm_pred_lng = cbm_gmm_locations[place][1]
+    cbm_particle_m_pred_lat = cbm_particle_mahalanobis_locations[place][0]
+    cbm_particle_m_pred_lng = cbm_particle_mahalanobis_locations[place][1]
 
     mean_distance = compute_distance(actual_lat, actual_lng, mean_pred_lat, mean_pred_lng)
     mean_distances.append(mean_distance)
@@ -920,9 +947,14 @@ for place in lats:
     cbm_gmm_latitude_err.append(compute_distance(actual_lat, actual_lng, cbm_gmm_pred_lat, actual_lng))
     cbm_gmm_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, cbm_gmm_pred_lng))
 
+    cbm_particle_m_distance = compute_distance(actual_lat, actual_lng, cbm_particle_m_pred_lat, cbm_particle_m_pred_lng)
+    cbm_particle_m_distances.append(cbm_gmm_distance)
+    cbm_particle_m_latitude_err.append(compute_distance(actual_lat, actual_lng, cbm_particle_m_pred_lat, actual_lng))
+    cbm_particle_m_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, cbm_particle_m_pred_lng))
+
     if random.randint(1, 100) < 101:
         if median_distance < 25 or density_distance < 25 or brock_ransac_distance < 25 or \
-           cbm_ransac_distance < 25 or cbm_median_distance < 25 or cbm_density_distance < 25 or cbm_particle_distance < 25 or cbm_gmm_distance < 25:
+           cbm_ransac_distance < 25 or cbm_median_distance < 25 or cbm_density_distance < 25 or cbm_particle_distance < 25 or cbm_gmm_distance < 25 or cbm_particle_m_distance < 25:
             print('Under 25km!')
 
         print(place)
@@ -938,6 +970,7 @@ for place in lats:
         print('Using RANSAC: ' + str(cbm_ransac_distance))
         print('Using particle: ' + str(cbm_particle_distance))
         print('Using GMM: ' + str(cbm_gmm_distance))
+        print('Using mahalanobis particle: ' + str(cbm_particle_m_distance))
         print('Actual lat, lng: ' + str(actual_lat) + ', ' + str(actual_lng))
         print('Brock Distance')
         print('Mean lat, lng: ' + str(mean_pred_lat) + ', ' + str(mean_pred_lng))
@@ -995,16 +1028,17 @@ def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker
 
 scatter_t0 = time.time()
 
-#scatter(days_used, mean_distances, 'mo', 'mean')
+scatter(days_used, mean_distances, 'mo', 'mean')
 scatter(days_used, median_distances, 'co', 'median')
 scatter(days_used, density_distances, None, 'gaussian kde', color=mcolors.CSS4_COLORS['fuchsia'], linestyle='None', marker='o')
 
-#scatter(days_used, cbm_mean_distances, 'mo', 'mean', cbm=True)
+scatter(days_used, cbm_mean_distances, 'mo', 'mean', cbm=True)
 scatter(days_used, cbm_median_distances, 'co', 'median', cbm=True)
 scatter(days_used, cbm_density_distances, None, 'gaussian kde', color=mcolors.CSS4_COLORS['fuchsia'], linestyle='None', marker='o', cbm=True)
 scatter(days_used, cbm_ransac_distances, None, 'RANSAC', color='xkcd:chartreuse', linestyle='None', marker='o', cbm=True)
 scatter(days_used, cbm_particle_distances, None, 'particle filter', color='xkcd:navy', linestyle='None', marker='o', cbm=True)
 scatter(days_used, cbm_gmm_distances, None, 'GMM', color='xkcd:pink', linestyle='None', marker='o', cbm=True)
+scatter(days_used, cbm_particle_m_distances, None, 'particle filter with mahalanobis distance', color='xkcd:azure', linestyle='None', marker='o', cbm=True)
 
 scatter_t1 = time.time()
 print('Calculating scatter time (m): ' + str((scatter_t1 - scatter_t0) / 60))
@@ -1264,6 +1298,10 @@ plot_all_places(bucket_size, buckets, bucket_labels,
 plot_all_places(bucket_size, buckets, bucket_labels,
                 cbm_gmm_locations, intervals, 'INTERVAL', 'GMM',
                 'Minutes Between Frames', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using GMM vs. Photo Interval (min)', 'cbm_interval_gmm_places.png')
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_particle_mahalanobis_locations, intervals, 'INTERVAL', 'PARTICLE (MAHALANOBIS)',
+                'Minutes Between Frames', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Particle Filter with Mahalanobis Distance vs. Photo Interval (min)', 'cbm_interval_particle_m_places.png')
+
 
 '''
 cbm_median_bucket_distances = [[] for x in range(len(buckets))]
@@ -1377,6 +1415,9 @@ plot_all_places(bucket_size, buckets, bucket_labels,
 plot_all_places(bucket_size, buckets, bucket_labels,
                 cbm_gmm_locations, sun_visibles, 'SUN', 'GMM',
                 '% of Days With Both Sunrise and Sunset Visible', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using GMM vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_gmm_places.png', 0)
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_particle_mahalanobis_locations, sun_visibles, 'SUN', 'PARTICLE (MAHALANOBIS)',
+                '% of Days With Both Sunrise and Sunset Visible', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Particle Filter with Mahalanobis Distance vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_particle_m_places.png', 0)
 
 '''
 cbm_median_sun_type_distances = [[] for x in range(len(buckets))]
@@ -1473,6 +1514,9 @@ plot_all_places(bucket_size, buckets, bucket_labels,
 plot_all_places(bucket_size, buckets, bucket_labels,
                 cbm_gmm_locations, cbm_gmm_locations, 'LAT', 'GMM',
                 'Latitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using GMM vs. Latitude', 'cbm_lat_gmm_places.png', 0)
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_particle_mahalanobis_locations, cbm_particle_mahalanobis_locations, 'LAT', 'PARTICLE (MAHALANOBIS)',
+                'Latitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Particle Filter with Mahalanobis Distance vs. Latitude', 'cbm_lat_particle_m_places.png', 0)
 
 '''
 cbm_median_lat_distances = [[] for x in range(len(buckets))]
@@ -1602,7 +1646,9 @@ plot_all_places(bucket_size, buckets, bucket_labels,
 plot_all_places(bucket_size, buckets, bucket_labels,
                 cbm_gmm_locations, cbm_gmm_locations, 'LNG', 'GMM',
                 'Longitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using GMM vs. Longitude', 'cbm_lng_gmm_places.png', 1)
-
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_particle_mahalanobis_locations, cbm_particle_mahalanobis_locations, 'LNG', 'PARTICLE (MAHALANOBIS)',
+                'Longitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Particle Filter with Mahalanobis Distance vs. Longitude', 'cbm_lng_particle_m_places.png', 1)
 
 '''
 cbm_median_lng_distances = [[] for x in range(len(buckets))]
@@ -1720,6 +1766,7 @@ cbm_density_errors = [0] * len(buckets)
 ransac_errors = [0] * len(buckets)
 particle_errors = [0] * len(buckets)
 gmm_errors = [0] * len(buckets)
+particle_m_errors = [0] * len(buckets)
 
 cbm_median_error_rmses = [0 for x in range(len(buckets))]
 cbm_median_error_num_data_pts = [0] * len(buckets)
@@ -1731,6 +1778,8 @@ particle_error_rmses = [0 for x in range(len(buckets))]
 particle_error_num_data_pts = [0] * len(buckets)
 gmm_error_rmses = [0 for x in range(len(buckets))]
 gmm_error_num_data_pts = [0] * len(buckets)
+particle_m_error_rmses = [0 for x in range(len(buckets))]
+particle_m_error_num_data_pts = [0] * len(buckets)
 
 for key in actual_locations:
     cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
@@ -1738,15 +1787,17 @@ for key in actual_locations:
     ransac_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_ransac_locations[key][0], cbm_ransac_locations[key][1])
     particle_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1],
                                            cbm_particle_locations[key][0], cbm_particle_locations[key][1])
-
     gmm_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1],
                                         cbm_gmm_locations[key][0], cbm_gmm_locations[key][1])
+    particle_m_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1],
+                                        cbm_particle_mahalanobis_locations[key][0], cbm_particle_mahalanobis_locations[key][1])
 
     median_idx = len(buckets) - 1
     density_idx = len(buckets) - 1
     ransac_idx = len(buckets) - 1
     particle_idx = len(buckets) - 1
     gmm_idx = len(buckets) - 1
+    particle_m_idx = len(buckets) - 1
 
     for bIdx, bucket in enumerate(buckets):
         if cbm_median_distance_err <= bucket + bucket_size:
@@ -1759,18 +1810,22 @@ for key in actual_locations:
             particle_idx = min(bIdx, particle_idx)
         if gmm_distance_err <= bucket + bucket_size:
             gmm_idx = min(bIdx, gmm_idx)
+        if particle_m_distance_err <= bucket + bucket_size:
+            particle_m_idx = min(bIdx, particle_m_idx)
 
     cbm_median_errors[median_idx] += 1
     cbm_density_errors[density_idx] += 1
     ransac_errors[ransac_idx] += 1
     particle_errors[particle_idx] += 1
     gmm_errors[gmm_idx] += 1
+    particle_m_errors[particle_idx] += 1
 
 bar(buckets, cbm_median_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Median', 'cbm_error_median.png')
 bar(buckets, cbm_density_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Gaussian KDE', 'cbm_error_density.png')
 bar(buckets, ransac_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using RANSAC', 'cbm_error_ransac.png')
 bar(buckets, particle_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Particle Filter', 'cbm_error_particle.png')
 bar(buckets, gmm_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using GMM', 'cbm_error_gmm.png')
+bar(buckets, particle_m_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Particle Filter With Mahalanobis Distance', 'cbm_error_particle_m.png')
 
 green = 0
 sunrise_only = 0

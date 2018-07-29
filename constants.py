@@ -18,7 +18,7 @@ BANDWIDTH = 0.125
             # 0.2 - 453, 398
             # 0.175 - 450, 395
             # 0.15 - 436, 357
-            # 0.125 - BEST 433, 335 in fixed outside
+            # 0.125 - BEST 433, 335/302
             # 0.1 - 438, 337
             # 0.075 - ?, 355
             # 0.05 - 490, 410
@@ -33,7 +33,7 @@ CENTER = False
 LAMBDA = 1 # REGULARIZER
 INLIER_THRESHOLD = 600 # km
                    # 800 - ?, 343
-                   # 600 - ?, 340
+                   # 600 - ?, 340/341
                    # 500 - 499, 362
                    # 450 - 490, 358
                    # 400 - BEST 468, 387
@@ -62,6 +62,7 @@ AZIMUTHAL_INLIER_THRESHOLD = 0.09407324668249435 # 600 km - ?, 331
                              ## 600 - 353
                              ## 700 - 338
                              ## 800 - 338
+AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 1
 MAHALANOBIS_INLIER_THRESHOLD = 1.25
                                # 2 - ?, 461 1 cluster
                                # 1.75 - ?, 451
