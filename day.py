@@ -165,19 +165,12 @@ class Day():
                 else:
                     sunset_before = True
 
-        if not reverse:
-            self.times, self.img_paths = self.uniform_subset(self.all_times[start_idx:end_idx + 1],
-                                                             self.all_img_paths[start_idx:end_idx + 1])
-        else:
-            #reverse_start_idx = constants.IMAGES_PER_DAY - 1 - start_idx
-            #reverse_end_idx = constants.IMAGES_PER_DAY - 1 - end_idx
-            self.reverse_all_images()
 
-            self.times, self.img_paths = self.uniform_subset(self.all_times[start_idx:end_idx + 1],
-                                                             self.all_img_paths[start_idx:end_idx + 1])
+        self.times, self.img_paths = self.uniform_subset(self.all_times[start_idx:end_idx + 1],
+                                                         self.all_img_paths[start_idx:end_idx + 1])
+
+        if reverse:
             self.reverse_images()
-            self.reverse_all_images()
-
 
         self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, self.sunrise, self.sunset)
 
@@ -287,14 +280,10 @@ class Day():
         #### END VLI
 
         self.times = [self.all_times[x] for x in subset_idx]
+        self.img_paths = [self.all_img_paths[x] for x in subset_idx]
 
-        if not reverse:
-            self.img_paths = [self.all_img_paths[x] for x in subset_idx]
-        else:
-            self.reverse_all_images()
-            self.img_paths = [self.all_img_paths[x] for x in subset_idx]
+        if reverse:
             self.reverse_images()
-            self.reverse_all_images()
 
         self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, self.sunrise, self.sunset)
 
@@ -333,12 +322,13 @@ class Day():
         self.times, self.img_paths = self.random_subset(self.all_times, self.all_img_paths)
         self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, self.sunrise, self.sunset)
 
-    def uniform_frames(self):
+    def uniform_frames(self, reverse=False):
         self.times, self.img_paths = self.uniform_subset(self.all_times, self.all_img_paths)
-        self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, self.sunrise, self.sunset)
 
-    def reverse_all_images(self):
-        self.all_img_paths = list(reversed(self.all_img_paths))
+        if reverse:
+            self.reverse_images()
+
+        self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, self.sunrise, self.sunset)
 
     def reverse_images(self):
         self.img_paths = list(reversed(self.img_paths))
