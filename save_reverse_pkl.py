@@ -210,8 +210,8 @@ sunrise_predict_t1 = time.time()
 print('Sunrise testing prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
 sys.stdout.flush()
 
-print('Sunrise mean error (min): {}'.format(statistics.mean(sunrise_err_total)))
-print('Sunrise median error (min): {}'.format(statistics.median(sunrise_err_total)))
+print('Sunrise mean error (min): {}'.format(statistics.mean(sunset_err_total)))
+print('Sunrise median error (min): {}'.format(statistics.median(sunset_err_total)))
 
 # sunset
 
