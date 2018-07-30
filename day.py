@@ -130,7 +130,7 @@ class Day():
 
         return (times, img_paths)
 
-    def change_frames_medium(self, center_frame, mode='sunrise', scale_factor=1.5, pass_idx=1): # Given a suggested frame idx, uniformly pick from 97 frames that are closest to it.
+    def change_frames_medium(self, center_frame, mode='sunrise', scale_factor=1.5, pass_idx=1, reverse=False): # Given a suggested frame idx, uniformly pick from 97 frames that are closest to it.
         suggested_time = self.get_local_time(center_frame)
 
         start_idx = len(self.all_times) - 1
@@ -165,7 +165,20 @@ class Day():
                 else:
                     sunset_before = True
 
-        self.times, self.img_paths = self.uniform_subset(self.all_times[start_idx:end_idx + 1], self.all_img_paths[start_idx:end_idx + 1])
+        if not reverse:
+            self.times, self.img_paths = self.uniform_subset(self.all_times[start_idx:end_idx + 1],
+                                                             self.all_img_paths[start_idx:end_idx + 1])
+        else:
+            #reverse_start_idx = constants.IMAGES_PER_DAY - 1 - start_idx
+            #reverse_end_idx = constants.IMAGES_PER_DAY - 1 - end_idx
+            self.reverse_all_images()
+
+            self.times, self.img_paths = self.uniform_subset(self.all_times[start_idx:end_idx + 1],
+                                                             self.all_img_paths[start_idx:end_idx + 1])
+            self.reverse_images()
+            self.reverse_all_images()
+
+
         self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, self.sunrise, self.sunset)
 
         if mode == 'sunrise':
@@ -191,7 +204,7 @@ class Day():
 
         sys.stdout.flush()
 
-    def change_frames_fine(self, center_frame, mode='sunrise'): # Given a suggested frame idx, repick 32 frames that are closest to it.
+    def change_frames_fine(self, center_frame, mode='sunrise', reverse=False): # Given a suggested frame idx, repick 32 frames that are closest to it.
         suggested_time = self.get_local_time(center_frame)
 
         start_idx = len(self.all_times) - 1
@@ -274,7 +287,14 @@ class Day():
         #### END VLI
 
         self.times = [self.all_times[x] for x in subset_idx]
-        self.img_paths = [self.all_img_paths[x] for x in subset_idx]
+
+        if not reverse:
+            self.img_paths = [self.all_img_paths[x] for x in subset_idx]
+        else:
+            self.reverse_all_images()
+            self.img_paths = [self.all_img_paths[x] for x in subset_idx]
+            self.reverse_images()
+            self.reverse_all_images()
 
         self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, self.sunrise, self.sunset)
 
@@ -317,23 +337,31 @@ class Day():
         self.times, self.img_paths = self.uniform_subset(self.all_times, self.all_img_paths)
         self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, self.sunrise, self.sunset)
 
-
-    def reverse_images(self):
+    def reverse_all_images(self):
         self.all_img_paths = list(reversed(self.all_img_paths))
 
+    def reverse_images(self):
+        self.img_paths = list(reversed(self.img_paths))
+
     def reverse_get_local_time(self, idx):
-        idx = constants.IMAGES_PER_DAY - 1 - idx # check if this is true !!!
+        idx = constants.IMAGES_PER_DAY - 1 - idx
         return self.get_local_time(idx)
 
         #19:30 sunset
         #17:00, 18:00, 20:00 - 1.75 idx normally
         # 20, 18, 17 - reverse outputs 0.25 -> 3 - 1 - 0.25 = 1.75
 
-    def reverse_change_frames_medium(self):
-        pass
+        # 14:00 sunset
+        # 17:00, 18:00, 20:00 -> -0.33333333 idx normally
+        # 20, 18, 17 - reverse outputs 2.3333333 -> 3 - 1 - 2.333333 = -0.3333333
 
-    def reverse_change_frames_fine(self):
-        pass
+    def reverse_change_frames_medium(self, center_frame, mode='sunrise', scale_factor=1.5, pass_idx=1):
+        center_frame = constants.IMAGES_PER_DAY - 1 - center_frame
+        self.change_frames_medium(center_frame, mode, scale_factor, pass_idx, True)
+
+    def reverse_change_frames_fine(self, center_frame, mode='sunrise'):
+        center_frame = constants.IMAGES_PER_DAY - 1 - center_frame
+        self.change_frames_fine(center_frame, mode, True)
 
     def __init__(self, place, times, img_paths, sunrise, sunset, train_test_valid, lat, lng, time_offset, mali_solar_noon):
         self.all_times = times

@@ -113,7 +113,7 @@ for batch_idx, (input, _) in enumerate(test_loader):
     batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunrise_idx.size()[0]]
 
     for d_idx, day in enumerate(batch_days):
-        day.change_frames_medium(sunrise_idx[d_idx, 0].data[0], scale_factor=4.5, pass_idx=0)
+        day.reverse_change_frames_medium(sunrise_idx[d_idx, 0].data[0], scale_factor=4.5, pass_idx=0)
 
     if batch_idx % constants.LOG_INTERVAL == 0:
         print('Batch Index: {}'.format(batch_idx))
@@ -138,7 +138,7 @@ for batch_idx, (input, _) in enumerate(test_loader):
     batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunrise_idx.size()[0]]
 
     for d_idx, day in enumerate(batch_days):
-        day.change_frames_medium(sunrise_idx[d_idx, 0].data[0], scale_factor=1.5, pass_idx=1)
+        day.reverse_change_frames_medium(sunrise_idx[d_idx, 0].data[0], scale_factor=1.5, pass_idx=1)
 
     if batch_idx % constants.LOG_INTERVAL == 0:
         print('Batch Index: {}'.format(batch_idx))
@@ -162,7 +162,7 @@ for batch_idx, (input, _) in enumerate(test_loader):
     batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunrise_idx.size()[0]]
 
     for d_idx, day in enumerate(batch_days):
-        day.change_frames_fine(sunrise_idx[d_idx, 0].data[0])
+        day.reverse_change_frames_fine(sunrise_idx[d_idx, 0].data[0])
 
     if batch_idx % constants.LOG_INTERVAL == 0:
         print('Batch Index: {}'.format(batch_idx))
@@ -172,6 +172,8 @@ passes += 1
 sunrise_predict_t1 = time.time()
 print('Sunrise prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
 sys.stdout.flush()
+
+sunrise_err_total = []
 
 sunrise_predict_t0 = time.time()
 for batch_idx, (input, _) in enumerate(test_loader):
@@ -185,7 +187,10 @@ for batch_idx, (input, _) in enumerate(test_loader):
     batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunrise_idx.size()[0]]
 
     for d_idx, day in enumerate(batch_days):
-        local_sunrise = day.get_local_time(sunrise_idx[d_idx, 0].data[0]) # - datetime.timedelta(seconds=days[d_idx].time_offset)
+        local_sunrise = day.reverse_get_local_time(sunrise_idx[d_idx, 0].data[0]) # - datetime.timedelta(seconds=days[d_idx].time_offset)
+
+        error_min = math.fabs(((day.sunrise - local_sunrise).total_seconds() / 60))
+        sunrise_err_total.append(error_min)
 
         if day.place not in locations:
             #locations[day.place] = Location(day.lat, day.lng, [], [], [])
@@ -206,6 +211,9 @@ sunrise_predict_t1 = time.time()
 print('Sunrise testing prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
 sys.stdout.flush()
 
+print('Sunrise mean error (min): {}'.format(statistics.mean(sunrise_err_total)))
+print('Sunrise median error (min): {}'.format(statistics.median(sunrise_err_total)))
+
 # sunset
 
 sunset_predict_t0 = time.time()
@@ -221,7 +229,7 @@ for batch_idx, (input, _) in enumerate(test_loader):
     batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunset_idx.size()[0]]
 
     for d_idx, day in enumerate(batch_days):
-        day.change_frames_medium(sunset_idx[d_idx, 0].data[0], mode='sunset', scale_factor=4.5, pass_idx=0) # VLI mode is only for print statements
+        day.reverse_change_frames_medium(sunset_idx[d_idx, 0].data[0], mode='sunset', scale_factor=4.5, pass_idx=0) # VLI mode is only for print statements
 
     if batch_idx % constants.LOG_INTERVAL == 0:
         print('Batch Index: {}'.format(batch_idx))
@@ -244,7 +252,7 @@ for batch_idx, (input, _) in enumerate(test_loader):
     batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunset_idx.size()[0]]
 
     for d_idx, day in enumerate(batch_days):
-        day.change_frames_medium(sunset_idx[d_idx, 0].data[0], mode='sunset', scale_factor=1.5, pass_idx=1) # VLI mode is only for print statements
+        day.reverse_change_frames_medium(sunset_idx[d_idx, 0].data[0], mode='sunset', scale_factor=1.5, pass_idx=1) # VLI mode is only for print statements
 
     if batch_idx % constants.LOG_INTERVAL == 0:
         print('Batch Index: {}'.format(batch_idx))
@@ -267,7 +275,7 @@ for batch_idx, (input, _) in enumerate(test_loader):
     batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunset_idx.size()[0]]
 
     for d_idx, day in enumerate(batch_days):
-        day.change_frames_fine(sunset_idx[d_idx, 0].data[0], mode='sunset') # VLI mode is only for print statements
+        day.reverse_change_frames_fine(sunset_idx[d_idx, 0].data[0], mode='sunset') # VLI mode is only for print statements
 
     if batch_idx % constants.LOG_INTERVAL == 0:
         print('Batch Index: {}'.format(batch_idx))
@@ -278,6 +286,8 @@ print('Sunset prediction time (min): {:.2f}'.format((sunset_predict_t1 - sunset_
 sys.stdout.flush()
 
 location_idx = {}
+
+sunset_err_total = []
 
 sunset_predict_t0 = time.time()
 for batch_idx, (input, target) in enumerate(test_loader):
@@ -291,7 +301,10 @@ for batch_idx, (input, target) in enumerate(test_loader):
     batch_days = days[batch_idx * constants.BATCH_SIZE:batch_idx * constants.BATCH_SIZE + sunset_idx.size()[0]]
 
     for d_idx, day in enumerate(batch_days):
-        local_sunset = day.get_local_time(sunset_idx[d_idx, 0].data[0]) #- datetime.timedelta(seconds=days[d_idx].time_offset)
+        local_sunset = day.reverse_get_local_time(sunset_idx[d_idx, 0].data[0]) #- datetime.timedelta(seconds=days[d_idx].time_offset)
+
+        error_min = math.fabs(((day.sunset - local_sunset).total_seconds() / 60))
+        sunset_err_total.append(error_min)
 
         #if day.place not in locations:
             #locations[day.place] = Location(day.lat, day.lng, [], [], [])
@@ -311,6 +324,9 @@ sunset_predict_t1 = time.time()
 print('Sunset testing prediction time (min): {:.2f}'.format((sunset_predict_t1 - sunset_predict_t0) / 60))
 sys.stdout.flush()
 
+print('Sunset mean error (min): {}'.format(statistics.mean(sunset_err_total)))
+print('Sunset median error (min): {}'.format(statistics.median(sunset_err_total)))
+
 # Sort by time.
 
 sorted_locations = {}
@@ -324,6 +340,6 @@ for place in locations:
 if not os.path.isdir(sunrise_dir + '/predictions/'):
     os.mkdir(sunrise_dir + '/predictions/')
 
-with open(sunrise_dir + '/predictions/{}_pred.pkl'.format(passes), 'wb') as f:
+with open(sunrise_dir + '/predictions/{}_reverse_pred.pkl'.format(passes), 'wb') as f:
     #pickle.dump(sorted_locations, f)
     pickle.dump(locations, f)

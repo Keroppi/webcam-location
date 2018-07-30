@@ -176,6 +176,8 @@ sunrise_predict_t1 = time.time()
 print('Sunrise prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
 sys.stdout.flush()
 
+sunrise_err_total = []
+
 sunrise_predict_t0 = time.time()
 for batch_idx, (input, _) in enumerate(test_loader):
     input = Variable(input, volatile=True)
@@ -189,6 +191,9 @@ for batch_idx, (input, _) in enumerate(test_loader):
 
     for d_idx, day in enumerate(batch_days):
         local_sunrise = day.get_local_time(sunrise_idx[d_idx, 0].data[0]) # - datetime.timedelta(seconds=days[d_idx].time_offset)
+
+        error_min = math.fabs(((day.sunrise - local_sunrise).total_seconds() / 60))
+        sunrise_err_total.append(error_min)
 
         if day.place not in locations:
             #locations[day.place] = Location(day.lat, day.lng, [], [], [])
@@ -208,6 +213,9 @@ passes += 1
 sunrise_predict_t1 = time.time()
 print('Sunrise testing prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
 sys.stdout.flush()
+
+print('Sunrise mean error (min): {}'.format(statistics.mean(sunrise_err_total)))
+print('Sunrise median error (min): {}'.format(statistics.median(sunrise_err_total)))
 
 # sunset
 
@@ -282,6 +290,8 @@ sys.stdout.flush()
 
 location_idx = {}
 
+sunset_err_total = []
+
 sunset_predict_t0 = time.time()
 for batch_idx, (input, target) in enumerate(test_loader):
     input = Variable(input, volatile=True)
@@ -295,6 +305,9 @@ for batch_idx, (input, target) in enumerate(test_loader):
 
     for d_idx, day in enumerate(batch_days):
         local_sunset = day.get_local_time(sunset_idx[d_idx, 0].data[0]) #- datetime.timedelta(seconds=days[d_idx].time_offset)
+
+        error_min = math.fabs(((day.sunset - local_sunset).total_seconds() / 60))
+        sunset_err_total.append(error_min)
 
         #if day.place not in locations:
             #locations[day.place] = Location(day.lat, day.lng, [], [], [])
@@ -313,6 +326,9 @@ for batch_idx, (input, target) in enumerate(test_loader):
 sunset_predict_t1 = time.time()
 print('Sunset testing prediction time (min): {:.2f}'.format((sunset_predict_t1 - sunset_predict_t0) / 60))
 sys.stdout.flush()
+
+print('Sunset mean error (min): {}'.format(statistics.mean(sunset_err_total)))
+print('Sunset median error (min): {}'.format(statistics.median(sunset_err_total)))
 
 # Sort by time.
 
