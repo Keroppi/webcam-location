@@ -65,12 +65,13 @@ for d_idx, (sunrise, sunset) in enumerate(zip(sunrises, sunsets)):
 
     solar_noon = (sunset - sunrise) / 2 + sunrise
 
-    # Latest solar noon in the world is in western China at 15:10, so truncate any time past ~15:14
-    if solar_noon.hour > 15 or (solar_noon.hour == 15 and solar_noon.minute >= 14):
-        solar_noon = solar_noon.replace(hour=15, minute=14, second=0, microsecond=0)
-    # Earliest solar noon in the world is in Greenland around 10:04 AM, so truncate any time before ~10 AM.
-    if solar_noon.hour < 10:
-        solar_noon = solar_noon.replace(hour=10, minute=0, second=0, microsecond=0)
+    # Latest solar noon in the world is in western China at 15:10, so truncate any time past ~15:20
+    if solar_noon.hour > 15 or (solar_noon.hour == 15 and solar_noon.minute >= 20):
+        solar_noon = solar_noon.replace(hour=15, minute=20, second=0, microsecond=0)
+    # Earliest solar noon in the world is in Greenland around 9:32 AM, so truncate any time before ~9:28 AM.
+    # https://www.timeanddate.com/sun/@81.5053,-12.1311?month=11&year=2017
+    if solar_noon.hour < 9 or (solar_noon.hour == 9 and solar_noon.minute <= 28):
+        solar_noon = solar_noon.replace(hour=9, minute=28, second=0, microsecond=0)
 
     '''
     if random.randint(1, 100) < 5:
@@ -134,6 +135,7 @@ def cbm(day_of_year, day_length_hours):
     return cbm_lat
 
 # Compute latitude.
+#latitudes_weird = []
 latitudes = []
 cbm_latitudes = []
 for d_idx, day_length in enumerate(day_lengths):
@@ -149,15 +151,19 @@ for d_idx, day_length in enumerate(day_lengths):
     # CBM Model
     cbm_lat = cbm(day_of_year, day_length_hours)
 
+    '''
     # Check if they're in different (north / south) hemispheres.
     if (cbm_lat > 0 and days[d_idx].lat < 0) or (cbm_lat < 0 and days[d_idx].lat > 0):
-        #if math.fabs(day_length_hours - 12) < 0.5:
-        cbm_lat *= -1
+        if math.fabs(day_length_hours - 12) < 1:
+            cbm_lat *= -1
+            # cbm_latitudes.append(-cbm_lat)
 
     # Check if they're in different (north / south) hemispheres.
     if (lat > 0 and days[d_idx].lat < 0) or (lat < 0 and days[d_idx].lat > 0):
-        #if math.fabs(day_length_hours - 12) < 0.5:
-        lat *= -1
+        if math.fabs(day_length_hours - 12) < 1:
+            lat *= -1
+            #latitudes.append(-lat)
+    '''
 
     latitudes.append(lat) # Only one day to predict latitude - could average across many days.
     cbm_latitudes.append(cbm_lat)  # Only one day to predict latitude - could average across many days.
@@ -173,25 +179,24 @@ for d_idx, day_length in enumerate(day_lengths):
 
     sys.stdout.flush()
 
-'''
+
 # Store which day of the year and day length for each place.
 day_lens = {}
-days_of_year = {}
+#days_of_year = {}
 for i in range(len(days)):
-    if days_of_year.get(days[i].place) is None:
-        days_of_year[days[i].place] = []
+    #if days_of_year.get(days[i].place) is None:
+    #    days_of_year[days[i].place] = []
 
     if day_lens.get(days[i].place) is None:
         day_lens[days[i].place] = []
 
-    ts = pd.Series(pd.to_datetime([str(days[i].date)]))
-    day_of_year = int(ts.dt.dayofyear)  # day_of_year from 1 to 365, inclusive
+    #ts = pd.Series(pd.to_datetime([str(days[i].date)]))
+    #day_of_year = int(ts.dt.dayofyear)  # day_of_year from 1 to 365, inclusive
 
-    days_of_year[days[i].place].append(days_of_year)
+    #days_of_year[days[i].place].append(days_of_year)
     day_lens[days[i].place].append(day_lengths[i])
-'''
 
-# Get mean and median of all lat/longs of same places.
+
 #places = {}
 cbm_lats = {}
 lats = {}
@@ -214,6 +219,10 @@ for i in range(len(days)):
     if cbm_lats.get(days[i].place) is None:
         cbm_lats[days[i].place] = []
     cbm_lats[days[i].place].append(cbm_latitudes[i])
+
+    #if day_lengths[i] > 11 and day_lengths[i] < 13:  # 2 guesses if around 12 hour day length - BAD IDEA IF YOU REALLY HAVE EQUATORIAL POINTS!
+    #    lats[days[i].place].append(-latitudes[i])
+    #    cbm_lats[days[i].place].append(-cbm_latitudes[i])
 
     if lngs.get(days[i].place) is None:
         lngs[days[i].place] = []

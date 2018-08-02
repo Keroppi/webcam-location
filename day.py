@@ -322,6 +322,9 @@ class Day():
         self.times, self.img_paths = self.random_subset(self.all_times, self.all_img_paths)
         self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, self.sunrise, self.sunset)
 
+    def reverse_images(self):
+        self.img_paths = list(reversed(self.img_paths))
+
     def uniform_frames(self, reverse=False):
         self.times, self.img_paths = self.uniform_subset(self.all_times, self.all_img_paths)
 
@@ -329,9 +332,6 @@ class Day():
             self.reverse_images()
 
         self.sunrise_idx, self.sunset_idx = self.get_sun_idx(self.times, self.sunrise, self.sunset)
-
-    def reverse_images(self):
-        self.img_paths = list(reversed(self.img_paths))
 
     def reverse_get_local_time(self, idx):
         idx = constants.IMAGES_PER_DAY - 1 - idx
