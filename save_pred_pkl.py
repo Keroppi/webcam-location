@@ -103,6 +103,7 @@ sys.stdout.flush()
 passes = 0
 locations = {}
 
+'''
 sunrise_predict_t0 = time.time()
 for batch_idx, (input, _) in enumerate(test_loader):
     input = Variable(input, volatile=True)
@@ -175,7 +176,7 @@ passes += 1
 sunrise_predict_t1 = time.time()
 print('Sunrise prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
 sys.stdout.flush()
-
+'''
 sunrise_err_total = []
 
 sunrise_predict_t0 = time.time()
@@ -218,7 +219,7 @@ print('Sunrise mean error (min): {}'.format(statistics.mean(sunrise_err_total)))
 print('Sunrise median error (min): {}'.format(statistics.median(sunrise_err_total)))
 
 # sunset
-
+'''
 sunset_predict_t0 = time.time()
 for batch_idx, (input, _) in enumerate(test_loader):
     input = Variable(input, volatile=True)
@@ -287,9 +288,9 @@ for batch_idx, (input, _) in enumerate(test_loader):
 sunset_predict_t1 = time.time()
 print('Sunset prediction time (min): {:.2f}'.format((sunset_predict_t1 - sunset_predict_t0) / 60))
 sys.stdout.flush()
+'''
 
 location_idx = {}
-
 sunset_err_total = []
 
 sunset_predict_t0 = time.time()
