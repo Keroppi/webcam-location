@@ -220,9 +220,10 @@ for i in range(len(days)):
         cbm_lats[days[i].place] = []
     cbm_lats[days[i].place].append(cbm_latitudes[i])
 
-    #if day_lengths[i] > 11 and day_lengths[i] < 13:  # 2 guesses if around 12 hour day length - BAD IDEA IF YOU REALLY HAVE EQUATORIAL POINTS!
-    #    lats[days[i].place].append(-latitudes[i])
-    #    cbm_lats[days[i].place].append(-cbm_latitudes[i])
+
+    if day_lengths[i] > 11 and day_lengths[i] < 13:
+        lats[days[i].place].append(-latitudes[i])
+        cbm_lats[days[i].place].append(-cbm_latitudes[i])
 
     if lngs.get(days[i].place) is None:
         lngs[days[i].place] = []
