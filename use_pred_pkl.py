@@ -225,7 +225,7 @@ for i in range(len(days)):
     lngs[days[i].place].append(longitudes[i])
 
     # VLI
-    if day_lengths[i] > 11 and day_lengths[i] < 13:
+    if day_lengths[i] / 3600 > 11 and day_lengths[i] / 3600 < 13:
         lats[days[i].place].append(-latitudes[i])
         cbm_lats[days[i].place].append(-cbm_latitudes[i])
         lngs[days[i].place].append(longitudes[i])
