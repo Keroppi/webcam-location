@@ -220,14 +220,16 @@ for i in range(len(days)):
         cbm_lats[days[i].place] = []
     cbm_lats[days[i].place].append(cbm_latitudes[i])
 
-
-    if day_lengths[i] > 11 and day_lengths[i] < 13:
-        lats[days[i].place].append(-latitudes[i])
-        cbm_lats[days[i].place].append(-cbm_latitudes[i])
-
     if lngs.get(days[i].place) is None:
         lngs[days[i].place] = []
     lngs[days[i].place].append(longitudes[i])
+
+    # VLI
+    if day_lengths[i] > 11 and day_lengths[i] < 13:
+        lats[days[i].place].append(-latitudes[i])
+        cbm_lats[days[i].place].append(-cbm_latitudes[i])
+        lngs[days[i].place].append(longitudes[i])
+
 
 
 def compute_haversine_distance(lat1, lng1, lat2, lng2): # km
