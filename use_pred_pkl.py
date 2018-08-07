@@ -535,6 +535,7 @@ def particle_filter(lats, lngs, mahalanobis=False):
 
     return particle_locations
 
+brock_particle_locations = particle_filter(lats, lngs)
 cbm_particle_locations = particle_filter(cbm_lats, lngs)
 cbm_particle_mahalanobis_locations = particle_filter(cbm_lats, lngs, True)
 
@@ -859,6 +860,10 @@ brock_ransac_distances = []
 brock_ransac_longitude_err = []
 brock_ransac_latitude_err = []
 
+brock_particle_distances = []
+brock_particle_longitude_err = []
+brock_particle_latitude_err = []
+
 cbm_ransac_distances = []
 cbm_ransac_longitude_err = []
 cbm_ransac_latitude_err = []
@@ -898,6 +903,8 @@ for place in lats:
     density_pred_lng = density_locations[place][1]
     brock_ransac_pred_lat = brock_ransac_locations[place][0]
     brock_ransac_pred_lng = brock_ransac_locations[place][1]
+    brock_particle_pred_lat = brock_particle_locations[place][0]
+    brock_particle_pred_lng = brock_particle_locations[place][1]
 
     cbm_mean_pred_lat = cbm_mean_locations[place][0]
     cbm_mean_pred_lng = cbm_mean_locations[place][1]
@@ -948,6 +955,11 @@ for place in lats:
     brock_ransac_distances.append(brock_ransac_distance)
     brock_ransac_latitude_err.append(compute_distance(actual_lat, actual_lng, brock_ransac_pred_lat, actual_lng))
     brock_ransac_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, brock_ransac_pred_lng))
+
+    brock_particle_distance = compute_distance(actual_lat, actual_lng, brock_particle_pred_lat, brock_particle_pred_lng)
+    brock_particle_distances.append(brock_particle_distance)
+    brock_particle_latitude_err.append(compute_distance(actual_lat, actual_lng, brock_particle_pred_lat, actual_lng))
+    brock_particle_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, brock_particle_pred_lng))
 
     cbm_particle_distance = compute_distance(actual_lat, actual_lng, cbm_particle_pred_lat, cbm_particle_pred_lng)
     cbm_particle_distances.append(cbm_particle_distance)
@@ -1868,15 +1880,22 @@ print('Brock Means Avg. Distance Error: {:.6f}'.format(statistics.mean(mean_dist
 print('Brock Medians Avg. Distance Error: {:.6f}'.format(statistics.mean(median_distances)))
 print('Brock Density Avg. Distance Error: {:.6f}'.format(statistics.mean(density_distances)))
 print('Brock RANSAC Avg. Distance Error: {:.6f}'.format(statistics.mean(brock_ransac_distances)))
+print('Brock Particle Avg. Distance Error: {:.6f}'.format(statistics.mean(brock_particle_distances)))
 print('Brock Means Median Distance Error: {:.6f}'.format(statistics.median(mean_distances)))
 print('Brock Medians Median Distance Error: {:.6f}'.format(statistics.median(median_distances)))
 print('Brock Density Median Distance Error: {:.6f}'.format(statistics.median(density_distances)))
+print('Brock RANSAC Median Distance Error: {:.6f}'.format(statistics.median(brock_ransac_distances)))
+print('Brock Particle Median Distance Error: {:.6f}'.format(statistics.median(brock_particle_distances)))
 print('Brock Means Max Distance Error: {:.6f}'.format(max(mean_distances)))
 print('Brock Means Min Distance Error: {:.6f}'.format(min(mean_distances)))
 print('Brock Medians Max Distance Error: {:.6f}'.format(max(median_distances)))
 print('Brock Medians Min Distance Error: {:.6f}'.format(min(median_distances)))
 print('Brock Density Max Distance Error: {:.6f}'.format(max(density_distances)))
 print('Brock Density Min Distance Error: {:.6f}'.format(min(density_distances)))
+print('Brock RANSAC Max Distance Error: {:.6f}'.format(max(brock_ransac_distances)))
+print('Brock RANSAC Min Distance Error: {:.6f}'.format(min(brock_ransac_distances)))
+print('Brock Particle Max Distance Error: {:.6f}'.format(max(brock_particle_distances)))
+print('Brock Particle Min Distance Error: {:.6f}'.format(min(brock_particle_distances)))
 print('')
 print('CBM Means Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_mean_distances)))
 print('CBM Medians Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_median_distances)))
