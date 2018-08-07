@@ -742,7 +742,7 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
     # Plot locations on a map.
     for place in lats:
-        if len(lats[place]) < 100: # Need at least 100 points.
+        if len(lats[place]) < 120: # Need at least 120 points.
             continue
 
         min_lat = max(min(lats[place]) - 1, -90)
