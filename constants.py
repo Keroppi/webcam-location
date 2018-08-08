@@ -13,7 +13,8 @@ LOG_INTERVAL = 20
 SPLIT_TOTAL = 100
 SPLIT_TRAIN = 75 # 75% train
 SPLIT_TEST = 100 # 25% test, 0% validation
-BANDWIDTH = 0.8
+BANDWIDTH = 0.4
+            # 0.8 - 332
             # 0.5 - 292
             # 0.3 - 307
             # 0.2 - 320
@@ -32,7 +33,8 @@ BANDWIDTH = 0.8
             ## 0.05 -
 CENTER = False
 LAMBDA = 1 # REGULARIZER
-INLIER_THRESHOLD = 1500 # km
+INLIER_THRESHOLD = 500
+                   # 1500 - 290
                    # 1000 - 295
                    # 800 - 301
                    # 600 - 320
@@ -48,11 +50,12 @@ INLIER_THRESHOLD = 1500 # km
                    ## 600 -
                    ## 700 -
                    ## 800 -
-AZIMUTHAL_INLIER_THRESHOLD = 0.23561944901923448 # 1500 km -
+AZIMUTHAL_INLIER_THRESHOLD = 0.10978120995044331 # 700 km -
+# 0.23561944901923448 # 1500 km - 296
 # 0.15707963267948966 # 1000 km - 290
 # 0.1411098700237413 # 900 km - 298
 # 0.12566370614359174 # 800 km - 297
-                             # 0.10978120995044331 # 700 km -
+
                              # 0.09407324668249435 # 600 km - 319
                              # 0.07853981633974483 # 500 km -
                              # 0.07068583470577036 # 450 km -
@@ -66,10 +69,10 @@ AZIMUTHAL_INLIER_THRESHOLD = 0.23561944901923448 # 1500 km -
                              ## 600 -
                              ## 700 -
                              ## 800 -
-MAHALANOBIS_INLIER_THRESHOLD = 1.75
+MAHALANOBIS_INLIER_THRESHOLD = 1
                                # 2.5 - 311
                                # 2 - 302
-                               # 1.75 -
+                               # 1.75 - 305
                                # 1.5 - 311
                                # 1.25 - 304
                                # 1 -
@@ -79,12 +82,13 @@ MAHALANOBIS_INLIER_THRESHOLD = 1.75
                                ## 1.5 -
                                ## 1 -
                                ## 0.5 -
-AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 0.2
+AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 1.5
                                          # 2 - 422
                                          # 1 - 283
                                          # 0.9 - 297
                                          # 0.75 - 292
                                          # 0.5 - 312
+                                         # 0.2 - 378
 BIGM = 100
 
 # 1 pass
