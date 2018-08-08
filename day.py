@@ -67,28 +67,26 @@ class Day():
             remainder = (sunset - times[max_sunset_idx - 1]) / (times[max_sunset_idx] - times[max_sunset_idx - 1])
             sunset_idx = remainder + max_sunset_idx - 1
 
-        '''
-        if len(times) == constants.IMAGES_PER_DAY:
-            print('Sunrise / Sunset and Idx')
-            print(sunrise_idx)
-            print(sunrise)
-            if sunrise_idx >= 0:
-                print(times[math.floor(sunrise_idx)])
-                print(times[math.ceil(sunrise_idx)])
-            print('')
+        #'''
+        print('Sunrise / Sunset and Idx')
+        print(sunrise_idx)
+        print(sunrise)
+        if sunrise_idx >= 0:
+            print(times[math.floor(sunrise_idx)])
+            print(times[math.ceil(sunrise_idx)])
+        print('')
 
-            print(sunset_idx)
-            print(sunset)
-
-            if sunset_idx <= len(times) - 1:
-                print(times[math.floor(sunset_idx)])
-                print(times[math.ceil(sunset_idx)])
-            print('')
-            print(time_diff)
-            print(times[0])
-            print(times[-1])
-            print('')
-        '''
+        print(sunset_idx)
+        print(sunset)
+        if sunset_idx <= len(times) - 1:
+            print(times[math.floor(sunset_idx)])
+            print(times[math.ceil(sunset_idx)])
+        print('')
+        print(time_diff)
+        print(times[0])
+        print(times[-1])
+        print('')
+        #'''
 
         return (sunrise_idx, sunset_idx)
 
@@ -162,6 +160,16 @@ class Day():
             if self.sunset_in_frames:
                 if not (self.sunset_idx >= 0 and self.sunset_idx <= constants.IMAGES_PER_DAY - 1):
                     sunset_before = False
+
+                    print('SUNSET WAS BAD BEFORE')  # Can count number of times this phrase appears.
+                    print(self.sunset)
+                    print(self.times[0])
+                    print(self.times[-1])
+                    print(self.all_times[0])
+                    print(self.all_times[-1])
+                    print(self.all_times[center_idx])
+                    print('')
+                    sys.stdout.flush()
                 else:
                     sunset_before = True
 
@@ -191,9 +199,18 @@ class Day():
                         print('CHANGE FRAMES {} MADE SUNSET WORSE'.format(pass_idx))
                     else:
                         print('CHANGE FRAMES {} DID NOT IMPROVE SUNSET'.format(pass_idx))
+                        print(self.sunset)
+                        print(self.times[0])
+                        print(self.times[-1])
+                        print(self.all_times[0])
+                        print(self.all_times[-1])
+                        print(self.all_times[center_idx])
+                        print('')
+                        sys.stdout.flush()
                 else:
                     if not sunset_before:
                         print('CHANGE FRAMES {} MADE SUNSET BETTER'.format(pass_idx))
+
 
         sys.stdout.flush()
 
@@ -302,14 +319,15 @@ class Day():
                 if not (self.sunset_idx >= 0 and self.sunset_idx <= constants.IMAGES_PER_DAY - 1):
                     if sunset_before:
                         print('CHANGE FRAMES 2 MADE SUNSET WORSE') # Can count number of times this phrase appears.
+                    else:
+                        print('CHANGE FRAMES 2 DID NOT IMPROVE SUNSET')
                         #print(self.sunset)
                         #print(self.times[0])
                         #print(self.times[-1])
                         #print(self.all_times[0])
                         #print(self.all_times[-1])
                         #print(self.all_times[center_idx])
-                    else:
-                        print('CHANGE FRAMES 2 DID NOT IMPROVE SUNSET')
+                        #print('')
                 else:
                     if not sunset_before:
                         print('CHANGE FRAMES 2 MADE SUNSET BETTER') # Can count number of times this phrase appears.

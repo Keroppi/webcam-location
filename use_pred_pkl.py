@@ -834,8 +834,10 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
     map_t1 = time.time()
     print('Calculating map time (m): ' + str((map_t1 - map_t0) / 60))
 
+
 plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, 'sun')
 plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, 'season')
+sys.stdout.flush()
 
 #finished_places = []
 days_used = []
