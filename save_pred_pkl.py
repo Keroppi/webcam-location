@@ -103,7 +103,6 @@ sys.stdout.flush()
 passes = 0
 locations = {}
 
-'''
 sunrise_predict_t0 = time.time()
 for batch_idx, (input, _) in enumerate(test_loader):
     input = Variable(input, volatile=True)
@@ -216,16 +215,11 @@ sys.stdout.flush()
 
 print('Sunrise mean error (min): {}'.format(statistics.mean(sunrise_err_total)))
 print('Sunrise median error (min): {}'.format(statistics.median(sunrise_err_total)))
-'''
 
 for day in days:
-    day.uniform_frames()
+    day.uniform_frames() # Reset the frames to be random instead of having a bias towards where sunrise is.
 
 # sunset
-
-# VLI
-print('SUNSET PART')
-sys.stdout.flush()
 
 sunset_predict_t0 = time.time()
 for batch_idx, (input, _) in enumerate(test_loader):
