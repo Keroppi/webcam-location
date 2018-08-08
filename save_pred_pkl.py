@@ -97,7 +97,7 @@ sys.stdout.flush()
 
 print('# Test Examples: {}'.format(len(test_loader.dataset)))
 sys.stdout.flush()
-
+'''
 # sunrise
 
 passes = 0
@@ -217,7 +217,7 @@ sys.stdout.flush()
 
 print('Sunrise mean error (min): {}'.format(statistics.mean(sunrise_err_total)))
 print('Sunrise median error (min): {}'.format(statistics.median(sunrise_err_total)))
-
+'''
 # sunset
 #'''
 sunset_predict_t0 = time.time()
