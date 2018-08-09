@@ -92,12 +92,12 @@ class Day():
 
 
     def in_frames(self, times, sunrise, sunset):
-        if sunrise >= times[0]:
+        if sunrise >= times[0] and sunrise <= times[-1]:
             sunrise_in_frames = True
         else:
             sunrise_in_frames = False
 
-        if sunset <= times[-1]:
+        if sunset <= times[-1] and sunset >= times[0]:
             sunset_in_frames = True
         else:
             sunset_in_frames = False
