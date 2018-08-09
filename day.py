@@ -160,14 +160,14 @@ class Day():
                     sunset_before = False
 
                     print('SUNSET WAS BAD BEFORE')  # Can count number of times this phrase appears.
-                    print(self.sunset)
-                    print(self.times[0])
-                    print(self.times[-1])
-                    print(self.all_times[0])
-                    print(self.all_times[-1])
-                    print(self.all_times[center_idx])
-                    print('')
-                    sys.stdout.flush()
+                    #print(self.sunset)
+                    #print(self.times[0])
+                    #print(self.times[-1])
+                    #print(self.all_times[0])
+                    #print(self.all_times[-1])
+                    #print(self.all_times[center_idx])
+                    #print('')
+                    #sys.stdout.flush()
                 else:
                     sunset_before = True
 
@@ -197,14 +197,14 @@ class Day():
                         print('CHANGE FRAMES {} MADE SUNSET WORSE'.format(pass_idx))
                     else:
                         print('CHANGE FRAMES {} DID NOT IMPROVE SUNSET'.format(pass_idx))
-                        print(self.sunset)
-                        print(self.times[0])
-                        print(self.times[-1])
-                        print(self.all_times[0])
-                        print(self.all_times[-1])
-                        print(self.all_times[center_idx])
-                        print('')
-                        sys.stdout.flush()
+                        #print(self.sunset)
+                        #print(self.times[0])
+                        #print(self.times[-1])
+                        #print(self.all_times[0])
+                        #print(self.all_times[-1])
+                        #print(self.all_times[center_idx])
+                        #print('')
+                        #sys.stdout.flush()
                 else:
                     if not sunset_before:
                         print('CHANGE FRAMES {} MADE SUNSET BETTER'.format(pass_idx))
