@@ -88,6 +88,7 @@ test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=constants.BAT
 # Test Set
 
 # When testing, use uniform frames to increase likelihood of grabbing sunrise and sunset.
+'''
 uniform_t0 = time.time()
 for day in days:
     day.uniform_frames()
@@ -97,6 +98,7 @@ sys.stdout.flush()
 
 print('# Test Examples: {}'.format(len(test_loader.dataset)))
 sys.stdout.flush()
+'''
 
 # sunrise
 
@@ -219,8 +221,10 @@ sys.stdout.flush()
 print('Sunrise mean error (min): {}'.format(statistics.mean(sunrise_err_total)))
 print('Sunrise median error (min): {}'.format(statistics.median(sunrise_err_total)))
 
+'''
 for day in days:
     day.uniform_frames() # Reset the frames to be random instead of having a bias towards where sunrise is.
+'''
 
 # sunset
 
@@ -348,6 +352,6 @@ for place in locations:
 if not os.path.isdir(sunrise_dir + '/predictions/'):
     os.mkdir(sunrise_dir + '/predictions/')
 
-with open(sunrise_dir + '/predictions/{}_pred.pkl'.format(passes), 'wb') as f:
+with open(sunrise_dir + '/predictions/{}_random_pred.pkl'.format(passes), 'wb') as f:
     #pickle.dump(sorted_locations, f)
     pickle.dump(locations, f)

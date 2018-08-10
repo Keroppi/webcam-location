@@ -26,6 +26,7 @@ BANDWIDTH = 0.5
             # 0.075 -
             # 0.05 - 345
 
+            ## 0.5 - 408
             ## 0.3 -
             ## 0.25 -
             ## 0.2 -
@@ -50,7 +51,7 @@ INLIER_THRESHOLD = 800
                    ## 500 -
                    ## 600 -
                    ## 700 -
-                   ## 800 -
+                   ## 800 - 358
 AZIMUTHAL_INLIER_THRESHOLD = 0.12566370614359174 # 800 km - 297
 
 # 0.23561944901923448 # 1500 km - 296
@@ -70,7 +71,7 @@ AZIMUTHAL_INLIER_THRESHOLD = 0.12566370614359174 # 800 km - 297
                              ## 500 -
                              ## 600 -
                              ## 700 -
-                             ## 800 -
+                             ## 800 - 345
 MAHALANOBIS_INLIER_THRESHOLD = 1.25
                                # 2.5 - 311
                                # 2 - 302
@@ -83,6 +84,7 @@ MAHALANOBIS_INLIER_THRESHOLD = 1.25
                                ## 2 -
                                ## 1.5 -
                                ## 1 -
+                               ## 1.25 - 422
                                ## 0.5 -
 AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 1
                                          # 2 - 422
@@ -92,8 +94,14 @@ AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 1
                                          # 0.75 - 292
                                          # 0.5 - 312
                                          # 0.2 - 378
+
+                                         ## 1 - 368
 BIGM = 100
 
 # 1 pass
 # Mean - 749 km
 # Median - 332 km
+
+# 4 pass
+# Means - 889.869959
+# Median - 450.728295
