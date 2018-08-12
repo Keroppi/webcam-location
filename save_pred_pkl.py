@@ -346,6 +346,6 @@ for place in locations:
 if not os.path.isdir(sunrise_dir + '/predictions/'):
     os.mkdir(sunrise_dir + '/predictions/')
 
-with open(sunrise_dir + '/predictions/{}_pred-again.pkl'.format(passes), 'wb') as f:
+with open(sunrise_dir + '/predictions/{}_pred.pkl'.format(passes), 'wb') as f:
     #pickle.dump(sorted_locations, f)
     pickle.dump(locations, f)
