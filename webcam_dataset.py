@@ -69,6 +69,7 @@ class WebcamData():
         #        for place in places:
 
         place = thread_place.split('/')[2]
+        self.places[place] = 1 # VLI
         place_dir = image_dir + thread_place + '/'
         #place_dir = country_dir + place + '/'
 
@@ -224,6 +225,7 @@ class WebcamData():
 
     def __init__(self):
         self.types = {'train': 0, 'test': 0, 'valid':0}
+        self.places = {} # VLI
 
         load_t0 = time.time()
 
@@ -279,6 +281,14 @@ class Train(Dataset):
             places[day.place] = 1
         print('Training data num places: {}'.format(len(places)))
         sys.stdout.flush()
+
+        # VLI
+        for place in data.places:
+            if place not in places:
+                print('MISSING')
+                print(place)
+                sys.stdout.flush()
+
 
         if constants.LEARNING_SUNRISE:
             self.mode = 'sunrise'
@@ -343,6 +353,13 @@ class Test(Dataset):
             places[day.place] = 1
         print('Testing data num places: {}'.format(len(places)))
         sys.stdout.flush()
+
+        # VLI
+        for place in data.places:
+            if place not in places:
+                print('MISSING')
+                print(place)
+                sys.stdout.flush()
 
         if constants.LEARNING_SUNRISE:
             self.mode = 'sunrise'
