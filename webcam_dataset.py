@@ -273,6 +273,13 @@ class Train(Dataset):
         self.sunset_label = np.asarray([x.sunset_idx for x in self.data])
         self.transforms = transforms
 
+        # VLI
+        places = {}
+        for day in self.data:
+            places[day.place] = 1
+        print('Training data num places: {}'.format(len(places)))
+        sys.stdout.flush()
+
         if constants.LEARNING_SUNRISE:
             self.mode = 'sunrise'
         else:
@@ -329,6 +336,13 @@ class Test(Dataset):
         self.sunrise_label = np.asarray([x.sunrise_idx for x in self.data])
         self.sunset_label = np.asarray([x.sunset_idx for x in self.data])
         self.transforms = transforms
+
+        # VLI
+        places = {}
+        for day in self.data:
+            places[day.place] = 1
+        print('Testing data num places: {}'.format(len(places)))
+        sys.stdout.flush()
 
         if constants.LEARNING_SUNRISE:
             self.mode = 'sunrise'

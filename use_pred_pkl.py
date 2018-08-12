@@ -539,7 +539,7 @@ brock_particle_locations = particle_filter(lats, lngs)
 cbm_particle_locations = particle_filter(cbm_lats, lngs)
 cbm_particle_mahalanobis_locations = particle_filter(cbm_lats, lngs, True)
 
-def ransac(lats, lngs):
+def ransac(lats, lngs, actual=False):
     ransacs = {}
     inlier_dict = {}
 
@@ -554,6 +554,7 @@ def ransac(lats, lngs):
                 if compute_distance(guess1[0], guess1[1], guess2[0], guess2[1]) < constants.INLIER_THRESHOLD:
                     inliers[g_idx1].append(guess2)
 
+
         max_inliers = -1
         max_idx = -1
         for i_idx, inlier in enumerate(inliers):
@@ -561,7 +562,11 @@ def ransac(lats, lngs):
                 max_idx = i_idx
                 max_inliers = len(inlier)
 
-        inlier_dict[place] = max_inliers
+        if not actual:
+            inlier_dict[place] = max_inliers
+        else:
+            inlier_dict[place] = len(inliers[-1]) - 1 # just use the actual location inliers and subtract the actual location itself
+
         ransacs[place] = (statistics.mean([x[0] for x in inliers[max_idx]]), statistics.mean([x[1] for x in inliers[max_idx]]))
 
     return (ransacs, inlier_dict)
@@ -577,13 +582,13 @@ for place in actual_locations:
     lats_with_actuals[place].append(actual_locations[place][0])
     lngs_with_actuals[place].append(actual_locations[place][1])
 
-_, inliers2 = ransac(lats_with_actuals, lngs_with_actuals)
+_, inliers2 = ransac(lats_with_actuals, lngs_with_actuals, actual=True)
 
 without_actual = 0
 tied = 0
 actual_better = 0
 
-for place in inliers1:
+for place in actual_locations:
     if inliers1[place] < inliers2[place]:
         actual_better += 1
     elif inliers1[place] == inliers2[place]:
