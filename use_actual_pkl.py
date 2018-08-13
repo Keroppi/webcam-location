@@ -59,19 +59,25 @@ for d_idx, (sunrise, sunset) in enumerate(zip(sunrises, sunsets)):
     # Threshold sunrise to be at earliest midnight.
     if sunrise.date() < days[d_idx].sunrise.date():
         sunrise = datetime.datetime.combine(sunrise, datetime.time.min)
+        print('WARNING - Sunrise truncated to 12:00 same day.')
     # Threshold sunset to be at latest 2 AM the next day.
     if sunset > datetime.datetime.combine(days[d_idx].sunrise.date() + datetime.timedelta(days=1), datetime.time(2, 0, 0)):
         sunset = datetime.datetime.combine(days[d_idx].sunrise.date() + datetime.timedelta(days=1), datetime.time(2, 0, 0))
+        print('WARNING - Sunset truncated to 2:00 next day.')
 
     solar_noon = (sunset - sunrise) / 2 + sunrise
 
     # Latest solar noon in the world is in western China at 15:10, so truncate any time past ~15:20
     if solar_noon.hour > 15 or (solar_noon.hour == 15 and solar_noon.minute >= 20):
         solar_noon = solar_noon.replace(hour=15, minute=20, second=0, microsecond=0)
+        print('WARNING - Solar noon truncated to 15:20.')
     # Earliest solar noon in the world is in Greenland around 9:32 AM, so truncate any time before ~9:28 AM.
     # https://www.timeanddate.com/sun/@81.5053,-12.1311?month=11&year=2017
     if solar_noon.hour < 9 or (solar_noon.hour == 9 and solar_noon.minute <= 28):
         solar_noon = solar_noon.replace(hour=9, minute=28, second=0, microsecond=0)
+        print('WARNING - Solar noon truncated to 9:28.')
+
+    sys.stdout.flush()
 
     '''
     if random.randint(1, 100) < 5:
@@ -351,16 +357,7 @@ for key in lats:
 cbm_mean_distances = []
 cbm_median_distances = []
 
-#for i in range(len(days)):
 for place in lats:
-    #place = days[i].place
-
-    # Go through each place.
-    #if place in finished_places:
-    #    continue
-    #else:
-    #    finished_places.append(place)
-
     actual_lat = actual_locations[place][0] #days[i].lat
     actual_lng = actual_locations[place][1] #days[i].lng
 
@@ -376,4 +373,11 @@ for place in lats:
 
 print('CBM Means Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_mean_distances)))
 print('CBM Medians Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_median_distances)))
+print('CBM Means Median Distance Error: {:.6f}'.format(statistics.median(cbm_mean_distances)))
+print('CBM Medians Median Distance Error: {:.6f}'.format(statistics.median(cbm_median_distances)))
+print('CBM Means Max Distance Error: {:.6f}'.format(max(cbm_mean_distances)))
+print('CBM Means Min Distance Error: {:.6f}'.format(min(cbm_mean_distances)))
+print('CBM Medians Max Distance Error: {:.6f}'.format(max(cbm_median_distances)))
+print('CBM Medians Min Distance Error: {:.6f}'.format(min(cbm_median_distances)))
+
 sys.stdout.flush()
