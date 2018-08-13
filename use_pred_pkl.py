@@ -574,6 +574,11 @@ def ransac(lats, lngs, actual=False):
 brock_ransac_locations, _ = ransac(lats, lngs)
 cbm_ransac_locations, inliers1 = ransac(cbm_lats, lngs)
 
+print('Mean number of inliers: {}'.format(statistics.mean(list(inliers1.values()))))
+print('Median number of inliers: {}'.format(statistics.median(list(inliers1.values()))))
+print('Stdev number of inliers: {}'.format(statistics.stdev(list(inliers1.values()))))
+sys.stdout.flush()
+
 # Do RANSAC again but with the actual
 lats_with_actuals = copy.deepcopy(cbm_lats)
 lngs_with_actuals = copy.deepcopy(lngs)
@@ -657,7 +662,7 @@ def kde_func_to_minimize(x, kernel):
     return -density[0] # Trying to minimize
 
 # Kernel density estimation to guess location.
-def kde(lats, lngs, median_locations):
+def kde(lats, lngs, init_guess_locations):
     kernel_t0 = time.time()
     density_locations = {}
     for key in lats:
@@ -680,7 +685,7 @@ def kde(lats, lngs, median_locations):
         max_lng = max(np_lngs)
 
         bnds = ((min_lat, max_lat), (min_lng, max_lng))
-        res = minimize(kde_func_to_minimize, np.asarray([math.radians(x) for x in median_locations[key]]), args=(kernel,), method='L-BFGS-B', bounds=bnds, options={'maxiter':150})
+        res = minimize(kde_func_to_minimize, np.asarray([math.radians(x) for x in init_guess_locations[key]]), args=(kernel,), method='L-BFGS-B', bounds=bnds, options={'maxiter':400})
 
         if res.success:
             #density_locations[key] = (math.degrees(res.x[0]), math.degrees(res.x[1]))
@@ -739,8 +744,10 @@ def kde(lats, lngs, median_locations):
 
     return density_locations
 
-density_locations = kde(lats, lngs, median_locations)
-cbm_density_locations = kde(cbm_lats, lngs, cbm_median_locations)
+#density_locations = kde(lats, lngs, median_locations)
+#cbm_density_locations = kde(cbm_lats, lngs, cbm_median_locations)
+density_locations = kde(lats, lngs, brock_ransac_locations)
+cbm_density_locations = kde(cbm_lats, lngs, cbm_ransac_locations)
 
 def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ransac_locations, particle_locations, gmm_locations, particle_mahalanobis_locations, mode='sun'):
     map_t0 = time.time()

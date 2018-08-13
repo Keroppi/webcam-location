@@ -217,6 +217,7 @@ sys.stdout.flush()
 
 print('Sunrise mean error (min): {}'.format(statistics.mean(sunrise_err_total)))
 print('Sunrise median error (min): {}'.format(statistics.median(sunrise_err_total)))
+print('Sunrise stdev error (min): {}'.format(statistics.stdev(sunrise_err_total)))
 
 for day in days:
     day.uniform_frames() # Reset the frames to be random instead of having a bias towards where sunrise is.
@@ -332,6 +333,7 @@ sys.stdout.flush()
 
 print('Sunset mean error (min): {}'.format(statistics.mean(sunset_err_total)))
 print('Sunset median error (min): {}'.format(statistics.median(sunset_err_total)))
+print('Sunset stdev error (min): {}'.format(statistics.stdev(sunset_err_total)))
 
 # Sort by time.
 
@@ -346,6 +348,6 @@ for place in locations:
 if not os.path.isdir(sunrise_dir + '/predictions/'):
     os.mkdir(sunrise_dir + '/predictions/')
 
-with open(sunrise_dir + '/predictions/{}_pred.pkl'.format(passes), 'wb') as f:
+with open(sunrise_dir + '/predictions/{}_pred-stdev.pkl'.format(passes), 'wb') as f:
     #pickle.dump(sorted_locations, f)
     pickle.dump(locations, f)
