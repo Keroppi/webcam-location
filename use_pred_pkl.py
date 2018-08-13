@@ -658,12 +658,6 @@ for key in sun_visibles:
     normalized = [x * 100 / sum(sun_visibles[key]) for x in sun_visibles[key]]
     sun_visibles[key] = normalized
 
-'''
-places_lat_lng = {}
-for key in places:
-    places_lat_lng[key] = (places[key][0] / places[key][2], places[key][1] / places[key][2])
-'''
-
 mean_locations = {}
 median_locations = {}
 
