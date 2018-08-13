@@ -52,6 +52,13 @@ for place in predictions:
         sunrises.append(predictions[place][d_idx].sunrise)
         sunsets.append(predictions[place][d_idx].sunset)
 
+for place in predictions:
+    print(place)
+    for day in predictions[place]:
+        print(day.sunrise)
+        print(day.sunset)
+sys.stdout.flush()
+
 # Compute solar noon and day length.
 solar_noons = []
 day_lengths = []
@@ -379,5 +386,41 @@ print('CBM Means Max Distance Error: {:.6f}'.format(max(cbm_mean_distances)))
 print('CBM Means Min Distance Error: {:.6f}'.format(min(cbm_mean_distances)))
 print('CBM Medians Max Distance Error: {:.6f}'.format(max(cbm_median_distances)))
 print('CBM Medians Min Distance Error: {:.6f}'.format(min(cbm_median_distances)))
+
+
+'''
+# Num locations vs. error using all methods.
+bucket_size = 10 # 100 km buckets
+buckets = list(range(0, 300, bucket_size))
+bucket_labels = [str(x // bucket_size) + '-' + str((x + bucket_size) // bucket_size) for x in buckets]
+bucket_labels[-1] = bucket_labels[-1] + '+'
+
+cbm_mean_errors = [0] * len(buckets)
+cbm_median_errors = [0] * len(buckets)
+
+cbm_mean_error_rmses = [0] * len(buckets)
+cbm_mean_error_num_data_pts = [0] * len(buckets)
+cbm_median_error_rmses = [0] * len(buckets)
+cbm_median_error_num_data_pts = [0] * len(buckets)
+
+for key in actual_locations:
+    cbm_mean_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_mean_locations[key][0], cbm_mean_locations[key][1])
+    cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
+
+    mean_idx = len(buckets) - 1
+    median_idx = len(buckets) - 1
+
+    for bIdx, bucket in enumerate(buckets):
+        if cbm_mean_distance_err <= bucket + bucket_size:
+            mean_idx = min(bIdx, mean_idx)
+        if cbm_median_distance_err <= bucket + bucket_size:
+            median_idx = min(bIdx, median_idx)
+
+    cbm_mean_errors[mean_idx] += 1
+    cbm_median_errors[median_idx] += 1
+
+bar(buckets, cbm_median_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Median', 'cbm_error_median_actual.png')
+bar(buckets, cbm_mean_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Mean', 'cbm_error_mean_actual.png')
+'''
 
 sys.stdout.flush()
