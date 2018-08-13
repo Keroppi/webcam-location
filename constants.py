@@ -13,7 +13,7 @@ LOG_INTERVAL = 20
 SPLIT_TOTAL = 100
 SPLIT_TRAIN = 75 # 75% train
 SPLIT_TEST = 100 # 25% test, 0% validation
-BANDWIDTH = 0.5
+BANDWIDTH = 0.01
             # 0.8 - 332
             # 0.5 - 292 - 287
             # 0.4 - 312
@@ -37,7 +37,7 @@ BANDWIDTH = 0.5
             ## 0.05 -
 CENTER = False
 LAMBDA = 1 # REGULARIZER
-INLIER_THRESHOLD = 1000
+INLIER_THRESHOLD = 30
                    # 1500 - 290
                    # 1000 - 295 - 288
                    # 800 - 301
@@ -55,7 +55,7 @@ INLIER_THRESHOLD = 1000
                    ## 700 -
                    ## 800 - 358
                    ## 1000 - 352
-AZIMUTHAL_INLIER_THRESHOLD = 1000
+AZIMUTHAL_INLIER_THRESHOLD = 30
 
 # 0.23561944901923448 # 1500 km - 296
 # 0.15707963267948966 # 1000 km - 290
@@ -77,7 +77,7 @@ AZIMUTHAL_INLIER_THRESHOLD = 1000
                              ## 800 - 345
                              ## 1000 - 343
                              ## 1500 - 422
-MAHALANOBIS_INLIER_THRESHOLD = 1.25
+MAHALANOBIS_INLIER_THRESHOLD = 0.03
                                # 2.5 - 311
                                # 2 - 302
                                # 1.75 - 305
@@ -93,7 +93,7 @@ MAHALANOBIS_INLIER_THRESHOLD = 1.25
                                ## 1.25 - 422
                                ## 0.5 - 445
                                ## 0.2 - 431
-AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 1.25
+AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 0.03
                                          # 2 - 422
                                          # 1.5 - 337
                                          # 1.25 -
