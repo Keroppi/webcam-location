@@ -96,7 +96,7 @@ MAHALANOBIS_INLIER_THRESHOLD = 1.25
 AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 1.25
                                          # 2 - 422
                                          # 1.5 - 337
-                                         # 1.25 - 
+                                         # 1.25 -
                                          # 1 - 283 - 284
                                          # 0.9 - 297
                                          # 0.75 - 292
