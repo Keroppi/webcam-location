@@ -275,20 +275,17 @@ class Train(Dataset):
         self.sunset_label = np.asarray([x.sunset_idx for x in self.data])
         self.transforms = transforms
 
-        # VLI
         places = {}
         for day in self.data:
             places[day.place] = 1
         print('Training data num places: {}'.format(len(places)))
         sys.stdout.flush()
 
-        # VLI
         for place in data.places:
             if place not in places:
                 print('MISSING')
                 print(place)
                 sys.stdout.flush()
-
 
         if constants.LEARNING_SUNRISE:
             self.mode = 'sunrise'
@@ -347,14 +344,12 @@ class Test(Dataset):
         self.sunset_label = np.asarray([x.sunset_idx for x in self.data])
         self.transforms = transforms
 
-        # VLI
         places = {}
         for day in self.data:
             places[day.place] = 1
         print('Testing data num places: {}'.format(len(places)))
         sys.stdout.flush()
 
-        # VLI
         for place in data.places:
             if place not in places:
                 print('MISSING')

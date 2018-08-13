@@ -130,7 +130,10 @@ for d_idx, solar_noon in enumerate(solar_noons):
 def cbm(day_of_year, day_length_hours):
     theta = 0.2163108 + 2 * math.atan(0.9671396 * math.tan(0.00860 * (day_of_year - 186)))
     phi = math.asin(0.39795 * math.cos(theta))
-    cbm_lat = 180 / math.pi * math.atan(math.cos(phi) / math.sin(phi) * math.cos(-math.pi / 24 * (day_length_hours - 24)))
+
+    p = 0.26667 # https://www.ikhebeenvraag.be/mediastorage/FSDocument/171/Forsythe+-+A+model+comparison+for+daylength+as+a+function+of+latitude+and+day+of+year+-+1995.pdf
+    p_value = math.sin(p * math.pi / 180)
+    cbm_lat = 180 / math.pi * math.atan(math.cos(phi) / math.sin(phi) * (math.cos(-math.pi / 24 * (day_length_hours - 24)) - p_value))
 
     return cbm_lat
 

@@ -197,7 +197,7 @@ for batch_idx, (input, _) in enumerate(test_loader):
         error_min = math.fabs(((day.sunrise - local_sunrise).total_seconds() / 60))
         sunrise_err_total.append(error_min)
 
-        local_sunrise = day.sunrise  # VLI
+        # local_sunrise = day.sunrise # use actual to see what happens
 
         if day.place not in locations:
             #locations[day.place] = Location(day.lat, day.lng, [], [], [])
@@ -318,7 +318,7 @@ for batch_idx, (input, target) in enumerate(test_loader):
         error_min = math.fabs(((day.sunset - local_sunset).total_seconds() / 60))
         sunset_err_total.append(error_min)
 
-        local_sunset = day.sunset # VLI
+        #local_sunset = day.sunset # use actual to see what happens
 
         #if day.place not in locations:
             #locations[day.place] = Location(day.lat, day.lng, [], [], [])
@@ -355,6 +355,6 @@ for place in locations:
 if not os.path.isdir(sunrise_dir + '/predictions/'):
     os.mkdir(sunrise_dir + '/predictions/')
 
-with open(sunrise_dir + '/predictions/{}_actual.pkl'.format(passes), 'wb') as f:
+with open(sunrise_dir + '/predictions/{}_pred.pkl'.format(passes), 'wb') as f:
     #pickle.dump(sorted_locations, f)
     pickle.dump(locations, f)
