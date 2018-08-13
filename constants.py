@@ -13,9 +13,9 @@ LOG_INTERVAL = 20
 SPLIT_TOTAL = 100
 SPLIT_TRAIN = 75 # 75% train
 SPLIT_TEST = 100 # 25% test, 0% validation
-BANDWIDTH = 0.05
+BANDWIDTH = 0.4
             # 0.8 - 332
-            # 0.5 - 292 - 287
+            # 0.5 - 285*
             # 0.4 - 312
             # 0.3 - 307
             # 0.2 - 320
@@ -36,12 +36,12 @@ BANDWIDTH = 0.05
             ## 0.1 - 410
             ## 0.05 -
 
-            ### 0.05 -
+            ### 0.05 - 68
 CENTER = False
 LAMBDA = 1 # REGULARIZER
-INLIER_THRESHOLD = 50
+INLIER_THRESHOLD = 800
                    # 1500 - 290
-                   # 1000 - 295 - 288
+                   # 1000 - 258*
                    # 800 - 301
                    # 600 - 320
                    # 500 - 341
@@ -58,11 +58,11 @@ INLIER_THRESHOLD = 50
                    ## 800 - 358
                    ## 1000 - 352
 
-                   ### 50 -
-AZIMUTHAL_INLIER_THRESHOLD = 50
+                   ### 50 - 128
+AZIMUTHAL_INLIER_THRESHOLD = 0.15707963267948966 # 1000 km - *
 
 # 0.23561944901923448 # 1500 km - 296
-# 0.15707963267948966 # 1000 km - 290
+
 # 0.1411098700237413 # 900 km - 298
 # 0.12566370614359174 # 800 km - 297 - 287
 # 0.10978120995044331 # 700 km - 312
@@ -82,13 +82,13 @@ AZIMUTHAL_INLIER_THRESHOLD = 50
                              ## 1000 - 343
                              ## 1500 - 422
 
-                             ### 50 -
-MAHALANOBIS_INLIER_THRESHOLD = 0.1
+                             ### 50 - ?
+MAHALANOBIS_INLIER_THRESHOLD = 1.75
                                # 2.5 - 311
                                # 2 - 302
                                # 1.75 - 305
                                # 1.5 - 311
-                               # 1.25 - 304 - 316
+                               # 1.25 - 298*
                                # 1 - 316
                                # 0.5 - 341
 
@@ -100,12 +100,12 @@ MAHALANOBIS_INLIER_THRESHOLD = 0.1
                                ## 0.5 - 445
                                ## 0.2 - 431
 
-                               ### 0.1 -
+                               ### 0.1 - 85
 
-AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 0.1
+AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 1.75
                                          # 2 - 422
                                          # 1.5 - 337
-                                         # 1.25 -
+                                         # 1.25 - 293*
                                          # 1 - 283 - 284
                                          # 0.9 - 297
                                          # 0.75 - 292
@@ -118,13 +118,17 @@ AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 0.1
                                          ## 0.5 - 371
                                          ## 0.2 - 440
 
-                                         ### 0.1 -
+                                         ### 0.1 - ?
 BIGM = 100
 
 # 1 pass
-# Mean - 749 km
-# Median - 332 km
+# Mean - 713 km
+# Median - 302 km
 
 # 4 pass
-# Means - 889.869959
+# Mean - 889.869959
 # Median - 450.728295
+
+# Actual
+# Mean - 250
+# Median - 113
