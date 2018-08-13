@@ -13,7 +13,7 @@ LOG_INTERVAL = 20
 SPLIT_TOTAL = 100
 SPLIT_TRAIN = 75 # 75% train
 SPLIT_TEST = 100 # 25% test, 0% validation
-BANDWIDTH = 0.01
+BANDWIDTH = 0.05
             # 0.8 - 332
             # 0.5 - 292 - 287
             # 0.4 - 312
@@ -35,9 +35,11 @@ BANDWIDTH = 0.01
             ## 0.125 -
             ## 0.1 - 410
             ## 0.05 -
+
+            ### 0.05 -
 CENTER = False
 LAMBDA = 1 # REGULARIZER
-INLIER_THRESHOLD = 30
+INLIER_THRESHOLD = 50
                    # 1500 - 290
                    # 1000 - 295 - 288
                    # 800 - 301
@@ -55,7 +57,9 @@ INLIER_THRESHOLD = 30
                    ## 700 -
                    ## 800 - 358
                    ## 1000 - 352
-AZIMUTHAL_INLIER_THRESHOLD = 30
+
+                   ### 50 -
+AZIMUTHAL_INLIER_THRESHOLD = 50
 
 # 0.23561944901923448 # 1500 km - 296
 # 0.15707963267948966 # 1000 km - 290
@@ -77,7 +81,9 @@ AZIMUTHAL_INLIER_THRESHOLD = 30
                              ## 800 - 345
                              ## 1000 - 343
                              ## 1500 - 422
-MAHALANOBIS_INLIER_THRESHOLD = 0.03
+
+                             ### 50 -
+MAHALANOBIS_INLIER_THRESHOLD = 0.1
                                # 2.5 - 311
                                # 2 - 302
                                # 1.75 - 305
@@ -93,7 +99,10 @@ MAHALANOBIS_INLIER_THRESHOLD = 0.03
                                ## 1.25 - 422
                                ## 0.5 - 445
                                ## 0.2 - 431
-AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 0.03
+
+                               ### 0.1 -
+
+AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 0.1
                                          # 2 - 422
                                          # 1.5 - 337
                                          # 1.25 -
@@ -109,6 +118,7 @@ AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 0.03
                                          ## 0.5 - 371
                                          ## 0.2 - 440
 
+                                         ### 0.1 -
 BIGM = 100
 
 # 1 pass
