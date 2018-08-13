@@ -131,7 +131,9 @@ def cbm(day_of_year, day_length_hours):
     theta = 0.2163108 + 2 * math.atan(0.9671396 * math.tan(0.00860 * (day_of_year - 186)))
     phi = math.asin(0.39795 * math.cos(theta))
 
-    p = 0.26667 # https://www.ikhebeenvraag.be/mediastorage/FSDocument/171/Forsythe+-+A+model+comparison+for+daylength+as+a+function+of+latitude+and+day+of+year+-+1995.pdf
+    p = 0.26667 # Constant for data from timeanddate.com (sunrise and sunset is when top of sun disk at horizon)
+                # https://www.timeanddate.com/sun/help
+                # https://www.ikhebeenvraag.be/mediastorage/FSDocument/171/Forsythe+-+A+model+comparison+for+daylength+as+a+function+of+latitude+and+day+of+year+-+1995.pdf
     p_value = math.sin(p * math.pi / 180)
     cbm_lat = 180 / math.pi * math.atan(math.cos(phi) / math.sin(phi) * (math.cos(-math.pi / 24 * (day_length_hours - 24)) - p_value))
 
@@ -357,6 +359,7 @@ def azimuthal_equidistant_inverse(x, y):
     return (lat, lng)
 
 def gaussian_mixture(lats, lngs):
+    gmm_t0 = time.time()
     #cov_avg = np.zeros((2, 2))
     locations = {}
 
@@ -455,11 +458,17 @@ def gaussian_mixture(lats, lngs):
     #print('COV AVG')
     #print(cov_avg)
 
+    gmm_t1 = time.time()
+    print('Calculating GMM time (m): ' + str((gmm_t1 - gmm_t0) / 60))
+    sys.stdout.flush()
+
     return locations
 
 cbm_gmm_locations = gaussian_mixture(cbm_lats, lngs)
 
 def particle_filter(lats, lngs, mahalanobis=False):
+    particle_t0 = time.time()
+
     bigM = constants.BIGM
 
     particle_locations = {}
@@ -536,6 +545,10 @@ def particle_filter(lats, lngs, mahalanobis=False):
 
         particle_locations[place] = (particle_lat, particle_lng)
 
+    particle_t1 = time.time()
+    print('Calculating Particle Filter time (m): ' + str((particle_t1 - particle_t0) / 60))
+    sys.stdout.flush()
+
     return particle_locations
 
 brock_particle_locations = particle_filter(lats, lngs)
@@ -543,6 +556,7 @@ cbm_particle_locations = particle_filter(cbm_lats, lngs)
 cbm_particle_mahalanobis_locations = particle_filter(cbm_lats, lngs, True)
 
 def ransac(lats, lngs, actual=False):
+    ransac_t0 = time.time()
     ransacs = {}
     inlier_dict = {}
 
@@ -571,6 +585,10 @@ def ransac(lats, lngs, actual=False):
             inlier_dict[place] = len(inliers[-1]) - 1 # just use the actual location inliers and subtract the actual location itself
 
         ransacs[place] = (statistics.mean([x[0] for x in inliers[max_idx]]), statistics.mean([x[1] for x in inliers[max_idx]]))
+
+    ransac_t1 = time.time()
+    print('Calculating RANSAC time (m): ' + str((ransac_t1 - ransac_t0) / 60))
+    sys.stdout.flush()
 
     return (ransacs, inlier_dict)
 
@@ -688,7 +706,7 @@ def kde(lats, lngs, init_guess_locations):
         max_lng = max(np_lngs)
 
         bnds = ((min_lat, max_lat), (min_lng, max_lng))
-        res = minimize(kde_func_to_minimize, np.asarray([math.radians(x) for x in init_guess_locations[key]]), args=(kernel,), method='L-BFGS-B', bounds=bnds, options={'maxiter':400})
+        res = minimize(kde_func_to_minimize, np.asarray([math.radians(x) for x in init_guess_locations[key]]), args=(kernel,), method='L-BFGS-B', bounds=bnds, options={'maxiter':500})
 
         if res.success:
             #density_locations[key] = (math.degrees(res.x[0]), math.degrees(res.x[1]))

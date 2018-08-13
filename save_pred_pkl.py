@@ -128,7 +128,6 @@ sunrise_predict_t1 = time.time()
 print('Sunrise prediction time (min): {:.2f}'.format((sunrise_predict_t1 - sunrise_predict_t0) / 60))
 sys.stdout.flush()
 
-
 sunrise_predict_t0 = time.time()
 for batch_idx, (input, _) in enumerate(test_loader):
     input = Variable(input, volatile=True)
