@@ -551,14 +551,14 @@ def particle_filter(lats, lngs, mahalanobis=False):
 
     return particle_locations
 
-# VLI - maps to maps
-brock_particle_locations = particle_filter(lats, lngs)
-cbm_particle_locations = particle_filter(cbm_lats, lngs)
-cbm_particle_mahalanobis_locations = particle_filter(cbm_lats, lngs, True)
+# VLI
+#brock_particle_locations = particle_filter(lats, lngs)
+#cbm_particle_locations = particle_filter(cbm_lats, lngs)
+#cbm_particle_mahalanobis_locations = particle_filter(cbm_lats, lngs, True)
 
-#brock_particle_locations = cbm_gmm_locations
-#cbm_particle_locations = cbm_gmm_locations
-#cbm_particle_mahalanobis_locations = cbm_gmm_locations
+brock_particle_locations = cbm_gmm_locations
+cbm_particle_locations = cbm_gmm_locations
+cbm_particle_mahalanobis_locations = cbm_gmm_locations
 
 
 def ransac(lats, lngs, actual=False):
@@ -858,10 +858,10 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
         plt.title(place)
 
-        if not os.path.isdir('/srv/glusterfs/vli/maps/' + mode + '/'):
-            os.mkdir('/srv/glusterfs/vli/maps/' + mode + '/')
+        if not os.path.isdir('/srv/glusterfs/vli/maps1/' + mode + '/'):
+            os.mkdir('/srv/glusterfs/vli/maps1/' + mode + '/')
 
-        plt.savefig('/srv/glusterfs/vli/maps/' + mode + '/' + place + '.png')
+        plt.savefig('/srv/glusterfs/vli/maps1/' + mode + '/' + place + '.png')
         plt.close()
 
     map_t1 = time.time()
@@ -1082,7 +1082,7 @@ def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker
     else:
         prefix = ''
 
-    plt.savefig('/srv/glusterfs/vli/maps/' + prefix + label + '_days_used.png')
+    plt.savefig('/srv/glusterfs/vli/maps1/' + prefix + label + '_days_used.png')
     plt.close()
 
 scatter_t0 = time.time()
@@ -1123,7 +1123,7 @@ def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None):
     ax.set_xticks(x)
     ax.set_xticklabels(x_labels)
     plt.title(title)
-    plt.savefig('/srv/glusterfs/vli/maps/' + filename)
+    plt.savefig('/srv/glusterfs/vli/maps1/' + filename)
     plt.close()
 
 # Plot average distance error vs. time interval OVER ALL DAYS.
