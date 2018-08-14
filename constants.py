@@ -13,7 +13,7 @@ LOG_INTERVAL = 20
 SPLIT_TOTAL = 100
 SPLIT_TRAIN = 75 # 75% train
 SPLIT_TEST = 100 # 25% test, 0% validation
-BANDWIDTH = 0.1
+BANDWIDTH = 0.4
             # 0.8 - 332
             # 0.7 - 306*
             # 0.6 - 294*
@@ -30,6 +30,7 @@ BANDWIDTH = 0.1
 
             ## 0.9 - 457
             ## 0.5 - 381
+            ## 0.4 - *
             ## 0.3 -
             ## 0.25 -
             ## 0.2 - 401
@@ -46,7 +47,7 @@ BANDWIDTH = 0.1
             ### 0.01 - 132
 CENTER = False
 LAMBDA = 1 # REGULARIZER
-INLIER_THRESHOLD = 20
+INLIER_THRESHOLD = 600
                    # 1500 - 290
                    # 1400 - 271*
                    # 1200 - 272*
@@ -62,7 +63,7 @@ INLIER_THRESHOLD = 20
 
                    ## 400 - 438
                    ## 500 -
-                   ## 600 - 387
+                   ## 600 - *
                    ## 700 -
                    ## 800 - 358
                    ## 1000 - 352
@@ -76,7 +77,7 @@ INLIER_THRESHOLD = 20
                    ### 10 - 113
 
 # PARTICLE
-AZIMUTHAL_INLIER_THRESHOLD = 0.007839437223541183 # 50 km - N/A
+AZIMUTHAL_INLIER_THRESHOLD = 0.09407324668249435 # 600 km
 
 # 0.23561944901923448 # 1500 km - 296
 # 0.1884955592153876 # 1200 km - 272*
@@ -96,7 +97,7 @@ AZIMUTHAL_INLIER_THRESHOLD = 0.007839437223541183 # 50 km - N/A
                              ## 300 -
                              ## 400 - 433
                              ## 500 -
-                             ## 600 - 374
+                             ## 600 - *
                              ## 700 -
                              ## 800 - 345
                              ## 1000 - 343
@@ -119,7 +120,7 @@ MAHALANOBIS_INLIER_THRESHOLD = 1.5
                                # 0.25 - 323*
 
                                ## 2 - 414
-                               ## 1.5 -
+                               ## 1.5 - *
                                ## 1 -
                                ## 0.75 - 436
                                ## 1.25 - 422
@@ -147,7 +148,7 @@ AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 1
                                          # 0.2 - 378
 
                                          ## 2 - 549
-                                         ## 1 - 368
+                                         ## 1 - *
                                          ## 0.75 - 357
                                          ## 0.5 - 371
                                          ## 0.2 - 440
