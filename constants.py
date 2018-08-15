@@ -81,7 +81,7 @@ INLIER_THRESHOLD = 1000
                    ### 10 - 113
 
 # PARTICLE
-AZIMUTHAL_INLIER_THRESHOLD = 0.12566370614359174 # 800 km
+AZIMUTHAL_INLIER_THRESHOLD = 0.15707963267948966 # 1000 km
 
 # 0.23561944901923448 # 1500 km - 296
 # 0.1884955592153876 # 1200 km - 272*
@@ -112,11 +112,11 @@ AZIMUTHAL_INLIER_THRESHOLD = 0.12566370614359174 # 800 km
                              ### 20 - ?
 
 # GMM
-MAHALANOBIS_INLIER_THRESHOLD = 1.5
+MAHALANOBIS_INLIER_THRESHOLD = 1.75
                                # 2.5 - 311
                                # 2.25 - 299*
                                # 2 - 298*
-                               # 1.75 - 287*
+                               # 1.75 - 287* -
                                # 1.5 - 311
                                # 1.25 - 298*
                                # 1 - 316
@@ -140,7 +140,7 @@ MAHALANOBIS_INLIER_THRESHOLD = 1.5
                                ### 0.1 - 85
 
 # Particle Mahalanobis
-AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 1
+AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 0.75
                                          # 2 - 422
                                          # 2.25 - 441*
                                          # 1.75 - 348*
@@ -148,7 +148,7 @@ AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 1
                                          # 1.25 - 293*
                                          # 1 - 283 - 284
                                          # 0.9 - 297
-                                         # 0.75 - 267*
+                                         # 0.75 - 267* -
                                          # 0.5 - 312
                                          # 0.25 - 336*
                                          # 0.2 - 378
