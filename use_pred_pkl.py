@@ -775,7 +775,7 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
     # Plot locations on a map.
     for place in lats:
-        if len(lats[place]) < 120: # Need at least 60 points.
+        if len(lats[place]) < 60: # Need at least 60 points.
             continue
 
         min_lat = max(min(lats[place]) - 1, -90)
@@ -858,10 +858,10 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
         plt.title(place)
 
-        if not os.path.isdir('/srv/glusterfs/vli/maps6/' + mode + '/'):
-            os.mkdir('/srv/glusterfs/vli/maps6/' + mode + '/')
+        if not os.path.isdir('/srv/glusterfs/vli/maps/' + mode + '/'):
+            os.mkdir('/srv/glusterfs/vli/maps/' + mode + '/')
 
-        plt.savefig('/srv/glusterfs/vli/maps6/' + mode + '/' + place + '.png')
+        plt.savefig('/srv/glusterfs/vli/maps/' + mode + '/' + place + '.png')
         plt.close()
 
     map_t1 = time.time()
@@ -1082,7 +1082,7 @@ def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker
     else:
         prefix = ''
 
-    plt.savefig('/srv/glusterfs/vli/maps6/' + prefix + label + '_days_used.png')
+    plt.savefig('/srv/glusterfs/vli/maps/' + prefix + label + '_days_used.png')
     plt.close()
 
 scatter_t0 = time.time()
@@ -1123,7 +1123,7 @@ def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None):
     ax.set_xticks(x)
     ax.set_xticklabels(x_labels)
     plt.title(title)
-    plt.savefig('/srv/glusterfs/vli/maps6/' + filename)
+    plt.savefig('/srv/glusterfs/vli/maps/' + filename)
     plt.close()
 
 # Plot average distance error vs. time interval OVER ALL DAYS.
@@ -2023,13 +2023,13 @@ print('CBM Medians Max Latitude Error: {:.6f}'.format(max(cbm_median_latitude_er
 print('CBM Medians Min Latitude Error: {:.6f}'.format(min(cbm_median_latitude_err)))
 print('CBM Density Max Latitude Error: {:.6f}'.format(max(cbm_density_latitude_err)))
 print('CBM Density Min Latitude Error: {:.6f}'.format(min(cbm_density_latitude_err)))
-print('RANSAC Max Longitude Error: {:.6f}'.format(max(cbm_ransac_latitude_err)))
-print('RANSAC Min Longitude Error: {:.6f}'.format(min(cbm_ransac_latitude_err)))
-print('Particle Max Longitude Error: {:.6f}'.format(max(cbm_particle_latitude_err)))
-print('Particle Min Longitude Error: {:.6f}'.format(min(cbm_particle_latitude_err)))
-print('GMM Max Longitude Error: {:.6f}'.format(max(cbm_gmm_latitude_err)))
-print('GMM Min Longitude Error: {:.6f}'.format(min(cbm_gmm_latitude_err)))
-print('Particle (Mahalanobis) Max Longitude Error: {:.6f}'.format(max(cbm_particle_m_latitude_err)))
-print('Particle (Mahalanobis) Min Longitude Error: {:.6f}'.format(min(cbm_particle_m_latitude_err)))
+print('RANSAC Max Latitude Error: {:.6f}'.format(max(cbm_ransac_latitude_err)))
+print('RANSAC Min Latitude Error: {:.6f}'.format(min(cbm_ransac_latitude_err)))
+print('Particle Max Latitude Error: {:.6f}'.format(max(cbm_particle_latitude_err)))
+print('Particle Min Latitude Error: {:.6f}'.format(min(cbm_particle_latitude_err)))
+print('GMM Max Latitude Error: {:.6f}'.format(max(cbm_gmm_latitude_err)))
+print('GMM Min Latitude Error: {:.6f}'.format(min(cbm_gmm_latitude_err)))
+print('Particle (Mahalanobis) Max Latitude Error: {:.6f}'.format(max(cbm_particle_m_latitude_err)))
+print('Particle (Mahalanobis) Min Latitude Error: {:.6f}'.format(min(cbm_particle_m_latitude_err)))
 print('')
 sys.stdout.flush()
