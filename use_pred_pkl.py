@@ -848,21 +848,21 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
         if mode == 'sun':
             guess_colors = ['g', 'r', mcolors.CSS4_COLORS['crimson'], 'k']
             legend_labels = ['sunrise and sunset in frames', 'sunrise not in frames', 'sunset not in frames', 'sunrise and sunset not in frames',
-                             'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC', 'Particle Filter', 'GMM', 'Particle Filter with Mahalanobis Dist.']
+                             'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC', 'particle filter', 'GMM', 'particle filter (mahalanobis)']
 
             handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in guess_colors] + \
                          [plt.plot([], marker="^", ls="", color=color)[0] for color in actual_and_pred_colors]
         elif mode == 'season':
             guess_colors = ['b', 'y', 'r', mcolors.CSS4_COLORS['tan']]
             legend_labels = ['winter', 'spring', 'summer', 'fall',
-                             'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC', 'Particle Filter', 'GMM', 'Particle Filter with Mahalanobis Dist.']
+                             'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC', 'particle filter', 'GMM', 'particle filter (mahalanobis)']
             handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in guess_colors] + \
                          [plt.plot([], marker="^", ls="", color=color)[0] for color in actual_and_pred_colors]
         elif mode == 'daylength':
             guess_colors = ['r', 'g']
             legend_labels = ['11-13 daylength hours', 'other',
-                             'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC', 'Particle Filter', 'GMM',
-                             'Particle Filter with Mahalanobis Dist.']
+                             'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC', 'particle filter', 'GMM',
+                             'particle filter (mahalanobis)']
             handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in guess_colors] + \
                          [plt.plot([], marker="^", ls="", color=color)[0] for color in actual_and_pred_colors]
 
@@ -882,6 +882,7 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
 plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, 'sun')
 plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, 'season')
+plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, 'daylength')
 sys.stdout.flush()
 
 #finished_places = []
