@@ -815,6 +815,11 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
                     colors.append('r')
                 else:
                     colors.append(mcolors.CSS4_COLORS['tan'])
+            elif mode == 'daylength':
+                if day_lengths[i] / 3600 >= 11 and day_lengths[i] / 3600 <= 13:
+                    colors.append('r')
+                else:
+                    colors.append('g')
 
         plt.figure(figsize=(24,12))
         map = Basemap(projection='cyl', # This projection is equidistant.
@@ -851,6 +856,13 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
             guess_colors = ['b', 'y', 'r', mcolors.CSS4_COLORS['tan']]
             legend_labels = ['winter', 'spring', 'summer', 'fall',
                              'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC', 'Particle Filter', 'GMM', 'Particle Filter with Mahalanobis Dist.']
+            handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in guess_colors] + \
+                         [plt.plot([], marker="^", ls="", color=color)[0] for color in actual_and_pred_colors]
+        elif mode == 'daylength':
+            guess_colors = ['r', 'g']
+            legend_labels = ['11-13 daylength hours', 'other',
+                             'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC', 'Particle Filter', 'GMM',
+                             'Particle Filter with Mahalanobis Dist.']
             handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in guess_colors] + \
                          [plt.plot([], marker="^", ls="", color=color)[0] for color in actual_and_pred_colors]
 
