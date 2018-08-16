@@ -42,8 +42,17 @@ else:
     sys.stdout.flush()
     sys.exit(1)
 
+def days_from_equinox(date):
+    autumn_diff = math.fabs((date - constants.AUTUMNAL_EQUINOX_2017).total_seconds())
+    spring_diff = math.fabs((date - constants.VERNAL_EQUINOX_2018).total_seconds())
+
+    days_away = min(autumn_diff, spring_diff) / 60 / 60 / 24
+
+    return days_away
+
 sunrises = []
 sunsets = []
+equinox_offsets = []
 days = []
 for place in predictions:
     days += predictions[place]
@@ -51,6 +60,8 @@ for place in predictions:
     for d_idx, day in enumerate(predictions[place]):
         sunrises.append(predictions[place][d_idx].sunrise)
         sunsets.append(predictions[place][d_idx].sunset)
+
+        equinox_offsets.append(days_from_equinox(predictions[place][d_idx].sunrise))
 
 # Compute solar noon and day length.
 solar_noons = []
@@ -201,6 +212,12 @@ for i in range(len(days)):
     #days_of_year[days[i].place].append(days_of_year)
     day_lens[days[i].place].append(day_lengths[i])
 
+equinox_offs = {}
+for i in range(len(days)):
+    if equinox_offs.get(days[i].place) is None:
+        equinox_offs[days[i].place] = []
+
+    equinox_offs[days[i].place].append(equinox_offsets[i])
 
 #places = {}
 cbm_lats = {}
@@ -552,14 +569,13 @@ def particle_filter(lats, lngs, mahalanobis=False):
     return particle_locations
 
 # VLI
-#brock_particle_locations = particle_filter(lats, lngs)
-#cbm_particle_locations = particle_filter(cbm_lats, lngs)
-#cbm_particle_mahalanobis_locations = particle_filter(cbm_lats, lngs, True)
+brock_particle_locations = particle_filter(lats, lngs)
+cbm_particle_locations = particle_filter(cbm_lats, lngs)
+cbm_particle_mahalanobis_locations = particle_filter(cbm_lats, lngs, True)
 
-brock_particle_locations = cbm_gmm_locations
-cbm_particle_locations = cbm_gmm_locations
-cbm_particle_mahalanobis_locations = cbm_gmm_locations
-
+#brock_particle_locations = cbm_gmm_locations
+#cbm_particle_locations = cbm_gmm_locations
+#cbm_particle_mahalanobis_locations = cbm_gmm_locations
 
 def ransac(lats, lngs, actual=False):
     ransac_t0 = time.time()
@@ -870,10 +886,10 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
         plt.title(place)
 
-        if not os.path.isdir('/srv/glusterfs/vli/maps2/' + mode + '/'):
-            os.mkdir('/srv/glusterfs/vli/maps2/' + mode + '/')
+        if not os.path.isdir('/srv/glusterfs/vli/maps/' + mode + '/'):
+            os.mkdir('/srv/glusterfs/vli/maps/' + mode + '/')
 
-        plt.savefig('/srv/glusterfs/vli/maps2/' + mode + '/' + place + '.png')
+        plt.savefig('/srv/glusterfs/vli/maps/' + mode + '/' + place + '.png')
         plt.close()
 
     map_t1 = time.time()
@@ -1095,7 +1111,7 @@ def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker
     else:
         prefix = ''
 
-    plt.savefig('/srv/glusterfs/vli/maps2/' + prefix + label + '_days_used.png')
+    plt.savefig('/srv/glusterfs/vli/maps/' + prefix + label + '_days_used.png')
     plt.close()
 
 scatter_t0 = time.time()
@@ -1136,7 +1152,7 @@ def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None):
     ax.set_xticks(x)
     ax.set_xticklabels(x_labels)
     plt.title(title)
-    plt.savefig('/srv/glusterfs/vli/maps2/' + filename)
+    plt.savefig('/srv/glusterfs/vli/maps/' + filename)
     plt.close()
 
 # Plot average distance error vs. time interval OVER ALL DAYS.
@@ -1317,6 +1333,37 @@ for bdIdx, distance_errs in enumerate(cbm_bucket_distances):
 #bar(buckets, bucket_distances, 'Median Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Median Error (km) Over All Days vs. Photo Interval (min)', 'interval.png', bucket_rmses)
 bar(buckets, cbm_bucket_distances, 'Median Distance Error (km)', 'Day Length Hours', bucket_labels, 'Median Error (km) Over All Days vs. Day Length Hours', 'cbm_day_length.png', cbm_bucket_rmses) #
 print('DAY LENGTH OVER ALL DAYS BUCKETS NUM DATA PTS: ' + str(cbm_bucket_num_data_pts)) #
+
+# Plot average latitude error vs. equinox offset over ALL DAYS.
+bucket_size = 5
+buckets = list(range(0, 180, bucket_size)) # 5 day intervals
+bucket_labels = [str(x) + '-' + str(x + bucket_size) for x in buckets]
+bucket_labels[-1] = bucket_labels[-1] + '+'
+bucket_distances = [[] for x in range(len(buckets))]
+cbm_bucket_distances = [[] for x in range(len(buckets))]
+#bucket_rmses = [0 for x in range(len(buckets))]
+cbm_bucket_rmses = [0] * len(buckets)
+#bucket_num_data_pts = [0] * len(buckets)
+cbm_bucket_num_data_pts = [0] * len(buckets)
+
+for i in range(len(days)):
+    for bIdx, bucket in enumerate(buckets):
+        if equinox_offsets[i] < bucket + bucket_size:
+            break
+
+    cbm_distance_err = compute_distance(days[i].lat, days[i].lng, cbm_latitudes[i], days[i].lng) # Use actual longitude twice.
+    cbm_bucket_distances[bIdx].append(cbm_distance_err)
+
+for bdIdx, distance_errs in enumerate(cbm_bucket_distances):
+    if len(distance_errs) > 0:
+        cbm_bucket_distances[bdIdx] = statistics.median(distance_errs)
+        cbm_bucket_rmses[bdIdx] = median_rmse(distance_errs)
+        cbm_bucket_num_data_pts[bdIdx] += len(distance_errs)
+    else:
+        cbm_bucket_distances[bdIdx] = 0
+
+bar(buckets, cbm_bucket_distances, 'Median Latitude Distance Error (km)', 'Days From Equinox', bucket_labels, 'Median Latitude Error (km) Over All Days vs. Days From Equinox', 'cbm_equinox.png', cbm_bucket_rmses)
+print('EQUINOX OVER ALL DAYS BUCKETS NUM DATA PTS: ' + str(cbm_bucket_num_data_pts))
 
 def plot_all_places(bucket_size, buckets, bucket_labels, locations, x_data, x_name, method_name, xlabel, ylabel, title, filename, sub_idx=None):
     bucket_distances = [[] for x in range(len(buckets))]

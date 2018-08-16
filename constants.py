@@ -1,3 +1,5 @@
+import datetime, time
+
 CLUSTER = True
 LEARNING_SUNRISE = False # True for sunrise, False for sunset
 DAYS_PER_MONTH = 'MAX'
@@ -165,6 +167,11 @@ AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 0.75
                                          ### 1 - ?
                                          ### 0.1 - ?
 BIGM = 100
+
+SUMMER_SOLSTICE_2017 = datetime.datetime(2017, 6, 21, 4, 24) # UTC times
+AUTUMNAL_EQUINOX_2017 = datetime.datetime(2017, 9, 22, 20, 2)
+WINTER_SOLSTICE_2017 = datetime.datetime(2017, 12, 21, 16, 28)
+VERNAL_EQUINOX_2018 = datetime.datetime(2018, 3, 20, 16, 15)
 
 # 1 pass
 # Mean - 713 km
