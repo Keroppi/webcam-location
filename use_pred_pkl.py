@@ -375,6 +375,20 @@ def azimuthal_equidistant_inverse(x, y):
 
     return (lat, lng)
 
+
+def equinox_weighting(lats):
+    output = {}
+
+    for place in equinox_offs:
+        curr_lats = np.array(lats[place])
+        curr_weights = np.array(equinox_offs[place])
+        numerator = np.dot(curr_lats, curr_weights)
+        total_weight = np.sum(curr_weights)
+        final_guess = numerator / total_weight
+        output[place] = final_guess
+
+    return output
+
 def gaussian_mixture(lats, lngs):
     gmm_t0 = time.time()
     #cov_avg = np.zeros((2, 2))
