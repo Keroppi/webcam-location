@@ -626,13 +626,13 @@ def particle_filter(lats, lngs, mahalanobis=False):
     return particle_locations
 
 # VLI
-#brock_particle_locations = particle_filter(lats, lngs)
-#cbm_particle_locations = particle_filter(cbm_lats, lngs)
-#cbm_particle_mahalanobis_locations = particle_filter(cbm_lats, lngs, True)
+brock_particle_locations = particle_filter(lats, lngs)
+cbm_particle_locations = particle_filter(cbm_lats, lngs)
+cbm_particle_mahalanobis_locations = particle_filter(cbm_lats, lngs, True)
 
-brock_particle_locations = cbm_gmm_locations
-cbm_particle_locations = cbm_gmm_locations
-cbm_particle_mahalanobis_locations = cbm_gmm_locations
+#brock_particle_locations = cbm_gmm_locations
+#cbm_particle_locations = cbm_gmm_locations
+#cbm_particle_mahalanobis_locations = cbm_gmm_locations
 
 def ransac(lats, lngs, actual=False):
     ransac_t0 = time.time()
@@ -953,9 +953,9 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
     print('Calculating map time (m): ' + str((map_t1 - map_t0) / 60))
 
 
-plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, 'sun')
-plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, 'season')
-plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, 'daylength')
+plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, cbm_equinox_locations, 'sun')
+plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, cbm_equinox_locations, 'season')
+plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, cbm_equinox_locations, 'daylength')
 sys.stdout.flush()
 
 #finished_places = []
