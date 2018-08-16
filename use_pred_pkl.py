@@ -943,10 +943,10 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
         plt.title(place)
 
-        if not os.path.isdir('/srv/glusterfs/vli/maps1/' + mode + '/'):
-            os.mkdir('/srv/glusterfs/vli/maps1/' + mode + '/')
+        if not os.path.isdir('/srv/glusterfs/vli/maps2/' + mode + '/'):
+            os.mkdir('/srv/glusterfs/vli/maps2/' + mode + '/')
 
-        plt.savefig('/srv/glusterfs/vli/maps1/' + mode + '/' + place + '.png')
+        plt.savefig('/srv/glusterfs/vli/maps2/' + mode + '/' + place + '.png')
         plt.close()
 
     map_t1 = time.time()
@@ -1180,7 +1180,7 @@ def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker
     else:
         prefix = ''
 
-    plt.savefig('/srv/glusterfs/vli/maps1/' + prefix + label + '_days_used.png')
+    plt.savefig('/srv/glusterfs/vli/maps2/' + prefix + label + '_days_used.png')
     plt.close()
 
 scatter_t0 = time.time()
@@ -1222,7 +1222,7 @@ def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None):
     ax.set_xticks(x)
     ax.set_xticklabels(x_labels)
     plt.title(title)
-    plt.savefig('/srv/glusterfs/vli/maps1/' + filename)
+    plt.savefig('/srv/glusterfs/vli/maps2/' + filename)
     plt.close()
 
 # Plot average distance error vs. time interval OVER ALL DAYS.

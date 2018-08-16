@@ -71,7 +71,7 @@ INLIER_THRESHOLD = 1000
                    ## 600 - 352*
                    ## 700 -
                    ## 800 - 333*
-                   ## 1000 - 330*
+                   ## 1000 - 330* -
                    ## 1200 - 345*
 
 
@@ -83,7 +83,7 @@ INLIER_THRESHOLD = 1000
                    ### 10 - 113
 
 # PARTICLE
-AZIMUTHAL_INLIER_THRESHOLD = 0.15707963267948966 # 1000 km
+AZIMUTHAL_INLIER_THRESHOLD = 0.12566370614359174 # 800 km - 273*
 
 # 0.23561944901923448 # 1500 km - 296
 # 0.1884955592153876 # 1200 km - 272*
@@ -105,7 +105,7 @@ AZIMUTHAL_INLIER_THRESHOLD = 0.15707963267948966 # 1000 km
                              ## 500 -
                              ## 600 - 338*
                              ## 700 -
-                             ## 800 - 326*
+                             ## 800 - 326* -
                              ## 1000 - 329*
                              ## 1200 - 372*
                              ## 1500 -
@@ -114,7 +114,7 @@ AZIMUTHAL_INLIER_THRESHOLD = 0.15707963267948966 # 1000 km
                              ### 20 - ?
 
 # GMM
-MAHALANOBIS_INLIER_THRESHOLD = 1.75
+MAHALANOBIS_INLIER_THRESHOLD = 1.5
                                # 2.5 - 311
                                # 2.25 - 299*
                                # 2 - 298*
@@ -142,7 +142,7 @@ MAHALANOBIS_INLIER_THRESHOLD = 1.75
                                ### 0.1 - 85
 
 # Particle Mahalanobis
-AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 0.75
+AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 1
                                          # 2 - 422
                                          # 2.25 - 441*
                                          # 1.75 - 348*
@@ -158,7 +158,7 @@ AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 0.75
                                          ## 2.5 - 647*
                                          ## 2 - 528*
                                          ## 1.5 - 413*
-                                         ## 1 - 346*
+                                         ## 1 - 346* -
                                          ## 0.75 -
                                          ## 0.5 - 348*
                                          ## 0.2 -
