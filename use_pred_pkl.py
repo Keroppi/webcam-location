@@ -226,7 +226,7 @@ for i in range(len(days)):
     if phis.get(days[i].place) is None:
         phis[days[i].place] = []
 
-    ts = pd.Series(pd.to_datetime([str(days[i].date)]))
+    ts = pd.Series(pd.to_datetime([str(days[i].sunrise)]))
     day_of_year = int(ts.dt.dayofyear)  # day_of_year from 1 to 365, inclusive
 
     days_of_year[days[i].place].append(day_of_year)
