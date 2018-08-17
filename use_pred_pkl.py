@@ -2027,7 +2027,7 @@ for key in actual_locations:
     particle_m_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1],
                                         cbm_particle_mahalanobis_locations[key][0], cbm_particle_mahalanobis_locations[key][1])
     equinox_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1],
-                                        cbm_equinoxahalanobis_locations[key][0], cbm_equinoxahalanobis_locations[key][1])
+                                        cbm_equinox_locations[key][0], cbm_equinox_locations[key][1])
 
     median_idx = len(buckets) - 1
     density_idx = len(buckets) - 1
