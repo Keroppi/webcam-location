@@ -43,19 +43,23 @@ else:
     sys.exit(1)
 
 def days_from_equinox(date):
-    autumn_diff = math.fabs((date - constants.AUTUMNAL_EQUINOX_2017).total_seconds())
-    spring_diff = math.fabs((date - constants.VERNAL_EQUINOX_2018).total_seconds())
+    spring_2017_diff = math.fabs((date - constants.VERNAL_EQUINOX_2017).total_seconds())
+    autumn_2017_diff = math.fabs((date - constants.AUTUMNAL_EQUINOX_2017).total_seconds())
+    spring_2018_diff = math.fabs((date - constants.VERNAL_EQUINOX_2018).total_seconds())
+    autumn_2018_diff = math.fabs((date - constants.AUTUMNAL_EQUINOX_2018).total_seconds())
 
-    days_away = min(autumn_diff, spring_diff) / 60 / 60 / 24
+    days_away = min([spring_2017_diff, autumn_2017_diff, spring_2018_diff, autumn_2018_diff]) / 60 / 60 / 24
 
     return days_away
 
 
 def days_from_solstice(date):
-    summer_diff = math.fabs((date - constants.SUMMER_SOLSTICE_2017).total_seconds())
-    winter_diff = math.fabs((date - constants.WINTER_SOLSTICE_2017).total_seconds())
+    winter_2016_diff = math.fabs((date - constants.WINTER_SOLSTICE_2016).total_seconds())
+    summer_2017_diff = math.fabs((date - constants.SUMMER_SOLSTICE_2017).total_seconds())
+    winter_2017_diff = math.fabs((date - constants.WINTER_SOLSTICE_2017).total_seconds())
+    summer_2018_diff = math.fabs((date - constants.SUMMER_SOLSTICE_2018).total_seconds())
 
-    days_away = min(summer_diff, winter_diff) / 60 / 60 / 24
+    days_away = min([winter_2016_diff, summer_2017_diff, winter_2017_diff, summer_2018_diff]) / 60 / 60 / 24
 
     return days_away
 
@@ -72,8 +76,8 @@ for place in predictions:
         sunrises.append(predictions[place][d_idx].sunrise)
         sunsets.append(predictions[place][d_idx].sunset)
 
-        equinox_offsets.append(days_from_equinox(predictions[place][d_idx].sunrise))
-        solstice_offsets.append(days_from_solstice(predictions[place][d_idx].sunrise))
+        equinox_offsets.append(days_from_equinox(predictions[place][d_idx].sunrise - datetime.timedelta(seconds=predictions[place][d_idx].time_offset)))
+        solstice_offsets.append(days_from_solstice(predictions[place][d_idx].sunrise - datetime.timedelta(seconds=predictions[place][d_idx].time_offset)))
 
 # Compute solar noon and day length.
 solar_noons = []
@@ -210,19 +214,28 @@ for d_idx, day_length in enumerate(day_lengths):
 
 # Store which day of the year and day length for each place.
 day_lens = {}
-#days_of_year = {}
+days_of_year = {}
+phis = {} # absolute value of solar declination in CBM model
 for i in range(len(days)):
-    #if days_of_year.get(days[i].place) is None:
-    #    days_of_year[days[i].place] = []
+    if days_of_year.get(days[i].place) is None:
+        days_of_year[days[i].place] = []
 
     if day_lens.get(days[i].place) is None:
         day_lens[days[i].place] = []
 
-    #ts = pd.Series(pd.to_datetime([str(days[i].date)]))
-    #day_of_year = int(ts.dt.dayofyear)  # day_of_year from 1 to 365, inclusive
+    if phis.get(days[i].place) is None:
+        phis[days[i].place] = []
 
-    #days_of_year[days[i].place].append(days_of_year)
+    ts = pd.Series(pd.to_datetime([str(days[i].date)]))
+    day_of_year = int(ts.dt.dayofyear)  # day_of_year from 1 to 365, inclusive
+
+    days_of_year[days[i].place].append(day_of_year)
     day_lens[days[i].place].append(day_lengths[i])
+
+    theta = 0.2163108 + 2 * math.atan(0.9671396 * math.tan(0.00860 * (day_of_year - 186)))
+    phi = math.asin(0.39795 * math.cos(theta))
+    phis[days[i].place].append(math.fabs(phi))
+
 
 equinox_offs = {}
 solstice_offs = {}
@@ -394,12 +407,20 @@ def azimuthal_equidistant_inverse(x, y):
     return (lat, lng)
 
 
-def equinox_weighting(lats):
+# 'day' weighting scales based on days from the equinox
+# 'declination' weighting scales based on the solar declination angle (0 to 23.44 degrees)
+# https://en.wikipedia.org/wiki/Position_of_the_Sun#Declination_of_the_Sun_as_seen_from_Earth
+def equinox_weighting(lats, mode='day'):
     output = {}
 
     for place in equinox_offs:
         curr_lats = np.array(lats[place])
-        curr_weights = np.array(equinox_offs[place])
+
+        if mode == 'day':
+            curr_weights = np.array(equinox_offs[place])
+        elif mode == 'declination':
+            curr_weights = np.array(phis[place])
+
         numerator = np.dot(curr_lats, curr_weights)
         total_weight = np.sum(curr_weights)
         final_guess = numerator / total_weight
@@ -407,12 +428,17 @@ def equinox_weighting(lats):
 
     return output
 
-def solstice_weighting(lngs):
+def solstice_weighting(lngs, mode='day'):
     output = {}
 
     for place in solstice_offs:
         curr_lngs = np.array(lngs[place])
-        curr_weights = np.array(solstice_offs[place])
+
+        if mode == 'day':
+            curr_weights = np.array(solstice_offs[place])
+        elif mode == 'declination':
+            curr_weights = np.array(phis[place])
+
         numerator = np.dot(curr_lngs, curr_weights)
         total_weight = np.sum(curr_weights)
         final_guess = numerator / total_weight
@@ -430,7 +456,8 @@ def equinox_solstice_weightings(lats, lngs):
 
     return locations
 
-cbm_equinox_locations = equinox_solstice_weightings(cbm_lats, lngs)
+cbm_equinox_day_locations = equinox_solstice_weightings(cbm_lats, lngs, 'day')
+cbm_equinox_declin_locations = equinox_solstice_weightings(cbm_lats, lngs, 'declination')
 
 def gaussian_mixture(lats, lngs):
     gmm_t0 = time.time()
@@ -626,13 +653,13 @@ def particle_filter(lats, lngs, mahalanobis=False):
     return particle_locations
 
 # VLI
-#brock_particle_locations = particle_filter(lats, lngs)
-#cbm_particle_locations = particle_filter(cbm_lats, lngs)
-#cbm_particle_mahalanobis_locations = particle_filter(cbm_lats, lngs, True)
+brock_particle_locations = particle_filter(lats, lngs)
+cbm_particle_locations = particle_filter(cbm_lats, lngs)
+cbm_particle_mahalanobis_locations = particle_filter(cbm_lats, lngs, True)
 
-brock_particle_locations = cbm_gmm_locations
-cbm_particle_locations = cbm_gmm_locations
-cbm_particle_mahalanobis_locations = cbm_gmm_locations
+#brock_particle_locations = cbm_gmm_locations
+#cbm_particle_locations = cbm_gmm_locations
+#cbm_particle_mahalanobis_locations = cbm_gmm_locations
 
 def ransac(lats, lngs, actual=False):
     ransac_t0 = time.time()
@@ -843,7 +870,7 @@ def kde(lats, lngs, init_guess_locations):
 density_locations = kde(lats, lngs, brock_ransac_locations)
 cbm_density_locations = kde(cbm_lats, lngs, cbm_ransac_locations)
 
-def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ransac_locations, particle_locations, gmm_locations, particle_mahalanobis_locations, equinox_locations, mode='sun'):
+def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ransac_locations, particle_locations, gmm_locations, particle_mahalanobis_locations, equinox_day_locations, equinox_declin_locations, mode='sun'):
     map_t0 = time.time()
 
     # Plot locations on a map.
@@ -909,9 +936,9 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
         #x_median,y_median = map([median_locations[place][1]], [median_locations[place][0]])
         #x_density,y_density = map([density_locations[place][1]], [density_locations[place][0]])
 
-        actual_and_pred_lngs = [actual_lng] + [mean_locations[place][1]] + [median_locations[place][1]] + [density_locations[place][1]] + [ransac_locations[place][1]] + [particle_locations[place][1]] + [gmm_locations[place][1]] + [particle_mahalanobis_locations[place][1]] + [equinox_locations[place][1]]
-        actual_and_pred_lats = [actual_lat] + [mean_locations[place][0]] + [median_locations[place][0]] + [density_locations[place][0]] + [ransac_locations[place][0]] + [particle_locations[place][0]] + [gmm_locations[place][0]] + [particle_mahalanobis_locations[place][0]] + [equinox_locations[place][0]]
-        actual_and_pred_colors = ['w', 'm', 'c', mcolors.CSS4_COLORS['fuchsia'], 'xkcd:chartreuse', 'xkcd:navy', 'xkcd:pink', 'xkcd:azure', 'xkcd:goldenrod']
+        actual_and_pred_lngs = [actual_lng] + [mean_locations[place][1]] + [median_locations[place][1]] + [density_locations[place][1]] + [ransac_locations[place][1]] + [particle_locations[place][1]] + [gmm_locations[place][1]] + [particle_mahalanobis_locations[place][1]] + [equinox_day_locations[place][1]] + [equinox_declin_locations[place][1]]
+        actual_and_pred_lats = [actual_lat] + [mean_locations[place][0]] + [median_locations[place][0]] + [density_locations[place][0]] + [ransac_locations[place][0]] + [particle_locations[place][0]] + [gmm_locations[place][0]] + [particle_mahalanobis_locations[place][0]] + [equinox_day_locations[place][0]] + [equinox_declin_locations[place][0]]
+        actual_and_pred_colors = ['w', 'm', 'c', mcolors.CSS4_COLORS['fuchsia'], 'xkcd:chartreuse', 'xkcd:navy', 'xkcd:pink', 'xkcd:azure', 'xkcd:goldenrod', 'xkcd:gold']
 
         guesses = map.scatter(lngs[place], lats[place], s=20, c=colors, latlon=True, zorder=10)
         actual_and_pred = map.scatter(actual_and_pred_lngs, actual_and_pred_lats, s=25, c=actual_and_pred_colors, latlon=True, zorder=10, marker='^')
@@ -921,21 +948,23 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
         if mode == 'sun':
             guess_colors = ['g', 'r', mcolors.CSS4_COLORS['crimson'], 'k']
             legend_labels = ['sunrise and sunset in frames', 'sunrise not in frames', 'sunset not in frames', 'sunrise and sunset not in frames',
-                             'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC', 'particle filter', 'GMM', 'particle filter (mahalanobis)', 'equinox solstice weighting']
+                             'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC', 'particle filter', 'GMM',
+                             'particle filter (mahalanobis)', 'equinox solstice weighting (day)', 'equinox solstice weighting (declination)']
 
             handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in guess_colors] + \
                          [plt.plot([], marker="^", ls="", color=color)[0] for color in actual_and_pred_colors]
         elif mode == 'season':
             guess_colors = ['b', 'y', 'r', mcolors.CSS4_COLORS['tan']]
             legend_labels = ['winter', 'spring', 'summer', 'fall',
-                             'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC', 'particle filter', 'GMM', 'particle filter (mahalanobis)', 'equinox solstice weighting']
+                             'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC', 'particle filter', 'GMM',
+                             'particle filter (mahalanobis)', 'equinox solstice weighting', 'equinox solstice weighting (declination)']
             handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in guess_colors] + \
                          [plt.plot([], marker="^", ls="", color=color)[0] for color in actual_and_pred_colors]
         elif mode == 'daylength':
             guess_colors = ['r', 'g']
             legend_labels = ['11-13 daylength hours', 'other',
                              'actual location', 'mean', 'median', 'gaussian kde', 'RANSAC', 'particle filter', 'GMM',
-                             'particle filter (mahalanobis)', 'equinox solstice weighting']
+                             'particle filter (mahalanobis)', 'equinox solstice weighting', 'equinox solstice weighting (declination)']
             handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in guess_colors] + \
                          [plt.plot([], marker="^", ls="", color=color)[0] for color in actual_and_pred_colors]
 
@@ -953,9 +982,9 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
     print('Calculating map time (m): ' + str((map_t1 - map_t0) / 60))
 
 
-plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, cbm_equinox_locations, 'sun')
-plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, cbm_equinox_locations, 'season')
-plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, cbm_equinox_locations, 'daylength')
+plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, cbm_equinox_day_locations, cbm_equinox_declin_locations, 'sun')
+plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, cbm_equinox_day_locations, cbm_equinox_declin_locations, 'season')
+plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, cbm_equinox_day_locations, cbm_equinox_declin_locations, 'daylength')
 sys.stdout.flush()
 
 #finished_places = []
@@ -1001,9 +1030,13 @@ cbm_particle_m_distances = []
 cbm_particle_m_longitude_err = []
 cbm_particle_m_latitude_err = []
 
-cbm_equinox_distances = []
-cbm_equinox_longitude_err = []
-cbm_equinox_latitude_err = []
+cbm_equinox_day_distances = []
+cbm_equinox_day_longitude_err = []
+cbm_equinox_day_latitude_err = []
+
+cbm_equinox_declin_distances = []
+cbm_equinox_declin_longitude_err = []
+cbm_equinox_declin_latitude_err = []
 
 #for i in range(len(days)):
 for place in lats:
@@ -1045,8 +1078,10 @@ for place in lats:
     cbm_gmm_pred_lng = cbm_gmm_locations[place][1]
     cbm_particle_m_pred_lat = cbm_particle_mahalanobis_locations[place][0]
     cbm_particle_m_pred_lng = cbm_particle_mahalanobis_locations[place][1]
-    cbm_equinox_pred_lat = cbm_equinox_locations[place][0]
-    cbm_equinox_pred_lng = cbm_equinox_locations[place][1]
+    cbm_equinox_day_pred_lat = cbm_equinox_day_locations[place][0]
+    cbm_equinox_day_pred_lng = cbm_equinox_day_locations[place][1]
+    cbm_equinox_declin_pred_lat = cbm_equinox_declin_locations[place][0]
+    cbm_equinox_declin_pred_lng = cbm_equinox_declin_locations[place][1]
 
     mean_distance = compute_distance(actual_lat, actual_lng, mean_pred_lat, mean_pred_lng)
     mean_distances.append(mean_distance)
@@ -1103,14 +1138,21 @@ for place in lats:
     cbm_particle_m_latitude_err.append(compute_distance(actual_lat, actual_lng, cbm_particle_m_pred_lat, actual_lng))
     cbm_particle_m_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, cbm_particle_m_pred_lng))
 
-    cbm_equinox_distance = compute_distance(actual_lat, actual_lng, cbm_equinox_pred_lat, cbm_equinox_pred_lng)
-    cbm_equinox_distances.append(cbm_equinox_distance)
-    cbm_equinox_latitude_err.append(compute_distance(actual_lat, actual_lng, cbm_equinox_pred_lat, actual_lng))
-    cbm_equinox_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, cbm_equinox_pred_lng))
+    cbm_equinox_day_distance = compute_distance(actual_lat, actual_lng, cbm_equinox_day_pred_lat, cbm_equinox_day_pred_lng)
+    cbm_equinox_day_distances.append(cbm_equinox_day_distance)
+    cbm_equinox_day_latitude_err.append(compute_distance(actual_lat, actual_lng, cbm_equinox_day_pred_lat, actual_lng))
+    cbm_equinox_day_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, cbm_equinox_day_pred_lng))
+
+    cbm_equinox_declin_distance = compute_distance(actual_lat, actual_lng, cbm_equinox_declin_pred_lat, cbm_equinox_declin_pred_lng)
+    cbm_equinox_declin_distances.append(cbm_equinox_declin_distance)
+    cbm_equinox_declin_latitude_err.append(compute_distance(actual_lat, actual_lng, cbm_equinox_declin_pred_lat, actual_lng))
+    cbm_equinox_declin_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, cbm_equinox_declin_pred_lng))
 
     if random.randint(1, 100) < 101:
         if median_distance < 25 or density_distance < 25 or brock_ransac_distance < 25 or \
-           cbm_ransac_distance < 25 or cbm_median_distance < 25 or cbm_density_distance < 25 or cbm_particle_distance < 25 or cbm_gmm_distance < 25 or cbm_particle_m_distance < 25 or cbm_equinox_distance < 25:
+           cbm_ransac_distance < 25 or cbm_median_distance < 25 or cbm_density_distance < 25 or \
+           cbm_particle_distance < 25 or cbm_gmm_distance < 25 or cbm_particle_m_distance < 25 or \
+           cbm_equinox_day_distance < 25 or cbm_equinox_declin_distance < 25:
             print('Under 25km!')
 
         print(place)
@@ -1127,7 +1169,8 @@ for place in lats:
         print('Using particle: ' + str(cbm_particle_distance))
         print('Using GMM: ' + str(cbm_gmm_distance))
         print('Using mahalanobis particle: ' + str(cbm_particle_m_distance))
-        print('Using equinox: ' + str(cbm_equinox_distance))
+        print('Using equinox (day): ' + str(cbm_equinox_day_distance))
+        print('Using equinox (declin): ' + str(cbm_equinox_declin_distance))
         print('Actual lat, lng: ' + str(actual_lat) + ', ' + str(actual_lng))
         print('Brock Distance')
         print('Mean lat, lng: ' + str(mean_pred_lat) + ', ' + str(mean_pred_lng))
@@ -1196,7 +1239,8 @@ scatter(days_used, cbm_ransac_distances, None, 'RANSAC', color='xkcd:chartreuse'
 scatter(days_used, cbm_particle_distances, None, 'particle filter', color='xkcd:navy', linestyle='None', marker='o', cbm=True)
 scatter(days_used, cbm_gmm_distances, None, 'GMM', color='xkcd:pink', linestyle='None', marker='o', cbm=True)
 scatter(days_used, cbm_particle_m_distances, None, 'particle filter with mahalanobis distance', color='xkcd:azure', linestyle='None', marker='o', cbm=True)
-scatter(days_used, cbm_equinox_distances, None, 'equinox solstice weighting', color='xkcd:goldenrod', linestyle='None', marker='o', cbm=True)
+scatter(days_used, cbm_equinox_day_distances, None, 'equinox solstice weighting (day)', color='xkcd:goldenrod', linestyle='None', marker='o', cbm=True)
+scatter(days_used, cbm_equinox_declin_distances, None, 'equinox solstice weighting (declination)', color='xkcd:gold', linestyle='None', marker='o', cbm=True)
 
 scatter_t1 = time.time()
 print('Calculating scatter time (m): ' + str((scatter_t1 - scatter_t0) / 60))
@@ -1405,8 +1449,8 @@ bar(buckets, cbm_bucket_distances, 'Median Distance Error (km)', 'Day Length Hou
 print('DAY LENGTH OVER ALL DAYS BUCKETS NUM DATA PTS: ' + str(cbm_bucket_num_data_pts)) #
 
 # Plot average latitude error vs. equinox offset over ALL DAYS.
-bucket_size = 5
-buckets = list(range(0, 180, bucket_size)) # 5 day intervals
+bucket_size = 7 # day intervals
+buckets = list(range(0, 100, bucket_size))
 bucket_labels = [str(x) + '-' + str(x + bucket_size) for x in buckets]
 bucket_labels[-1] = bucket_labels[-1] + '+'
 bucket_distances = [[] for x in range(len(buckets))]
@@ -1436,8 +1480,8 @@ bar(buckets, cbm_bucket_distances, 'Median Latitude Distance Error (km)', 'Days 
 print('EQUINOX (LAT) OVER ALL DAYS BUCKETS NUM DATA PTS: ' + str(cbm_bucket_num_data_pts))
 
 # Plot average longitude error vs. solstice offset over ALL DAYS.
-bucket_size = 5
-buckets = list(range(0, 180, bucket_size)) # 5 day intervals
+bucket_size = 7 # day intervals
+buckets = list(range(0, 100, bucket_size))
 bucket_labels = [str(x) + '-' + str(x + bucket_size) for x in buckets]
 bucket_labels[-1] = bucket_labels[-1] + '+'
 bucket_distances = [[] for x in range(len(buckets))]
@@ -1522,8 +1566,11 @@ plot_all_places(bucket_size, buckets, bucket_labels,
                 cbm_particle_mahalanobis_locations, intervals, 'INTERVAL', 'PARTICLE (MAHALANOBIS)',
                 'Minutes Between Frames', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Particle Filter with Mahalanobis Distance vs. Photo Interval (min)', 'cbm_interval_particle_m_places.png')
 plot_all_places(bucket_size, buckets, bucket_labels,
-                cbm_equinox_locations, intervals, 'INTERVAL', 'EQUINOX SOLSTICE',
-                'Minutes Between Frames', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Equinox Solstice Weighting vs. Photo Interval (min)', 'cbm_interval_equinox_places.png')
+                cbm_equinox_day_locations, intervals, 'INTERVAL', 'EQUINOX SOLSTICE (DAY)',
+                'Minutes Between Frames', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Equinox Solstice Weighting (Day) vs. Photo Interval (min)', 'cbm_interval_equinox_day_places.png')
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_equinox_declin_locations, intervals, 'INTERVAL', 'EQUINOX SOLSTICE (DECLIN)',
+                'Minutes Between Frames', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Equinox Solstice Weighting (Solar Declination) vs. Photo Interval (min)', 'cbm_interval_equinox_declin_places.png')
 
 '''
 cbm_median_bucket_distances = [[] for x in range(len(buckets))]
@@ -1641,8 +1688,11 @@ plot_all_places(bucket_size, buckets, bucket_labels,
                 cbm_particle_mahalanobis_locations, sun_visibles, 'SUN', 'PARTICLE (MAHALANOBIS)',
                 '% of Days With Both Sunrise and Sunset Visible', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Particle Filter with Mahalanobis Distance vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_particle_m_places.png', 0)
 plot_all_places(bucket_size, buckets, bucket_labels,
-                cbm_equinox_locations, sun_visibles, 'SUN', 'EQUINOX SOLSTICE',
-                '% of Days With Both Sunrise and Sunset Visible', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Equinox Solstice Weighting vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_equinox_places.png', 0)
+                cbm_equinox_day_locations, sun_visibles, 'SUN', 'EQUINOX SOLSTICE (DAY)',
+                '% of Days With Both Sunrise and Sunset Visible', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Equinox Solstice Weighting (Day) vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_equinox_day_places.png', 0)
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_equinox_declin_locations, sun_visibles, 'SUN', 'EQUINOX SOLSTICE (DECLIN)',
+                '% of Days With Both Sunrise and Sunset Visible', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Equinox Solstice Weighting (Solar Declination) vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_equinox_declin_places.png', 0)
 
 '''
 cbm_median_sun_type_distances = [[] for x in range(len(buckets))]
@@ -1743,8 +1793,11 @@ plot_all_places(bucket_size, buckets, bucket_labels,
                 cbm_particle_mahalanobis_locations, cbm_particle_mahalanobis_locations, 'LAT', 'PARTICLE (MAHALANOBIS)',
                 'Latitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Particle Filter with Mahalanobis Distance vs. Latitude', 'cbm_lat_particle_m_places.png', 0)
 plot_all_places(bucket_size, buckets, bucket_labels,
-                cbm_equinox_locations, cbm_equinox_locations, 'LAT', 'EQUINOX SOLSTICE',
-                'Latitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Equinox Solstice Weighting vs. Latitude', 'cbm_lat_equinox_places.png', 0)
+                cbm_equinox_day_locations, cbm_equinox_day_locations, 'LAT', 'EQUINOX SOLSTICE (DAY)',
+                'Latitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Equinox Solstice Weighting (Day) vs. Latitude', 'cbm_lat_equinox_day_places.png', 0)
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_equinox_declin_locations, cbm_equinox_declin_locations, 'LAT', 'EQUINOX SOLSTICE (DECLIN)',
+                'Latitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Equinox Solstice Weighting (Solar Declination) vs. Latitude', 'cbm_lat_equinox_declin_places.png', 0)
 
 
 '''
@@ -1879,8 +1932,11 @@ plot_all_places(bucket_size, buckets, bucket_labels,
                 cbm_particle_mahalanobis_locations, cbm_particle_mahalanobis_locations, 'LNG', 'PARTICLE (MAHALANOBIS)',
                 'Longitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Particle Filter with Mahalanobis Distance vs. Longitude', 'cbm_lng_particle_m_places.png', 1)
 plot_all_places(bucket_size, buckets, bucket_labels,
-                cbm_equinox_locations, cbm_equinox_locations, 'LNG', 'EQUINOX SOLSTICE',
-                'Longitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Equinox Solstice Weighting vs. Longitude', 'cbm_lng_equinox_places.png', 1)
+                cbm_equinox_day_locations, cbm_equinox_day_locations, 'LNG', 'EQUINOX SOLSTICE (DAY)',
+                'Longitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Equinox Solstice Weighting (Day) vs. Longitude', 'cbm_lng_equinox_day_places.png', 1)
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_equinox_declin_locations, cbm_equinox_declin_locations, 'LNG', 'EQUINOX SOLSTICE (DECLIN)',
+                'Longitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Equinox Solstice Weighting (Solar Declination) vs. Longitude', 'cbm_lng_equinox_declin_places.png', 1)
 
 '''
 cbm_median_lng_distances = [[] for x in range(len(buckets))]
@@ -1999,7 +2055,8 @@ ransac_errors = [0] * len(buckets)
 particle_errors = [0] * len(buckets)
 gmm_errors = [0] * len(buckets)
 particle_m_errors = [0] * len(buckets)
-equinox_errors = [0] * len(buckets)
+equinox_day_errors = [0] * len(buckets)
+equinox_declin_errors = [0] * len(buckets)
 
 cbm_median_error_rmses = [0 for x in range(len(buckets))]
 cbm_median_error_num_data_pts = [0] * len(buckets)
@@ -2013,8 +2070,10 @@ gmm_error_rmses = [0 for x in range(len(buckets))]
 gmm_error_num_data_pts = [0] * len(buckets)
 particle_m_error_rmses = [0 for x in range(len(buckets))]
 particle_m_error_num_data_pts = [0] * len(buckets)
-equinox_error_rmses = [0 for x in range(len(buckets))]
-equinox_error_num_data_pts = [0] * len(buckets)
+equinox_day_error_rmses = [0 for x in range(len(buckets))]
+equinox_day_error_num_data_pts = [0] * len(buckets)
+equinox_declin_error_rmses = [0 for x in range(len(buckets))]
+equinox_declin_error_num_data_pts = [0] * len(buckets)
 
 for key in actual_locations:
     cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
@@ -2026,8 +2085,10 @@ for key in actual_locations:
                                         cbm_gmm_locations[key][0], cbm_gmm_locations[key][1])
     particle_m_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1],
                                         cbm_particle_mahalanobis_locations[key][0], cbm_particle_mahalanobis_locations[key][1])
-    equinox_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1],
-                                        cbm_equinox_locations[key][0], cbm_equinox_locations[key][1])
+    equinox_day_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1],
+                                        cbm_equinox_day_locations[key][0], cbm_equinox_day_locations[key][1])
+    equinox_declin_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1],
+                                        cbm_equinox_declin_locations[key][0], cbm_equinox_declin_locations[key][1])
 
     median_idx = len(buckets) - 1
     density_idx = len(buckets) - 1
@@ -2035,7 +2096,8 @@ for key in actual_locations:
     particle_idx = len(buckets) - 1
     gmm_idx = len(buckets) - 1
     particle_m_idx = len(buckets) - 1
-    equinox_idx = len(buckets) - 1
+    equinox_day_idx = len(buckets) - 1
+    equinox_declin_idx = len(buckets) - 1
 
     for bIdx, bucket in enumerate(buckets):
         if cbm_median_distance_err <= bucket + bucket_size:
@@ -2050,8 +2112,10 @@ for key in actual_locations:
             gmm_idx = min(bIdx, gmm_idx)
         if particle_m_distance_err <= bucket + bucket_size:
             particle_m_idx = min(bIdx, particle_m_idx)
-        if equinox_distance_err <= bucket + bucket_size:
-            equinox_idx = min(bIdx, equinox_idx)
+        if equinox_day_distance_err <= bucket + bucket_size:
+            equinox_day_idx = min(bIdx, equinox_day_idx)
+        if equinox_declin_distance_err <= bucket + bucket_size:
+            equinox_declin_idx = min(bIdx, equinox_declin_idx)
 
     cbm_median_errors[median_idx] += 1
     cbm_density_errors[density_idx] += 1
@@ -2059,7 +2123,8 @@ for key in actual_locations:
     particle_errors[particle_idx] += 1
     gmm_errors[gmm_idx] += 1
     particle_m_errors[particle_idx] += 1
-    equinox_errors[particle_idx] += 1
+    equinox_day_errors[particle_idx] += 1
+    equinox_declin_errors[particle_idx] += 1
 
 bar(buckets, cbm_median_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Median', 'cbm_error_median.png')
 bar(buckets, cbm_density_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Gaussian KDE', 'cbm_error_density.png')
@@ -2067,7 +2132,8 @@ bar(buckets, ransac_errors, '# of Places', 'Error ({} km)'.format(bucket_size), 
 bar(buckets, particle_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Particle Filter', 'cbm_error_particle.png')
 bar(buckets, gmm_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using GMM', 'cbm_error_gmm.png')
 bar(buckets, particle_m_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Particle Filter With Mahalanobis Distance', 'cbm_error_particle_m.png')
-bar(buckets, equinox_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Equinox Solstice Weighting', 'cbm_error_equinox.png')
+bar(buckets, equinox_day_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Equinox Solstice Weighting (Day)', 'cbm_error_equinox_day.png')
+bar(buckets, equinox_declin_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Equinox Solstice Weighting (Solar Declination)', 'cbm_error_equinox_declin.png')
 
 green = 0
 sunrise_only = 0
@@ -2122,7 +2188,8 @@ print('RANSAC Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_ransac_dis
 print('Particle Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_particle_distances)))
 print('GMM Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_gmm_distances)))
 print('Particle (Mahalanobis) Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_particle_m_distances)))
-print('Equinox Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_equinox_distances)))
+print('Equinox (Day) Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_equinox_day_distances)))
+print('Equinox (Declin) Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_equinox_declin_distances)))
 print('CBM Means Median Distance Error: {:.6f}'.format(statistics.median(cbm_mean_distances)))
 print('CBM Medians Median Distance Error: {:.6f}'.format(statistics.median(cbm_median_distances)))
 print('CBM Density Median Distance Error: {:.6f}'.format(statistics.median(cbm_density_distances)))
@@ -2130,7 +2197,8 @@ print('RANSAC Median Distance Error: {:.6f}'.format(statistics.median(cbm_ransac
 print('Particle Median Distance Error: {:.6f}'.format(statistics.median(cbm_particle_distances)))
 print('GMM Median Distance Error: {:.6f}'.format(statistics.median(cbm_gmm_distances)))
 print('Particle (Mahalanobis) Median Distance Error: {:.6f}'.format(statistics.median(cbm_particle_m_distances)))
-print('Equinox Median Distance Error: {:.6f}'.format(statistics.median(cbm_equinox_distances)))
+print('Equinox (Day) Median Distance Error: {:.6f}'.format(statistics.median(cbm_equinox_day_distances)))
+print('Equinox (Declin) Median Distance Error: {:.6f}'.format(statistics.median(cbm_equinox_declin_distances)))
 print('CBM Means Max Distance Error: {:.6f}'.format(max(cbm_mean_distances)))
 print('CBM Means Min Distance Error: {:.6f}'.format(min(cbm_mean_distances)))
 print('CBM Medians Max Distance Error: {:.6f}'.format(max(cbm_median_distances)))
@@ -2145,8 +2213,10 @@ print('GMM Max Distance Error: {:.6f}'.format(max(cbm_gmm_distances)))
 print('GMM Min Distance Error: {:.6f}'.format(min(cbm_gmm_distances)))
 print('Particle (Mahalanobis) Max Distance Error: {:.6f}'.format(max(cbm_particle_m_distances)))
 print('Particle (Mahalanobis) Min Distance Error: {:.6f}'.format(min(cbm_particle_m_distances)))
-print('Equinox Max Distance Error: {:.6f}'.format(max(cbm_equinox_distances)))
-print('Equinox Min Distance Error: {:.6f}'.format(min(cbm_equinox_distances)))
+print('Equinox (Day) Max Distance Error: {:.6f}'.format(max(cbm_equinox_day_distances)))
+print('Equinox (Day) Min Distance Error: {:.6f}'.format(min(cbm_equinox_day_distances)))
+print('Equinox (Declin) Max Distance Error: {:.6f}'.format(max(cbm_equinox_declin_distances)))
+print('Equinox (Declin) Min Distance Error: {:.6f}'.format(min(cbm_equinox_declin_distances)))
 print('')
 print('Means Avg. Longitude Error: {:.6f}'.format(statistics.mean(mean_longitude_err)))
 print('Medians Avg. Longitude Error: {:.6f}'.format(statistics.mean(median_longitude_err)))
@@ -2155,7 +2225,8 @@ print('RANSAC Avg. Longitude Error: {:.6f}'.format(statistics.mean(cbm_ransac_lo
 print('Particle Avg. Longitude Error: {:.6f}'.format(statistics.mean(cbm_particle_longitude_err)))
 print('GMM Avg. Longitude Error: {:.6f}'.format(statistics.mean(cbm_gmm_longitude_err)))
 print('Particle (Mahalanobis) Avg. Longitude Error: {:.6f}'.format(statistics.mean(cbm_particle_m_longitude_err)))
-print('Equinox Avg. Longitude Error: {:.6f}'.format(statistics.mean(cbm_equinox_longitude_err)))
+print('Equinox (Day) Avg. Longitude Error: {:.6f}'.format(statistics.mean(cbm_equinox_day_longitude_err)))
+print('Equinox (Declin) Avg. Longitude Error: {:.6f}'.format(statistics.mean(cbm_equinox_declin_longitude_err)))
 print('Means Median Longitude Error: {:.6f}'.format(statistics.median(mean_longitude_err)))
 print('Medians Median Longitude Error: {:.6f}'.format(statistics.median(median_longitude_err)))
 print('Density Median Longitude Error: {:.6f}'.format(statistics.median(density_longitude_err)))
@@ -2163,7 +2234,8 @@ print('RANSAC Median Longitude Error: {:.6f}'.format(statistics.median(cbm_ransa
 print('Particle Median Longitude Error: {:.6f}'.format(statistics.median(cbm_particle_longitude_err)))
 print('GMM Median Longitude Error: {:.6f}'.format(statistics.median(cbm_gmm_longitude_err)))
 print('Particle (Mahalanobis) Median Longitude Error: {:.6f}'.format(statistics.median(cbm_particle_m_longitude_err)))
-print('Equinox Median Longitude Error: {:.6f}'.format(statistics.median(cbm_equinox_longitude_err)))
+print('Equinox (Day) Median Longitude Error: {:.6f}'.format(statistics.median(cbm_equinox_day_longitude_err)))
+print('Equinox (Declin) Median Longitude Error: {:.6f}'.format(statistics.median(cbm_equinox_declin_longitude_err)))
 print('Means Max Longitude Error: {:.6f}'.format(max(mean_longitude_err)))
 print('Means Min Longitude Error: {:.6f}'.format(min(mean_longitude_err)))
 print('Medians Max Longitude Error: {:.6f}'.format(max(median_longitude_err)))
@@ -2178,8 +2250,10 @@ print('GMM Max Longitude Error: {:.6f}'.format(max(cbm_gmm_longitude_err)))
 print('GMM Min Longitude Error: {:.6f}'.format(min(cbm_gmm_longitude_err)))
 print('Particle (Mahalanobis) Max Longitude Error: {:.6f}'.format(max(cbm_particle_m_longitude_err)))
 print('Particle (Mahalanobis) Min Longitude Error: {:.6f}'.format(min(cbm_particle_m_longitude_err)))
-print('Equinox Max Longitude Error: {:.6f}'.format(max(cbm_equinox_longitude_err)))
-print('Equinox Min Longitude Error: {:.6f}'.format(min(cbm_equinox_longitude_err)))
+print('Equinox (Day) Max Longitude Error: {:.6f}'.format(max(cbm_equinox_day_longitude_err)))
+print('Equinox (Day) Min Longitude Error: {:.6f}'.format(min(cbm_equinox_day_longitude_err)))
+print('Equinox (Declin) Max Longitude Error: {:.6f}'.format(max(cbm_equinox_declin_longitude_err)))
+print('Equinox (Declin) Min Longitude Error: {:.6f}'.format(min(cbm_equinox_declin_longitude_err)))
 print('')
 print('Brock Means Avg. Latitude Error: {:.6f}'.format(statistics.mean(mean_latitude_err)))
 print('Brock Medians Avg. Latitude Error: {:.6f}'.format(statistics.mean(median_latitude_err)))
@@ -2201,7 +2275,8 @@ print('RANSAC Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_ransac_lat
 print('Particle Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_particle_latitude_err)))
 print('GMM Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_gmm_latitude_err)))
 print('Particle (Mahalanobis) Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_particle_m_latitude_err)))
-print('Equinox Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_equinox_latitude_err)))
+print('Equinox (Day) Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_equinox_day_latitude_err)))
+print('Equinox (Declin) Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_equinox_declin_latitude_err)))
 print('CBM Means Median Latitude Error: {:.6f}'.format(statistics.median(cbm_mean_latitude_err)))
 print('CBM Medians Median Latitude Error: {:.6f}'.format(statistics.median(cbm_median_latitude_err)))
 print('CBM Density Median Latitude Error: {:.6f}'.format(statistics.median(cbm_density_latitude_err)))
@@ -2209,7 +2284,8 @@ print('RANSAC Median Latitude Error: {:.6f}'.format(statistics.median(cbm_ransac
 print('Particle Median Latitude Error: {:.6f}'.format(statistics.median(cbm_particle_latitude_err)))
 print('GMM Median Latitude Error: {:.6f}'.format(statistics.median(cbm_gmm_latitude_err)))
 print('Particle (Mahalanobis) Median Latitude Error: {:.6f}'.format(statistics.median(cbm_particle_m_latitude_err)))
-print('Equinox Median Latitude Error: {:.6f}'.format(statistics.median(cbm_equinox_latitude_err)))
+print('Equinox (Day) Median Latitude Error: {:.6f}'.format(statistics.median(cbm_equinox_day_latitude_err)))
+print('Equinox (Declin) Median Latitude Error: {:.6f}'.format(statistics.median(cbm_equinox_declin_latitude_err)))
 print('CBM Means Max Latitude Error: {:.6f}'.format(max(cbm_mean_latitude_err)))
 print('CBM Means Min Latitude Error: {:.6f}'.format(min(cbm_mean_latitude_err)))
 print('CBM Medians Max Latitude Error: {:.6f}'.format(max(cbm_median_latitude_err)))
@@ -2224,7 +2300,9 @@ print('GMM Max Latitude Error: {:.6f}'.format(max(cbm_gmm_latitude_err)))
 print('GMM Min Latitude Error: {:.6f}'.format(min(cbm_gmm_latitude_err)))
 print('Particle (Mahalanobis) Max Latitude Error: {:.6f}'.format(max(cbm_particle_m_latitude_err)))
 print('Particle (Mahalanobis) Min Latitude Error: {:.6f}'.format(min(cbm_particle_m_latitude_err)))
-print('Equinox Max Latitude Error: {:.6f}'.format(max(cbm_equinox_latitude_err)))
-print('Equinox Min Latitude Error: {:.6f}'.format(min(cbm_equinox_latitude_err)))
+print('Equinox (Day) Max Latitude Error: {:.6f}'.format(max(cbm_equinox_day_latitude_err)))
+print('Equinox (Day) Min Latitude Error: {:.6f}'.format(min(cbm_equinox_day_latitude_err)))
+print('Equinox (Declin) Max Latitude Error: {:.6f}'.format(max(cbm_equinox_declin_latitude_err)))
+print('Equinox (Declin) Min Latitude Error: {:.6f}'.format(min(cbm_equinox_declin_latitude_err)))
 print('')
 sys.stdout.flush()
