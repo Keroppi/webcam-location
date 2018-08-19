@@ -166,6 +166,16 @@ def cbm(day_of_year, day_length_hours):
 
     return cbm_lat
 
+def inverse_cbm(day_of_year, latitude):
+    theta = 0.2163108 + 2 * math.atan(0.9671396 * math.tan(0.00860 * (day_of_year - 186)))
+    phi = math.asin(0.39795 * math.cos(theta))
+
+    p = 0.26667  # Constant for data from timeanddate.com (sunrise and sunset is when top of sun disk at horizon)
+    p_value = math.sin(p * math.pi / 180)
+    day_length = 24 - 24 / math.pi * math.acos((p_value + math.sin(latitude * math.pi / 180) * math.sin(phi)) / (math.cos(latitude * math.pi / 180) * math.cos(phi)))
+
+    return day_length
+
 # Compute latitude.
 #latitudes_weird = []
 latitudes = []
@@ -428,6 +438,7 @@ def equinox_weighting(lats, mode='day'):
 
     return output
 
+'''
 def solstice_weighting(lngs, mode='day'):
     output = {}
 
@@ -445,14 +456,15 @@ def solstice_weighting(lngs, mode='day'):
         output[place] = final_guess
 
     return output
+'''
 
 def equinox_solstice_weightings(lats, lngs, mode='day'):
     new_lats = equinox_weighting(lats, mode)
-    new_lngs = solstice_weighting(lngs, mode)
+    #new_lngs = solstice_weighting(lngs, mode)
 
     locations = {}
     for place in lats:
-        locations[place] = (new_lats[place], new_lngs[place])
+        locations[place] = (new_lats[place], None)
 
     return locations
 
@@ -870,6 +882,11 @@ def kde(lats, lngs, init_guess_locations):
 density_locations = kde(lats, lngs, brock_ransac_locations)
 cbm_density_locations = kde(cbm_lats, lngs, cbm_ransac_locations)
 
+# Use Gaussian KDE for longitude.
+for place in cbm_equinox_day_locations:
+    cbm_equinox_day_locations[place][1] = cbm_density_locations[place][1]
+    cbm_equinox_declin_locations[place][1] = cbm_density_locations[place][1]
+
 def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ransac_locations, particle_locations, gmm_locations, particle_mahalanobis_locations, equinox_day_locations, equinox_declin_locations, mode='sun'):
     map_t0 = time.time()
 
@@ -972,10 +989,10 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
         plt.title(place)
 
-        if not os.path.isdir('/srv/glusterfs/vli/maps2/' + mode + '/'):
-            os.mkdir('/srv/glusterfs/vli/maps2/' + mode + '/')
+        if not os.path.isdir('/srv/glusterfs/vli/maps/' + mode + '/'):
+            os.mkdir('/srv/glusterfs/vli/maps/' + mode + '/')
 
-        plt.savefig('/srv/glusterfs/vli/maps2/' + mode + '/' + place + '.png')
+        plt.savefig('/srv/glusterfs/vli/maps/' + mode + '/' + place + '.png')
         plt.close()
 
     map_t1 = time.time()
@@ -1223,7 +1240,7 @@ def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker
     else:
         prefix = ''
 
-    plt.savefig('/srv/glusterfs/vli/maps2/' + prefix + label + '_days_used.png')
+    plt.savefig('/srv/glusterfs/vli/maps/' + prefix + label + '_days_used.png')
     plt.close()
 
 scatter_t0 = time.time()
@@ -1266,7 +1283,7 @@ def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None):
     ax.set_xticks(x)
     ax.set_xticklabels(x_labels)
     plt.title(title)
-    plt.savefig('/srv/glusterfs/vli/maps2/' + filename)
+    plt.savefig('/srv/glusterfs/vli/maps/' + filename)
     plt.close()
 
 # Plot average distance error vs. time interval OVER ALL DAYS.

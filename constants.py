@@ -178,6 +178,8 @@ VERNAL_EQUINOX_2018 = datetime.datetime(2018, 3, 20, 16, 15) # end of dataset
 SUMMER_SOLSTICE_2018 = datetime.datetime(2018, 6, 21, 10, 7)
 AUTUMNAL_EQUINOX_2018 = datetime.datetime(2018, 9, 23, 1, 54)
 
+MALI_LATITUDE = 17.5707
+
 # 1 pass
 # Mean - 713 km
 # Median - 302 km
