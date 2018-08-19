@@ -884,8 +884,8 @@ cbm_density_locations = kde(cbm_lats, lngs, cbm_ransac_locations)
 
 # Use Gaussian KDE for longitude.
 for place in cbm_equinox_day_locations:
-    cbm_equinox_day_locations[place][1] = cbm_density_locations[place][1]
-    cbm_equinox_declin_locations[place][1] = cbm_density_locations[place][1]
+    cbm_equinox_day_locations[place] = (cbm_equinox_day_locations[place][0], cbm_density_locations[place][1])
+    cbm_equinox_declin_locations[place] = (cbm_equinox_declin_locations[place][0], cbm_density_locations[place][1])
 
 def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ransac_locations, particle_locations, gmm_locations, particle_mahalanobis_locations, equinox_day_locations, equinox_declin_locations, mode='sun'):
     map_t0 = time.time()
