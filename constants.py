@@ -15,7 +15,7 @@ LOG_INTERVAL = 20
 SPLIT_TOTAL = 100
 SPLIT_TRAIN = 75 # 75% train
 SPLIT_TEST = 100 # 25% test, 0% validation
-BANDWIDTH = 0.05
+BANDWIDTH = 0.2
             # 0.8 - 332
             # 0.7 - 306*
             # 0.6 - 294*
@@ -52,7 +52,7 @@ BANDWIDTH = 0.05
             ### 0.01 - 132
 CENTER = False
 LAMBDA = 1 # REGULARIZER
-INLIER_THRESHOLD = 20
+INLIER_THRESHOLD = 1000
                    # 1500 - 290
                    # 1400 - 271*
                    # 1200 - 272*
