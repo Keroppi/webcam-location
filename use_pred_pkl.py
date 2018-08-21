@@ -73,11 +73,20 @@ for place in predictions:
     days += predictions[place]
 
     for d_idx, day in enumerate(predictions[place]):
+        equinox_days = days_from_equinox(predictions[place][d_idx].sunrise - datetime.timedelta(seconds=predictions[place][d_idx].time_offset))
+        solstice_days = days_from_solstice(predictions[place][d_idx].sunrise - datetime.timedelta(seconds=predictions[place][d_idx].time_offset))
+
+        # VLI
+        if equinox_days < 35:  # 5 weeks
+            continue
+
         sunrises.append(predictions[place][d_idx].sunrise)
         sunsets.append(predictions[place][d_idx].sunset)
 
-        equinox_offsets.append(days_from_equinox(predictions[place][d_idx].sunrise - datetime.timedelta(seconds=predictions[place][d_idx].time_offset)))
-        solstice_offsets.append(days_from_solstice(predictions[place][d_idx].sunrise - datetime.timedelta(seconds=predictions[place][d_idx].time_offset)))
+        equinox_offsets.append(equinox_days)
+        solstice_offsets.append(solstice_days)
+
+
 
 # Compute solar noon and day length.
 solar_noons = []
@@ -273,10 +282,6 @@ for i in range(len(days)):
     places[days[i].place][1] += longitudes[i]
     places[days[i].place][2] += 1
     '''
-
-    # VLI
-    if equinox_offsets[i] < 35: # 5 weeks
-        continue
 
     # Collect lat/lng based on location.
     if lats.get(days[i].place) is None:
