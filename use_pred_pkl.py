@@ -274,8 +274,9 @@ for i in range(len(days)):
     places[days[i].place][2] += 1
     '''
 
-    if equinox_offsets[i] < 35: # 5 weeks
-        continue
+    # VLI
+    #if equinox_offsets[i] < 35: # 5 weeks
+    #    continue
 
     # Collect lat/lng based on location.
     if lats.get(days[i].place) is None:
