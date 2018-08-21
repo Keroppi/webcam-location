@@ -492,7 +492,7 @@ def gaussian_mixture(lats, lngs):
 
     for place in lats:
         if len(lats[place]) == 1:
-            locations[place] = (lats[place][0], lngs[place][1])
+            locations[place] = (lats[place][0], lngs[place][0])
             continue
 
         points = []
