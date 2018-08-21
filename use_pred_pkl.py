@@ -77,7 +77,7 @@ for place in predictions:
         solstice_days = days_from_solstice(predictions[place][d_idx].sunrise - datetime.timedelta(seconds=predictions[place][d_idx].time_offset))
 
         # VLI
-        if equinox_days < 28:  # 4 weeks
+        if equinox_days < 35:  # 5 weeks
             continue
 
         days += [day]
@@ -491,6 +491,10 @@ def gaussian_mixture(lats, lngs):
     locations = {}
 
     for place in lats:
+        if len(lats[place]) == 1:
+            locations[place] = (lats[place][0], lngs[place][1])
+            continue
+
         points = []
         for lat, lng in zip(lats[place], lngs[place]):
             x, y = azimuthal_equidistant(lat, lng)
