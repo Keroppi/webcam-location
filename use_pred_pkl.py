@@ -274,6 +274,9 @@ for i in range(len(days)):
     places[days[i].place][2] += 1
     '''
 
+    if equinox_offsets[i] < 35: # 5 weeks
+        continue
+
     # Collect lat/lng based on location.
     if lats.get(days[i].place) is None:
         lats[days[i].place] = []
@@ -291,6 +294,9 @@ for i in range(len(days)):
     #    lats[days[i].place].append(-latitudes[i])
     #    cbm_lats[days[i].place].append(-cbm_latitudes[i])
     #    lngs[days[i].place].append(longitudes[i])
+
+
+
 
 
 
@@ -665,13 +671,13 @@ def particle_filter(lats, lngs, mahalanobis=False):
     return particle_locations
 
 # VLI
-#brock_particle_locations = particle_filter(lats, lngs)
-#cbm_particle_locations = particle_filter(cbm_lats, lngs)
-#cbm_particle_mahalanobis_locations = particle_filter(cbm_lats, lngs, True)
+brock_particle_locations = particle_filter(lats, lngs)
+cbm_particle_locations = particle_filter(cbm_lats, lngs)
+cbm_particle_mahalanobis_locations = particle_filter(cbm_lats, lngs, True)
 
-brock_particle_locations = cbm_gmm_locations
-cbm_particle_locations = cbm_gmm_locations
-cbm_particle_mahalanobis_locations = cbm_gmm_locations
+#brock_particle_locations = cbm_gmm_locations
+#cbm_particle_locations = cbm_gmm_locations
+#cbm_particle_mahalanobis_locations = cbm_gmm_locations
 
 def ransac(lats, lngs, actual=False):
     ransac_t0 = time.time()
@@ -1115,11 +1121,11 @@ for place in lats:
     cbm_density_distances.append(cbm_density_distance)
 
     mean_latitude_err.append(compute_distance(actual_lat, actual_lng, mean_pred_lat, actual_lng))
-    mean_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, mean_pred_lng))
+    mean_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, cbm_mean_pred_lng))
     median_latitude_err.append(compute_distance(actual_lat, actual_lng, median_pred_lat, actual_lng))
-    median_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, median_pred_lng))
+    median_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, cbm_median_pred_lng))
     density_latitude_err.append(compute_distance(actual_lat, actual_lng, density_pred_lat, actual_lng))
-    density_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, density_pred_lng))
+    density_longitude_err.append(compute_distance(actual_lat, actual_lng, actual_lat, cbm_density_pred_lng))
 
     cbm_mean_latitude_err.append(compute_distance(actual_lat, actual_lng, cbm_mean_pred_lat, actual_lng))
     cbm_median_latitude_err.append(compute_distance(actual_lat, actual_lng, cbm_median_pred_lat, actual_lng))
