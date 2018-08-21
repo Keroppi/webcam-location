@@ -70,7 +70,7 @@ equinox_offsets = []
 solstice_offsets = []
 days = []
 for place in predictions:
-    days += predictions[place]
+    # days += predictions[place]
 
     for d_idx, day in enumerate(predictions[place]):
         equinox_days = days_from_equinox(predictions[place][d_idx].sunrise - datetime.timedelta(seconds=predictions[place][d_idx].time_offset))
@@ -79,6 +79,8 @@ for place in predictions:
         # VLI
         if equinox_days < 35:  # 5 weeks
             continue
+
+        days += [day]
 
         sunrises.append(predictions[place][d_idx].sunrise)
         sunsets.append(predictions[place][d_idx].sunset)
