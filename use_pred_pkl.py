@@ -88,7 +88,7 @@ for place in predictions:
         equinox_offsets.append(equinox_days)
         solstice_offsets.append(solstice_days)
 
-
+print('Number of days: {}'.format(len(days)))
 
 # Compute solar noon and day length.
 solar_noons = []
@@ -910,7 +910,7 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
     # Plot locations on a map.
     for place in lats:
-        if len(lats[place]) < 80: # Need at least 80 points.
+        if len(lats[place]) < 50: # Need at least 50 points.
             continue
 
         min_lat = max(min(lats[place]) - 1, -90)
