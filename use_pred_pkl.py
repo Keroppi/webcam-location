@@ -77,8 +77,8 @@ for place in predictions:
         solstice_days = days_from_solstice(predictions[place][d_idx].sunrise - datetime.timedelta(seconds=predictions[place][d_idx].time_offset))
 
         # VLI
-        if equinox_days < 35:  # 5 weeks
-            continue
+        #if equinox_days < 35:  # 5 weeks
+        #    continue
 
         days += [day]
 
@@ -683,13 +683,13 @@ def particle_filter(lats, lngs, mahalanobis=False):
     return particle_locations
 
 # VLI
-#brock_particle_locations = particle_filter(lats, lngs)
-#cbm_particle_locations = particle_filter(cbm_lats, lngs)
-#cbm_particle_mahalanobis_locations = particle_filter(cbm_lats, lngs, True)
+brock_particle_locations = particle_filter(lats, lngs)
+cbm_particle_locations = particle_filter(cbm_lats, lngs)
+cbm_particle_mahalanobis_locations = particle_filter(cbm_lats, lngs, True)
 
-brock_particle_locations = cbm_gmm_locations
-cbm_particle_locations = cbm_gmm_locations
-cbm_particle_mahalanobis_locations = cbm_gmm_locations
+#brock_particle_locations = cbm_gmm_locations
+#cbm_particle_locations = cbm_gmm_locations
+#cbm_particle_mahalanobis_locations = cbm_gmm_locations
 
 def ransac(lats, lngs, actual=False):
     ransac_t0 = time.time()
