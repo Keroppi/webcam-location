@@ -77,8 +77,8 @@ for place in predictions:
         solstice_days = days_from_solstice(predictions[place][d_idx].sunrise - datetime.timedelta(seconds=predictions[place][d_idx].time_offset))
 
         # VLI
-        #if equinox_days < 35:  # 5 weeks
-        #    continue
+        if equinox_days < 35:  # 5 weeks
+            continue
 
         days += [day]
 
@@ -605,6 +605,13 @@ def particle_filter(lats, lngs, mahalanobis=False):
     particle_locations = {}
 
     for place in lats:
+        if len(lats[place]) == 1:
+            particle_locations[place] = (lats[place][0], lngs[place][0])
+            continue
+        elif len(lats[place]) == 2:
+            particle_locations[place] = (statistics.mean(lats[place]), statistics.mean(lngs[place]))
+            continue
+
         transformed_lats = []
         transformed_lngs = []
 
@@ -1007,10 +1014,10 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
         plt.title(place)
 
-        if not os.path.isdir('/srv/glusterfs/vli/maps2/' + mode + '/'):
-            os.mkdir('/srv/glusterfs/vli/maps2/' + mode + '/')
+        if not os.path.isdir('/srv/glusterfs/vli/maps3/' + mode + '/'):
+            os.mkdir('/srv/glusterfs/vli/maps3/' + mode + '/')
 
-        plt.savefig('/srv/glusterfs/vli/maps2/' + mode + '/' + place + '.png')
+        plt.savefig('/srv/glusterfs/vli/maps3/' + mode + '/' + place + '.png')
         plt.close()
 
     map_t1 = time.time()
@@ -1258,7 +1265,7 @@ def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker
     else:
         prefix = ''
 
-    plt.savefig('/srv/glusterfs/vli/maps2/' + prefix + label + '_days_used.png')
+    plt.savefig('/srv/glusterfs/vli/maps3/' + prefix + label + '_days_used.png')
     plt.close()
 
 scatter_t0 = time.time()
@@ -1301,7 +1308,7 @@ def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None):
     ax.set_xticks(x)
     ax.set_xticklabels(x_labels)
     plt.title(title)
-    plt.savefig('/srv/glusterfs/vli/maps2/' + filename)
+    plt.savefig('/srv/glusterfs/vli/maps3/' + filename)
     plt.close()
 
 # Plot average distance error vs. time interval OVER ALL DAYS.
