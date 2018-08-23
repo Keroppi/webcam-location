@@ -921,11 +921,6 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
         min_lng = max(min(lngs[place]) - 0.1, -180)
         max_lng = min(max(lngs[place]) + 0.1, 180)
 
-        print(place)
-        print(lngs[place])
-        print((min_lng, max_lng))
-        sys.stdout.flush()
-
         colors = []
 
         #actual_lng = float('inf')
