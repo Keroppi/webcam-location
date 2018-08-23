@@ -78,8 +78,8 @@ for place in predictions:
         solstice_days = days_from_solstice(predictions[place][d_idx].sunrise - datetime.timedelta(seconds=predictions[place][d_idx].time_offset))
 
         # VLI
-        #if equinox_days < constants.EQUINOX_DISCARD_DAYS: # ? weeks
-        #    continue
+        if equinox_days < constants.EQUINOX_DISCARD_DAYS: # ? weeks
+            continue
 
         days += [day]
 
@@ -164,8 +164,6 @@ for d_idx, solar_noon in enumerate(solar_noons):
     '''
 
     longitudes.append(lng)
-
-print('Number of longitudes: {}'.format(len(longitudes)))
 
 # CBM Model
 def cbm(day_of_year, day_length_hours):
@@ -918,10 +916,10 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
         if len(lats[place]) < 50: # Need at least 50 points.
             continue
 
-        min_lat = max(min(lats[place]) - 1, -90)
-        max_lat = min(max(lats[place]) + 1, 90)
-        min_lng = max(min(lngs[place]) - 1, -180)
-        max_lng = min(max(lngs[place]) + 1, 180)
+        min_lat = max(min(lats[place]) - 0.1, -90)
+        max_lat = min(max(lats[place]) + 0.1, 90)
+        min_lng = max(min(lngs[place]) - 0.1, -180)
+        max_lng = min(max(lngs[place]) + 0.1, 180)
 
         print(place)
         print(lngs[place])
