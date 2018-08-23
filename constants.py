@@ -181,6 +181,8 @@ AUTUMNAL_EQUINOX_2018 = datetime.datetime(2018, 9, 23, 1, 54)
 
 MALI_LATITUDE = 17.5707
 
+EQUINOX_DISCARD_DAYS = 21
+
 # 1 pass
 # Mean - 713 km
 # Median - 302 km

@@ -27,6 +27,7 @@ print('Particle Inlier: {}'.format(constants.AZIMUTHAL_INLIER_THRESHOLD))
 print('Big-M: {}'.format(constants.BIGM))
 print('GMM Mahalanobis: {}'.format(constants.MAHALANOBIS_INLIER_THRESHOLD))
 print('Particle Mahalanobis: {}'.format(constants.AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD))
+print('Discard Days From Equinox: {}'.format(constants.EQUINOX_DISCARD_DAYS))
 sys.stdout.flush()
 
 parser = argparse.ArgumentParser(description='Predict Location')
@@ -77,7 +78,7 @@ for place in predictions:
         solstice_days = days_from_solstice(predictions[place][d_idx].sunrise - datetime.timedelta(seconds=predictions[place][d_idx].time_offset))
 
         # VLI
-        if equinox_days < 35: # ? weeks
+        if equinox_days < constants.EQUINOX_DISCARD_DAYS: # ? weeks
             continue
 
         days += [day]
