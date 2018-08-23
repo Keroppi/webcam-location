@@ -24,7 +24,7 @@ qsub -l gpu -l h_vmem=40G -q gpu.long.q@biwirender* -R y -j y -t 4 -o /srv/glust
 qsub -l gpu -l h_vmem=40G -q gpu.long.q@biwirender* -R y -j y -t 4 -o /srv/glusterfs/vli/job_logs ~/save_reverse_pkl.sh
 qsub -l gpu -l h_vmem=40G -q gpu.long.q@biwirender* -R y -j y -t 4 -o /srv/glusterfs/vli/job_logs ~/save_interval_pkl.sh
 qsub -l h_vmem=44G -q middle.q@* -R y -j y -t 4 -o /srv/glusterfs/vli/job_logs ~/use_actual_pkl.sh
-qsub -l h_vmem=44G -q long.q@* -R y -j y -t 4 -o /srv/glusterfs/vli/job_logs ~/use_pred_pkl.sh
+qsub -l h_vmem=10G -q long.q@* -R y -j y -t 4 -o /srv/glusterfs/vli/job_logs ~/use_pred_pkl.sh
 qsub -l h_vmem=40G -q middle.q@* -R y -j y -t 4 -o /srv/glusterfs/vli/job_logs ~/template.sh
 
 Note: Try not to use biwirender02 - only 5 GB GPUs
