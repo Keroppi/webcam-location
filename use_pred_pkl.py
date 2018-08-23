@@ -77,7 +77,7 @@ for place in predictions:
         solstice_days = days_from_solstice(predictions[place][d_idx].sunrise - datetime.timedelta(seconds=predictions[place][d_idx].time_offset))
 
         # VLI
-        if equinox_days < 35:  # 5 weeks
+        if equinox_days < 35: # ? weeks
             continue
 
         days += [day]
@@ -163,6 +163,8 @@ for d_idx, solar_noon in enumerate(solar_noons):
     '''
 
     longitudes.append(lng)
+
+print('Number of longitudes: {}'.format(len(longitudes)))
 
 # CBM Model
 def cbm(day_of_year, day_length_hours):
@@ -302,11 +304,6 @@ for i in range(len(days)):
     #    lats[days[i].place].append(-latitudes[i])
     #    cbm_lats[days[i].place].append(-cbm_latitudes[i])
     #    lngs[days[i].place].append(longitudes[i])
-
-    
-
-
-
 
 def compute_haversine_distance(lat1, lng1, lat2, lng2): # km
     radius_of_earth = 6371  # km
@@ -925,6 +922,11 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
         min_lng = max(min(lngs[place]) - 1, -180)
         max_lng = min(max(lngs[place]) + 1, 180)
 
+        print(place)
+        print(lngs[place])
+        print((min_lng, max_lng))
+        sys.stdout.flush()
+
         colors = []
 
         #actual_lng = float('inf')
@@ -1014,10 +1016,10 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
         plt.title(place)
 
-        if not os.path.isdir('/srv/glusterfs/vli/maps1/' + mode + '/'):
-            os.mkdir('/srv/glusterfs/vli/maps1/' + mode + '/')
+        if not os.path.isdir('/srv/glusterfs/vli/maps/' + mode + '/'):
+            os.mkdir('/srv/glusterfs/vli/maps/' + mode + '/')
 
-        plt.savefig('/srv/glusterfs/vli/maps1/' + mode + '/' + place + '.png')
+        plt.savefig('/srv/glusterfs/vli/maps/' + mode + '/' + place + '.png')
         plt.close()
 
     map_t1 = time.time()
@@ -1265,7 +1267,7 @@ def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker
     else:
         prefix = ''
 
-    plt.savefig('/srv/glusterfs/vli/maps1/' + prefix + label + '_days_used.png')
+    plt.savefig('/srv/glusterfs/vli/maps/' + prefix + label + '_days_used.png')
     plt.close()
 
 scatter_t0 = time.time()
@@ -1308,7 +1310,7 @@ def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None):
     ax.set_xticks(x)
     ax.set_xticklabels(x_labels)
     plt.title(title)
-    plt.savefig('/srv/glusterfs/vli/maps1/' + filename)
+    plt.savefig('/srv/glusterfs/vli/maps/' + filename)
     plt.close()
 
 # Plot average distance error vs. time interval OVER ALL DAYS.
