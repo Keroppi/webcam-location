@@ -48,7 +48,7 @@ BANDWIDTH = 0.2
             ### 0.3 - 76
             ### 0.2 - 74
             ### 0.1 - 71
-            ### 0.05 - 68 -
+            ### 0.05 - 68, 31 -
             ### 0.01 - 132
 CENTER = False
 LAMBDA = 1 # REGULARIZER
@@ -77,7 +77,7 @@ INLIER_THRESHOLD = 1000
 
                    ### 80 - 141
                    ### 65 - 135
-                   ### 50 - 128
+                   ### 50 - 128, 128
                    ### 35 - 121
                    ### 20 - 113*
                    ### 10 - 113
@@ -140,7 +140,7 @@ MAHALANOBIS_INLIER_THRESHOLD = 1.75
                                ### 1.5 - 76 -
                                ### 1 - 83
                                ### 0.5 - 114
-                               ### 0.1 - 85
+                               ### 0.1 - 85, 57
 
 # Particle Mahalanobis
 AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 0.75
@@ -192,5 +192,5 @@ EQUINOX_DISCARD_DAYS = 35
 # Median - 450.728295
 
 # Actual
-# Mean - 250
-# Median - 113
+# Mean - 250, 187
+# Median - 113, 103

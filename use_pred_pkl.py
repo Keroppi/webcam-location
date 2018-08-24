@@ -2388,18 +2388,18 @@ print('')
 sys.stdout.flush()
 
 # Compute error for places under 50 km.
-print('Using only places with at least 50 days.')
+print('Using only places with at least 80 days.')
 
 
 
 subset_idx = []
 for p_idx, place in enumerate(lats):
-    if len(lats) < 50:
+    if len(lats) < 80:
         continue
 
     subset_idx.append(p_idx)
 
-print('# places with at least 50 days: {}'.format(len(subset_idx)))
+print('# places with at least 80 days: {}'.format(len(subset_idx)))
 print('')
 
 cbm_mean_distances = [cbm_mean_distances[x] for x in subset_idx]
