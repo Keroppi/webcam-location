@@ -691,13 +691,13 @@ def particle_filter(lats, lngs, mahalanobis=False):
     return particle_locations
 
 # VLI
-#brock_particle_locations = particle_filter(lats, lngs)
-#cbm_particle_locations = particle_filter(cbm_lats, lngs)
-#cbm_particle_mahalanobis_locations = particle_filter(cbm_lats, lngs, True)
+brock_particle_locations = particle_filter(lats, lngs)
+cbm_particle_locations = particle_filter(cbm_lats, lngs)
+cbm_particle_mahalanobis_locations = particle_filter(cbm_lats, lngs, True)
 
-brock_particle_locations = cbm_gmm_locations
-cbm_particle_locations = cbm_gmm_locations
-cbm_particle_mahalanobis_locations = cbm_gmm_locations
+#brock_particle_locations = cbm_gmm_locations
+#cbm_particle_locations = cbm_gmm_locations
+#cbm_particle_mahalanobis_locations = cbm_gmm_locations
 
 def ransac(lats, lngs, actual=False):
     ransac_t0 = time.time()
@@ -2352,7 +2352,8 @@ sys.stdout.flush()
 
 # Compute error for places under 50 km.
 print('Using only places with at least 50 days.')
-print('')
+
+
 
 subset_idx = []
 for p_idx, place in enumerate(lats):
@@ -2360,6 +2361,9 @@ for p_idx, place in enumerate(lats):
         continue
 
     subset_idx.append(p_idx)
+
+print('# places with at least 50 days: {}'.format(len(subset_idx)))
+print('')
 
 cbm_mean_distances = [cbm_mean_distances[x] for x in subset_idx]
 cbm_median_distances = [cbm_median_distances[x] for x in subset_idx]
