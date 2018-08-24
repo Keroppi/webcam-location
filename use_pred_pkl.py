@@ -1583,6 +1583,43 @@ def plot_all_places(bucket_size, buckets, bucket_labels, locations, x_data, x_na
 
     print(x_name + ' OVER ALL LOCATIONS (' + method_name + ') BUCKETS NUM DATA PTS: ' + str(bucket_num_data_pts))
 
+# Plot average distance error vs. days used over ALL PLACES.
+# Only using CBM model for now.
+bucket_size = 10 # days
+buckets = list(range(0, 125, bucket_size))
+bucket_labels = [str(x) + '-' + str(x + bucket_size) for x in buckets]
+bucket_labels[-1] = bucket_labels[-1] + '+'
+
+days_used_dict = {}
+for p_idx, place in enumerate(lats):
+    days_used_dict[place] = days_used[p_idx]
+
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_median_locations, days_used_dict, 'DAYS USED', 'MEDIAN',
+                '# Days Used', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Median vs. # Days Used', 'cbm_days_used_median_places.png')
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_density_locations, days_used_dict, 'DAYS USED', 'DENSITY',
+                '# Days Used', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Gaussian KDE vs. # Days Used', 'cbm_days_used_density_places.png')
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_ransac_locations, days_used_dict, 'DAYS USED', 'RANSAC',
+                '# Days Used', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using RANSAC vs. # Days Used', 'cbm_days_used_ransac_places.png')
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_particle_locations, days_used_dict, 'DAYS USED', 'PARTICLE',
+                '# Days Used', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Particle Filter vs. # Days Used', 'cbm_days_used_particle_places.png')
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_gmm_locations, days_used_dict, 'DAYS USED', 'GMM',
+                '# Days Used', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using GMM vs. # Days Used', 'cbm_days_used_gmm_places.png')
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_particle_mahalanobis_locations, days_used_dict, 'DAYS USED', 'PARTICLE (MAHALANOBIS)',
+                '# Days Used', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Particle Filter with Mahalanobis Distance vs. # Days Used', 'cbm_days_used_particle_m_places.png')
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_equinox_day_locations, days_used_dict, 'DAYS USED', 'EQUINOX SOLSTICE (DAY)',
+                '# Days Used', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Equinox Solstice Weighting (Day) vs. # Days Used', 'cbm_days_used_equinox_day_places.png')
+plot_all_places(bucket_size, buckets, bucket_labels,
+                cbm_equinox_declin_locations, days_used_dict, 'DAYS USED', 'EQUINOX SOLSTICE (DECLIN)',
+                '# Days Used', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Equinox Solstice Weighting (Solar Declination) vs. # Days Used', 'cbm_days_used_equinox_declin_places.png')
+
+
 # Plot average distance error vs. intervals over ALL PLACES.
 # Only using CBM model for now.
 bucket_size = 5 # minute intervals
