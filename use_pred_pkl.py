@@ -918,7 +918,7 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
     # Plot locations on a map.
     for place in lats:
-        if len(lats[place]) < 120: # Need at least 120 points.
+        if len(lats[place]) < 50: # Need at least 120 points.
             continue
 
         min_lat = max(min(lats[place]) - 0.03, -90)
@@ -2388,18 +2388,18 @@ print('')
 sys.stdout.flush()
 
 # Compute error for places under 50 km.
-print('Using only places with at least 80 days.')
+print('Using only places with at least 50 days.')
 
 
 
 subset_idx = []
 for p_idx, place in enumerate(lats):
-    if len(lats) < 80:
+    if len(lats[place]) < 50:
         continue
 
     subset_idx.append(p_idx)
 
-print('# places with at least 80 days: {}'.format(len(subset_idx)))
+print('# places with at least 50 days: {}'.format(len(subset_idx)))
 print('')
 
 cbm_mean_distances = [cbm_mean_distances[x] for x in subset_idx]
