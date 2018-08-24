@@ -71,7 +71,7 @@ equinox_offsets = []
 solstice_offsets = []
 days = []
 for place in predictions:
-    # days += predictions[place]
+    #days += predictions[place]
 
     for d_idx, day in enumerate(predictions[place]):
         equinox_days = days_from_equinox(predictions[place][d_idx].sunrise - datetime.timedelta(seconds=predictions[place][d_idx].time_offset))
@@ -136,6 +136,11 @@ for d_idx, solar_noon in enumerate(solar_noons):
     hours_time_zone_diff = days[d_idx].time_offset / 60 / 60
     hours_utc_diff = utc_diff.total_seconds() / 60 / 60
     lng = (hours_utc_diff + hours_time_zone_diff) * 15
+
+    # Note:
+    # hours_time_zone_diff is lowest 0.5 hours, times 15 which is 7.5 degrees
+    # utc_diff is in minute accuracy (multiples of 60), so hours_utc_diff is at best accuracy of 1/60, times 15 is 1/4 = 0.25 degrees!
+    # 1/8 degrees are because my solar_noon is an average which can get half minutes
 
     # Convert to UTC time first - doesn't make a difference compared to above.
     #utc_solar_noon = solar_noon - datetime.timedelta(seconds=days[d_idx].time_offset)
@@ -916,10 +921,10 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
         if len(lats[place]) < 50: # Need at least 50 points.
             continue
 
-        min_lat = max(min(lats[place]) - 0.1, -90)
-        max_lat = min(max(lats[place]) + 0.1, 90)
-        min_lng = max(min(lngs[place]) - 0.1, -180)
-        max_lng = min(max(lngs[place]) + 0.1, 180)
+        min_lat = max(min(lats[place]) - 0.03, -90)
+        max_lat = min(max(lats[place]) + 0.03, 90)
+        min_lng = max(min(lngs[place]) - 0.03, -180)
+        max_lng = min(max(lngs[place]) + 0.03, 180)
 
         colors = []
 
@@ -2344,3 +2349,155 @@ print('Equinox (Declin) Max Latitude Error: {:.6f}'.format(max(cbm_equinox_decli
 print('Equinox (Declin) Min Latitude Error: {:.6f}'.format(min(cbm_equinox_declin_latitude_err)))
 print('')
 sys.stdout.flush()
+
+# Compute error for places under 50 km.
+print('Using only places with at least 50 days.')
+print('')
+
+subset_idx = []
+for p_idx, place in enumerate(lats):
+    if len(lats) < 50:
+        continue
+
+    subset_idx.append(p_idx)
+
+cbm_mean_distances = [cbm_mean_distances[x] for x in subset_idx]
+cbm_median_distances = [cbm_median_distances[x] for x in subset_idx]
+cbm_density_distances = [cbm_density_distances[x] for x in subset_idx]
+cbm_ransac_distances = [cbm_ransac_distances[x] for x in subset_idx]
+cbm_particle_distances = [cbm_particle_distances[x] for x in subset_idx]
+cbm_gmm_distances = [cbm_gmm_distances[x] for x in subset_idx]
+cbm_particle_m_distances = [cbm_particle_m_distances[x] for x in subset_idx]
+cbm_equinox_day_distances = [cbm_equinox_day_distances[x] for x in subset_idx]
+cbm_equinox_declin_distances = [cbm_equinox_declin_distances[x] for x in subset_idx]
+
+mean_longitude_err = [mean_longitude_err[x] for x in subset_idx]
+median_longitude_err = [median_longitude_err[x] for x in subset_idx]
+density_longitude_err = [density_longitude_err[x] for x in subset_idx]
+cbm_ransac_longitude_err = [cbm_ransac_longitude_err[x] for x in subset_idx]
+cbm_particle_longitude_err = [cbm_particle_longitude_err[x] for x in subset_idx]
+cbm_gmm_longitude_err = [cbm_gmm_longitude_err[x] for x in subset_idx]
+cbm_particle_m_longitude_err = [cbm_particle_m_longitude_err[x] for x in subset_idx]
+cbm_equinox_day_longitude_err = [cbm_equinox_day_longitude_err[x] for x in subset_idx]
+cbm_equinox_declin_longitude_err = [cbm_equinox_declin_longitude_err[x] for x in subset_idx]
+
+cbm_mean_latitude_err = [cbm_mean_latitude_err[x] for x in subset_idx]
+cbm_median_latitude_err = [cbm_median_latitude_err[x] for x in subset_idx]
+cbm_density_latitude_err = [cbm_density_latitude_err[x] for x in subset_idx]
+cbm_ransac_latitude_err = [cbm_ransac_latitude_err[x] for x in subset_idx]
+cbm_particle_latitude_err = [cbm_particle_latitude_err[x] for x in subset_idx]
+cbm_gmm_latitude_err = [cbm_gmm_latitude_err[x] for x in subset_idx]
+cbm_particle_m_latitude_err = [cbm_particle_m_latitude_err[x] for x in subset_idx]
+cbm_equinox_day_latitude_err = [cbm_equinox_day_latitude_err[x] for x in subset_idx]
+cbm_equinox_declin_latitude_err = [cbm_equinox_declin_latitude_err[x] for x in subset_idx]
+
+print('CBM Means Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_mean_distances)))
+print('CBM Medians Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_median_distances)))
+print('CBM Density Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_density_distances)))
+print('RANSAC Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_ransac_distances)))
+print('Particle Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_particle_distances)))
+print('GMM Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_gmm_distances)))
+print('Particle (Mahalanobis) Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_particle_m_distances)))
+print('Equinox (Day) Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_equinox_day_distances)))
+print('Equinox (Declin) Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_equinox_declin_distances)))
+print('CBM Means Median Distance Error: {:.6f}'.format(statistics.median(cbm_mean_distances)))
+print('CBM Medians Median Distance Error: {:.6f}'.format(statistics.median(cbm_median_distances)))
+print('CBM Density Median Distance Error: {:.6f}'.format(statistics.median(cbm_density_distances)))
+print('RANSAC Median Distance Error: {:.6f}'.format(statistics.median(cbm_ransac_distances)))
+print('Particle Median Distance Error: {:.6f}'.format(statistics.median(cbm_particle_distances)))
+print('GMM Median Distance Error: {:.6f}'.format(statistics.median(cbm_gmm_distances)))
+print('Particle (Mahalanobis) Median Distance Error: {:.6f}'.format(statistics.median(cbm_particle_m_distances)))
+print('Equinox (Day) Median Distance Error: {:.6f}'.format(statistics.median(cbm_equinox_day_distances)))
+print('Equinox (Declin) Median Distance Error: {:.6f}'.format(statistics.median(cbm_equinox_declin_distances)))
+print('CBM Means Max Distance Error: {:.6f}'.format(max(cbm_mean_distances)))
+print('CBM Means Min Distance Error: {:.6f}'.format(min(cbm_mean_distances)))
+print('CBM Medians Max Distance Error: {:.6f}'.format(max(cbm_median_distances)))
+print('CBM Medians Min Distance Error: {:.6f}'.format(min(cbm_median_distances)))
+print('CBM Density Max Distance Error: {:.6f}'.format(max(cbm_density_distances)))
+print('CBM Density Min Distance Error: {:.6f}'.format(min(cbm_density_distances)))
+print('RANSAC Max Distance Error: {:.6f}'.format(max(cbm_ransac_distances)))
+print('RANSAC Min Distance Error: {:.6f}'.format(min(cbm_ransac_distances)))
+print('Particle Max Distance Error: {:.6f}'.format(max(cbm_particle_distances)))
+print('Particle Min Distance Error: {:.6f}'.format(min(cbm_particle_distances)))
+print('GMM Max Distance Error: {:.6f}'.format(max(cbm_gmm_distances)))
+print('GMM Min Distance Error: {:.6f}'.format(min(cbm_gmm_distances)))
+print('Particle (Mahalanobis) Max Distance Error: {:.6f}'.format(max(cbm_particle_m_distances)))
+print('Particle (Mahalanobis) Min Distance Error: {:.6f}'.format(min(cbm_particle_m_distances)))
+print('Equinox (Day) Max Distance Error: {:.6f}'.format(max(cbm_equinox_day_distances)))
+print('Equinox (Day) Min Distance Error: {:.6f}'.format(min(cbm_equinox_day_distances)))
+print('Equinox (Declin) Max Distance Error: {:.6f}'.format(max(cbm_equinox_declin_distances)))
+print('Equinox (Declin) Min Distance Error: {:.6f}'.format(min(cbm_equinox_declin_distances)))
+print('')
+print('Means Avg. Longitude Error: {:.6f}'.format(statistics.mean(mean_longitude_err)))
+print('Medians Avg. Longitude Error: {:.6f}'.format(statistics.mean(median_longitude_err)))
+print('Density Avg. Longitude Error: {:.6f}'.format(statistics.mean(density_longitude_err)))
+print('RANSAC Avg. Longitude Error: {:.6f}'.format(statistics.mean(cbm_ransac_longitude_err)))
+print('Particle Avg. Longitude Error: {:.6f}'.format(statistics.mean(cbm_particle_longitude_err)))
+print('GMM Avg. Longitude Error: {:.6f}'.format(statistics.mean(cbm_gmm_longitude_err)))
+print('Particle (Mahalanobis) Avg. Longitude Error: {:.6f}'.format(statistics.mean(cbm_particle_m_longitude_err)))
+print('Equinox (Day) Avg. Longitude Error: {:.6f}'.format(statistics.mean(cbm_equinox_day_longitude_err)))
+print('Equinox (Declin) Avg. Longitude Error: {:.6f}'.format(statistics.mean(cbm_equinox_declin_longitude_err)))
+print('Means Median Longitude Error: {:.6f}'.format(statistics.median(mean_longitude_err)))
+print('Medians Median Longitude Error: {:.6f}'.format(statistics.median(median_longitude_err)))
+print('Density Median Longitude Error: {:.6f}'.format(statistics.median(density_longitude_err)))
+print('RANSAC Median Longitude Error: {:.6f}'.format(statistics.median(cbm_ransac_longitude_err)))
+print('Particle Median Longitude Error: {:.6f}'.format(statistics.median(cbm_particle_longitude_err)))
+print('GMM Median Longitude Error: {:.6f}'.format(statistics.median(cbm_gmm_longitude_err)))
+print('Particle (Mahalanobis) Median Longitude Error: {:.6f}'.format(statistics.median(cbm_particle_m_longitude_err)))
+print('Equinox (Day) Median Longitude Error: {:.6f}'.format(statistics.median(cbm_equinox_day_longitude_err)))
+print('Equinox (Declin) Median Longitude Error: {:.6f}'.format(statistics.median(cbm_equinox_declin_longitude_err)))
+print('Means Max Longitude Error: {:.6f}'.format(max(mean_longitude_err)))
+print('Means Min Longitude Error: {:.6f}'.format(min(mean_longitude_err)))
+print('Medians Max Longitude Error: {:.6f}'.format(max(median_longitude_err)))
+print('Medians Min Longitude Error: {:.6f}'.format(min(median_longitude_err)))
+print('Density Max Longitude Error: {:.6f}'.format(max(density_longitude_err)))
+print('Density Min Longitude Error: {:.6f}'.format(min(density_longitude_err)))
+print('RANSAC Max Longitude Error: {:.6f}'.format(max(cbm_ransac_longitude_err)))
+print('RANSAC Min Longitude Error: {:.6f}'.format(min(cbm_ransac_longitude_err)))
+print('Particle Max Longitude Error: {:.6f}'.format(max(cbm_particle_longitude_err)))
+print('Particle Min Longitude Error: {:.6f}'.format(min(cbm_particle_longitude_err)))
+print('GMM Max Longitude Error: {:.6f}'.format(max(cbm_gmm_longitude_err)))
+print('GMM Min Longitude Error: {:.6f}'.format(min(cbm_gmm_longitude_err)))
+print('Particle (Mahalanobis) Max Longitude Error: {:.6f}'.format(max(cbm_particle_m_longitude_err)))
+print('Particle (Mahalanobis) Min Longitude Error: {:.6f}'.format(min(cbm_particle_m_longitude_err)))
+print('Equinox (Day) Max Longitude Error: {:.6f}'.format(max(cbm_equinox_day_longitude_err)))
+print('Equinox (Day) Min Longitude Error: {:.6f}'.format(min(cbm_equinox_day_longitude_err)))
+print('Equinox (Declin) Max Longitude Error: {:.6f}'.format(max(cbm_equinox_declin_longitude_err)))
+print('Equinox (Declin) Min Longitude Error: {:.6f}'.format(min(cbm_equinox_declin_longitude_err)))
+print('')
+print('CBM Means Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_mean_latitude_err)))
+print('CBM Medians Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_median_latitude_err)))
+print('CBM Density Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_density_latitude_err)))
+print('RANSAC Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_ransac_latitude_err)))
+print('Particle Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_particle_latitude_err)))
+print('GMM Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_gmm_latitude_err)))
+print('Particle (Mahalanobis) Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_particle_m_latitude_err)))
+print('Equinox (Day) Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_equinox_day_latitude_err)))
+print('Equinox (Declin) Avg. Latitude Error: {:.6f}'.format(statistics.mean(cbm_equinox_declin_latitude_err)))
+print('CBM Means Median Latitude Error: {:.6f}'.format(statistics.median(cbm_mean_latitude_err)))
+print('CBM Medians Median Latitude Error: {:.6f}'.format(statistics.median(cbm_median_latitude_err)))
+print('CBM Density Median Latitude Error: {:.6f}'.format(statistics.median(cbm_density_latitude_err)))
+print('RANSAC Median Latitude Error: {:.6f}'.format(statistics.median(cbm_ransac_latitude_err)))
+print('Particle Median Latitude Error: {:.6f}'.format(statistics.median(cbm_particle_latitude_err)))
+print('GMM Median Latitude Error: {:.6f}'.format(statistics.median(cbm_gmm_latitude_err)))
+print('Particle (Mahalanobis) Median Latitude Error: {:.6f}'.format(statistics.median(cbm_particle_m_latitude_err)))
+print('Equinox (Day) Median Latitude Error: {:.6f}'.format(statistics.median(cbm_equinox_day_latitude_err)))
+print('Equinox (Declin) Median Latitude Error: {:.6f}'.format(statistics.median(cbm_equinox_declin_latitude_err)))
+print('CBM Means Max Latitude Error: {:.6f}'.format(max(cbm_mean_latitude_err)))
+print('CBM Means Min Latitude Error: {:.6f}'.format(min(cbm_mean_latitude_err)))
+print('CBM Medians Max Latitude Error: {:.6f}'.format(max(cbm_median_latitude_err)))
+print('CBM Medians Min Latitude Error: {:.6f}'.format(min(cbm_median_latitude_err)))
+print('CBM Density Max Latitude Error: {:.6f}'.format(max(cbm_density_latitude_err)))
+print('CBM Density Min Latitude Error: {:.6f}'.format(min(cbm_density_latitude_err)))
+print('RANSAC Max Latitude Error: {:.6f}'.format(max(cbm_ransac_latitude_err)))
+print('RANSAC Min Latitude Error: {:.6f}'.format(min(cbm_ransac_latitude_err)))
+print('Particle Max Latitude Error: {:.6f}'.format(max(cbm_particle_latitude_err)))
+print('Particle Min Latitude Error: {:.6f}'.format(min(cbm_particle_latitude_err)))
+print('GMM Max Latitude Error: {:.6f}'.format(max(cbm_gmm_latitude_err)))
+print('GMM Min Latitude Error: {:.6f}'.format(min(cbm_gmm_latitude_err)))
+print('Particle (Mahalanobis) Max Latitude Error: {:.6f}'.format(max(cbm_particle_m_latitude_err)))
+print('Particle (Mahalanobis) Min Latitude Error: {:.6f}'.format(min(cbm_particle_m_latitude_err)))
+print('Equinox (Day) Max Latitude Error: {:.6f}'.format(max(cbm_equinox_day_latitude_err)))
+print('Equinox (Day) Min Latitude Error: {:.6f}'.format(min(cbm_equinox_day_latitude_err)))
+print('Equinox (Declin) Max Latitude Error: {:.6f}'.format(max(cbm_equinox_declin_latitude_err)))
+print('Equinox (Declin) Min Latitude Error: {:.6f}'.format(min(cbm_equinox_declin_latitude_err)))
