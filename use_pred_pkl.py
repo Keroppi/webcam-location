@@ -78,8 +78,8 @@ for place in predictions:
         solstice_days = days_from_solstice(predictions[place][d_idx].sunrise - datetime.timedelta(seconds=predictions[place][d_idx].time_offset))
 
         # VLI
-        if equinox_days < constants.EQUINOX_DISCARD_DAYS: # ? weeks
-            continue
+        #if equinox_days < constants.EQUINOX_DISCARD_DAYS: # ? weeks
+        #    continue
 
         days += [day]
 
@@ -963,6 +963,8 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
                     colors.append('r')
                 else:
                     colors.append('g')
+            elif mode == 'none':
+                colors.append('k')
 
         plt.figure(figsize=(24,12))
         map = Basemap(projection='cyl', # This projection is equidistant.
@@ -1010,15 +1012,19 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
                              'particle filter (mahalanobis)', 'equinox solstice weighting', 'equinox solstice weighting (declination)']
             handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in guess_colors] + \
                          [plt.plot([], marker="^", ls="", color=color)[0] for color in actual_and_pred_colors]
+        elif mode == 'none':
+            guess_colors = ['k']
+            legend_labels = []
+            handlelist = []
 
         plt.legend(handlelist, legend_labels)
 
         plt.title(place)
 
-        if not os.path.isdir('/srv/glusterfs/vli/maps3/' + mode + '/'):
-            os.mkdir('/srv/glusterfs/vli/maps3/' + mode + '/')
+        if not os.path.isdir('/srv/glusterfs/vli/maps/' + mode + '/'):
+            os.mkdir('/srv/glusterfs/vli/maps/' + mode + '/')
 
-        plt.savefig('/srv/glusterfs/vli/maps3/' + mode + '/' + place + '.png')
+        plt.savefig('/srv/glusterfs/vli/maps/' + mode + '/' + place + '.png')
         plt.close()
 
     map_t1 = time.time()
@@ -1028,6 +1034,7 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, cbm_equinox_day_locations, cbm_equinox_declin_locations, 'sun')
 plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, cbm_equinox_day_locations, cbm_equinox_declin_locations, 'season')
 plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, cbm_equinox_day_locations, cbm_equinox_declin_locations, 'daylength')
+plot_map(cbm_lats, lngs, cbm_mean_locations, cbm_median_locations, cbm_density_locations, cbm_ransac_locations, cbm_particle_locations, cbm_gmm_locations, cbm_particle_mahalanobis_locations, cbm_equinox_day_locations, cbm_equinox_declin_locations, 'none')
 sys.stdout.flush()
 
 #finished_places = []
@@ -1266,7 +1273,7 @@ def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker
     else:
         prefix = ''
 
-    plt.savefig('/srv/glusterfs/vli/maps3/' + prefix + label + '_days_used.png')
+    plt.savefig('/srv/glusterfs/vli/maps/' + prefix + label + '_days_used.png')
     plt.close()
 
 scatter_t0 = time.time()
@@ -1309,7 +1316,7 @@ def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None):
     ax.set_xticks(x)
     ax.set_xticklabels(x_labels)
     plt.title(title)
-    plt.savefig('/srv/glusterfs/vli/maps3/' + filename)
+    plt.savefig('/srv/glusterfs/vli/maps/' + filename)
     plt.close()
 
 # Plot average distance error vs. time interval OVER ALL DAYS.
