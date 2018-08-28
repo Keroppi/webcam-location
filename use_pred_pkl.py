@@ -1013,9 +1013,9 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
             handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in guess_colors] + \
                          [plt.plot([], marker="^", ls="", color=color)[0] for color in actual_and_pred_colors]
         elif mode == 'none':
-            guess_colors = ['k']
-            legend_labels = []
-            handlelist = []
+            legend_labels = ['one day', 'actual location']
+            handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in ['k']] + \
+                         [plt.plot([], marker="^", ls="", color=color)[0] for color in ['w']]
 
         plt.legend(handlelist, legend_labels)
 
