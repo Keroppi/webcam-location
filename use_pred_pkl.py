@@ -918,7 +918,7 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
     # Plot locations on a map.
     for place in lats:
-        if len(lats[place]) < 50: # Need at least 50 points.
+        if len(lats[place]) < 20: # Need at least 20 points.
             continue
 
         min_lat = max(min(lats[place]) - 0.03, -90)
@@ -986,7 +986,12 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
         actual_and_pred_colors = ['w', 'm', 'c', mcolors.CSS4_COLORS['fuchsia'], 'xkcd:chartreuse', 'xkcd:navy', 'xkcd:pink', 'xkcd:azure', 'xkcd:goldenrod', 'xkcd:gold']
 
         guesses = map.scatter(lngs[place], lats[place], s=20, c=colors, latlon=True, zorder=10)
-        actual_and_pred = map.scatter(actual_and_pred_lngs, actual_and_pred_lats, s=25, c=actual_and_pred_colors, latlon=True, zorder=10, marker='^')
+
+        if not mode == 'none':
+            actual_and_pred = map.scatter(actual_and_pred_lngs, actual_and_pred_lats, s=25, c=actual_and_pred_colors, latlon=True, zorder=10, marker='^')
+        else:
+            actual = map.scatter([actual_lng], [actual_lat], s=25, c=['w'],
+                                 latlon=True, zorder=10, marker='^')
 
         #plt.legend(handles=[guesses, actual, mean_guess, median_guess, density_guess])
 
