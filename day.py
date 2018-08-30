@@ -402,6 +402,7 @@ class Day():
         diff_min = [x.total_seconds() / 60 for x in diff]
         self.interval_min = statistics.mean(diff_min)
 
+        # Outdated - should use astronomical definition of season rather than meteorological.
         if self.lat > 0: # Northern hemisphere
             if self.date.month >= 3 and self.date.month <= 5:
                 self.season = 'spring'

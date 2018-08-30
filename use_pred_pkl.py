@@ -91,6 +91,11 @@ for place in predictions:
 
 print('Number of days: {}'.format(len(days)))
 
+# Calculate season based on equinoxes and solstices.
+# https://www.timeanddate.com/calendar/aboutseasons.html
+
+
+
 # Compute solar noon and day length.
 solar_noons = []
 day_lengths = []
@@ -238,6 +243,10 @@ for d_idx, day_length in enumerate(day_lengths):
 
     sys.stdout.flush()
 
+# Keep track of how many days are before or after halfway point of year depending on latitude.
+# CBM Model overestimates daylength if in northern hemisphere AND in 2nd half of year (> 182.5)
+#                                OR if in southern hemisphere AND in 1st half of year (< 182.5)
+daylength_overestimated = 0
 
 # Store which day of the year and day length for each place.
 day_lens = {}
@@ -263,6 +272,11 @@ for i in range(len(days)):
     phi = math.asin(0.39795 * math.cos(theta))
     phis[days[i].place].append(math.fabs(phi))
 
+    if days[i].lat < 0:
+        if
+            daylength_overestimated += 1
+
+    sys.stdout.flush()
 
 equinox_offs = {}
 solstice_offs = {}
@@ -990,7 +1004,7 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
         if not mode == 'none':
             actual_and_pred = map.scatter(actual_and_pred_lngs, actual_and_pred_lats, s=25, c=actual_and_pred_colors, latlon=True, zorder=10, marker='^')
         else:
-            actual = map.scatter([actual_lng], [actual_lat], s=25, c=['w'],
+            actual = map.scatter([actual_lng, actual_lng, actual_lng], [actual_lat, actual_lat, actual_lat], s=25, c=['w'],
                                  latlon=True, zorder=10, marker='^')
 
         #plt.legend(handles=[guesses, actual, mean_guess, median_guess, density_guess])
