@@ -246,7 +246,6 @@ for d_idx, day_length in enumerate(day_lengths):
 # Keep track of how many days are before or after halfway point of year depending on latitude.
 # CBM Model overestimates daylength if in northern hemisphere AND in 2nd half of year (> 182.5)
 #                                OR if in southern hemisphere AND in 1st half of year (< 182.5)
-daylength_overestimated = 0
 
 # Store which day of the year and day length for each place.
 day_lens = {}
@@ -271,10 +270,6 @@ for i in range(len(days)):
     theta = 0.2163108 + 2 * math.atan(0.9671396 * math.tan(0.00860 * (day_of_year - 186)))
     phi = math.asin(0.39795 * math.cos(theta))
     phis[days[i].place].append(math.fabs(phi))
-
-    if days[i].lat < 0:
-        if
-            daylength_overestimated += 1
 
     sys.stdout.flush()
 
