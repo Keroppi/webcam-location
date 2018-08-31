@@ -183,6 +183,10 @@ def cbm(day_of_year, day_length_hours):
     p = 0.26667 # Constant for data from timeanddate.com (sunrise and sunset is when top of sun disk at horizon)
                 # https://www.timeanddate.com/sun/help
                 # https://www.ikhebeenvraag.be/mediastorage/FSDocument/171/Forsythe+-+A+model+comparison+for+daylength+as+a+function+of+latitude+and+day+of+year+-+1995.pdf
+    p = 0.8333 # Sunrise/Sunset is when the top of the
+               # sun is apparently even with horizon
+               # (US government definition)
+               # INCLUDING REFRACTION
     p_value = math.sin(p * math.pi / 180)
     cbm_lat = 180 / math.pi * math.atan(math.cos(phi) / math.sin(phi) * (math.cos(-math.pi / 24 * (day_length_hours - 24)) - p_value))
 
@@ -193,6 +197,10 @@ def inverse_cbm(day_of_year, latitude):
     phi = math.asin(0.39795 * math.cos(theta))
 
     p = 0.26667  # Constant for data from timeanddate.com (sunrise and sunset is when top of sun disk at horizon)
+    p = 0.8333  # Sunrise/Sunset is when the top of the
+    # sun is apparently even with horizon
+    # (US government definition)
+    # INCLUDING REFRACTION
     p_value = math.sin(p * math.pi / 180)
     day_length = 24 - 24 / math.pi * math.acos((p_value + math.sin(latitude * math.pi / 180) * math.sin(phi)) / (math.cos(latitude * math.pi / 180) * math.cos(phi)))
 
@@ -1035,10 +1043,10 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
         plt.title(place)
 
-        if not os.path.isdir('/srv/glusterfs/vli/maps1/' + mode + '/'):
-            os.mkdir('/srv/glusterfs/vli/maps1/' + mode + '/')
+        if not os.path.isdir('/srv/glusterfs/vli/maps/' + mode + '/'):
+            os.mkdir('/srv/glusterfs/vli/maps/' + mode + '/')
 
-        plt.savefig('/srv/glusterfs/vli/maps1/' + mode + '/' + place + '.png')
+        plt.savefig('/srv/glusterfs/vli/maps/' + mode + '/' + place + '.png')
         plt.close()
 
     map_t1 = time.time()
@@ -1287,7 +1295,7 @@ def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker
     else:
         prefix = ''
 
-    plt.savefig('/srv/glusterfs/vli/maps1/' + prefix + label + '_days_used.png')
+    plt.savefig('/srv/glusterfs/vli/maps/' + prefix + label + '_days_used.png')
     plt.close()
 
 scatter_t0 = time.time()
@@ -1330,7 +1338,7 @@ def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None):
     ax.set_xticks(x)
     ax.set_xticklabels(x_labels)
     plt.title(title)
-    plt.savefig('/srv/glusterfs/vli/maps1/' + filename)
+    plt.savefig('/srv/glusterfs/vli/maps/' + filename)
     plt.close()
 
 # Plot average distance error vs. time interval OVER ALL DAYS.
