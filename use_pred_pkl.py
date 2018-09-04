@@ -935,7 +935,7 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
     # Plot locations on a map.
     for place in lats:
-        if len(lats[place]) < 20: # Need at least 20 points.
+        if len(lats[place]) < 120: # Need at least 120 points.
             continue
 
         min_lat = max(min(lats[place]) - 0.03, -90)
@@ -1008,7 +1008,7 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
             actual_and_pred = map.scatter(actual_and_pred_lngs, actual_and_pred_lats, s=25, c=actual_and_pred_colors, latlon=True, zorder=10, marker='^')
         else:
             actual = map.scatter([actual_lng, actual_lng, actual_lng], [actual_lat, actual_lat, actual_lat], s=25, c=['w'],
-                                 latlon=True, zorder=10, marker='^')
+                                 latlon=True, zorder=10, marker='^') # For some reason need to have at least 3 points...
 
         #plt.legend(handles=[guesses, actual, mean_guess, median_guess, density_guess])
 
@@ -1043,10 +1043,10 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
         plt.title(place)
 
-        if not os.path.isdir('/srv/glusterfs/vli/maps6/' + mode + '/'):
-            os.mkdir('/srv/glusterfs/vli/maps6/' + mode + '/')
+        if not os.path.isdir('/srv/glusterfs/vli/maps/' + mode + '/'):
+            os.mkdir('/srv/glusterfs/vli/maps/' + mode + '/')
 
-        plt.savefig('/srv/glusterfs/vli/maps6/' + mode + '/' + place + '.png')
+        plt.savefig('/srv/glusterfs/vli/maps/' + mode + '/' + place + '.png')
         plt.close()
 
     map_t1 = time.time()
@@ -1295,7 +1295,7 @@ def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker
     else:
         prefix = ''
 
-    plt.savefig('/srv/glusterfs/vli/maps6/' + prefix + label + '_days_used.png')
+    plt.savefig('/srv/glusterfs/vli/maps/' + prefix + label + '_days_used.png')
     plt.close()
 
 scatter_t0 = time.time()
@@ -1338,7 +1338,7 @@ def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None):
     ax.set_xticks(x)
     ax.set_xticklabels(x_labels)
     plt.title(title)
-    plt.savefig('/srv/glusterfs/vli/maps6/' + filename)
+    plt.savefig('/srv/glusterfs/vli/maps/' + filename)
     plt.close()
 
 # Plot average distance error vs. time interval OVER ALL DAYS.
