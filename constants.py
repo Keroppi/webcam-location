@@ -50,12 +50,12 @@ BANDWIDTH = 0.1
             ### 0.5 - 84, 52
             ### 0.3 - 76, 45
             ### 0.2 - 74, 38
-            ### 0.1 - 71, 34
+            ### 0.1 - 71, 34 /
             ### 0.05 - 68, 31 -
             ### 0.01 - 132, 132
 CENTER = False
 LAMBDA = 1 # REGULARIZER
-INLIER_THRESHOLD = 400
+INLIER_THRESHOLD = 20
                    # 1500 -
                    # 1400 - 271, 170
                    # 1200 - 272, 171
@@ -82,7 +82,7 @@ INLIER_THRESHOLD = 400
                    ### 65 - 135, 135
                    ### 50 - 128, 128
                    ### 35 - 121, 119
-                   ### 20 - 113, 110
+                   ### 20 - 113, 110 /
                    ### 10 - 113, 107 -
 
 # PARTICLE
@@ -118,7 +118,7 @@ AZIMUTHAL_INLIER_THRESHOLD = 0.06283185307179587 # 400 km
                              ### 20 - ?
 
 # GMM
-MAHALANOBIS_INLIER_THRESHOLD = 1.75
+MAHALANOBIS_INLIER_THRESHOLD = 2
                                # 2.5 -
                                # 2.25 - 299, 178
                                # 2 - 298, 174*
@@ -140,7 +140,7 @@ MAHALANOBIS_INLIER_THRESHOLD = 1.75
                                ## 0.5 - 407, 279
                                ## 0.2 -
 
-                               ### 2 - 76, 42
+                               ### 2 - 76, 42 /
                                ### 1.5 - 76, 41 -
                                ### 1 - 83, 49
                                ### 0.5 - 114, 109
