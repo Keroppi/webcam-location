@@ -15,7 +15,7 @@ LOG_INTERVAL = 20
 SPLIT_TOTAL = 100
 SPLIT_TRAIN = 75 # 75% train
 SPLIT_TEST = 100 # 25% test, 0% validation
-BANDWIDTH = 0.6
+BANDWIDTH = 0.05
             # 1pass
             # 0.8 -
             # 0.7 - 306, 184*
@@ -44,7 +44,7 @@ BANDWIDTH = 0.6
             ## 0.17 -
             ## 0.125 -
             ## 0.1 -
-            ## 0.05 -
+            ## 0.05 - ?, ?
 
             # actual
             ### 0.5 - 84, 52
@@ -55,7 +55,7 @@ BANDWIDTH = 0.6
             ### 0.01 - 132, 132
 CENTER = False
 LAMBDA = 1 # REGULARIZER
-INLIER_THRESHOLD = 1200
+INLIER_THRESHOLD = 600
                    # 1500 -
                    # 1400 - 271, 170
                    # 1200 - 272, 171
@@ -71,7 +71,7 @@ INLIER_THRESHOLD = 1200
 
                    ## 400 - 401, 336*
                    ## 500 -
-                   ## 600 - 352, 220*
+                   ## 600 - 352, 220
                    ## 700 -
                    ## 800 - 333, 192 -
                    ## 1000 - 330, 202
@@ -86,7 +86,7 @@ INLIER_THRESHOLD = 1200
                    ### 10 - 113, 107 -
 
 # PARTICLE
-AZIMUTHAL_INLIER_THRESHOLD = 0.1884955592153876 # 1200 km
+AZIMUTHAL_INLIER_THRESHOLD = 0.09407324668249435 # 600 km
 
 # 0.23561944901923448 # 1500 km -
 # 0.2195624199 # 1400 km -
@@ -107,7 +107,7 @@ AZIMUTHAL_INLIER_THRESHOLD = 0.1884955592153876 # 1200 km
                              ## 300 -
                              ## 400 - 399, 323*
                              ## 500 -
-                             ## 600 - 338, 204*
+                             ## 600 - 338, 204
                              ## 700 -
                              ## 800 - 326, 175 -
                              ## 1000 - 329, 183
@@ -118,7 +118,7 @@ AZIMUTHAL_INLIER_THRESHOLD = 0.1884955592153876 # 1200 km
                              ### 20 - ?
 
 # GMM
-MAHALANOBIS_INLIER_THRESHOLD = 1
+MAHALANOBIS_INLIER_THRESHOLD = 0.5
                                # 2.5 -
                                # 2.25 - 299, 178
                                # 2 - 298, 174*
@@ -137,7 +137,7 @@ MAHALANOBIS_INLIER_THRESHOLD = 1
                                ## 1 - 404, 255
                                ## 0.75 -
                                ## 1.25 -
-                               ## 0.5 - 407, 279*
+                               ## 0.5 - 407, 279
                                ## 0.2 -
 
                                ### 2 - 76, 42
@@ -147,7 +147,7 @@ MAHALANOBIS_INLIER_THRESHOLD = 1
                                ### 0.1 - 85, 57
 
 # Particle Mahalanobis
-AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 1.5
+AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 2
                                          # 2.25 - 441, 199
                                          # 2 -
                                          # 1.75 - 348, 190
@@ -161,7 +161,7 @@ AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 1.5
                                          # 0.2 -
 
                                          ## 2.5 - 647, 325*
-                                         ## 2 - 528, 264*
+                                         ## 2 - 528, 264
                                          ## 1.5 - 413, 223
                                          ## 1.25 -
                                          ## 1 - 346, 194
