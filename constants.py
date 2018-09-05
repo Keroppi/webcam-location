@@ -55,7 +55,7 @@ BANDWIDTH = 0.01
             ### 0.01 - 132, 132 / 32, 18 -
 CENTER = False
 LAMBDA = 1 # REGULARIZER
-INLIER_THRESHOLD = 40
+INLIER_THRESHOLD = 35
                    # 1500 -
                    # 1400 - 271, 170 / 250, 167
                    # 1200 - 272, 171 / 250, 166
@@ -118,7 +118,7 @@ AZIMUTHAL_INLIER_THRESHOLD = 0.06283185307179587 # 400 km
                              ### 20 - ?
 
 # GMM
-MAHALANOBIS_INLIER_THRESHOLD = 1.75
+MAHALANOBIS_INLIER_THRESHOLD = 1.5
                                # 2.5 -
                                # 2.25 - 299, 178 / 269, 153 -
                                # 2 - 298, 174*
