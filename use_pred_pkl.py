@@ -78,8 +78,8 @@ for place in predictions:
         solstice_days = days_from_solstice(predictions[place][d_idx].sunrise - datetime.timedelta(seconds=predictions[place][d_idx].time_offset))
 
         # VLI
-        if equinox_days < constants.EQUINOX_DISCARD_DAYS: # ? weeks
-            continue
+        #if equinox_days < constants.EQUINOX_DISCARD_DAYS: # ? weeks
+        #    continue
 
         days += [day]
 
