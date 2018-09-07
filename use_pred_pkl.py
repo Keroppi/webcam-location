@@ -99,6 +99,7 @@ print('Number of days: {}'.format(len(days)))
 # Compute solar noon and day length.
 solar_noons = []
 day_lengths = []
+actual_day_lengths = []
 for d_idx, (sunrise, sunset) in enumerate(zip(sunrises, sunsets)):
     # Threshold sunrise to be at earliest midnight.
     if sunrise.date() < days[d_idx].sunrise.date():
@@ -129,6 +130,7 @@ for d_idx, (sunrise, sunset) in enumerate(zip(sunrises, sunsets)):
 
     solar_noons.append(solar_noon)
     day_lengths.append((sunset - sunrise).total_seconds())
+    actual_day_lengths.append((days[d_idx].sunset - days[d_idx].sunrise).total_seconds())
 
     if day_lengths[-1] < 0:
         print('WARNING - Negative day length!')
@@ -256,15 +258,15 @@ for d_idx, day_length in enumerate(day_lengths):
 #                                OR if in southern hemisphere AND in 1st half of year (< 182.5)
 
 # Store which day of the year and day length for each place.
-day_lens = {}
+actual_day_lens = {}
 days_of_year = {}
 phis = {} # absolute value of solar declination in CBM model
 for i in range(len(days)):
     if days_of_year.get(days[i].place) is None:
         days_of_year[days[i].place] = []
 
-    if day_lens.get(days[i].place) is None:
-        day_lens[days[i].place] = []
+    if actual_day_lens.get(days[i].place) is None:
+        actual_day_lens[days[i].place] = []
 
     if phis.get(days[i].place) is None:
         phis[days[i].place] = []
@@ -273,7 +275,7 @@ for i in range(len(days)):
     day_of_year = int(ts.dt.dayofyear)  # day_of_year from 1 to 365, inclusive
 
     days_of_year[days[i].place].append(day_of_year)
-    day_lens[days[i].place].append(day_lengths[i])
+    actual_day_lens[days[i].place].append(actual_day_lengths[i])
 
     theta = 0.2163108 + 2 * math.atan(0.9671396 * math.tan(0.00860 * (day_of_year - 186)))
     phi = math.asin(0.39795 * math.cos(theta))
@@ -976,7 +978,7 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
                 else:
                     colors.append(mcolors.CSS4_COLORS['tan'])
             elif mode == 'daylength':
-                if day_lengths[i] / 3600 >= 11 and day_lengths[i] / 3600 <= 13:
+                if actual_day_lengths[i] / 3600 >= 11 and actual_day_lengths[i] / 3600 <= 13:
                     colors.append('r')
                 else:
                     colors.append('g')
@@ -1322,7 +1324,7 @@ def median_rmse(data):
     mse = mean_squared_error(data, [median] * len(data))
     return math.sqrt(mse)
 
-def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None):
+def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None, ymax=None):
     plt.figure(figsize=(24, 12))
 
     if yerr is not None:
@@ -1337,6 +1339,10 @@ def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None):
     ax = plt.gca()
     ax.set_xticks(x)
     ax.set_xticklabels(x_labels)
+
+    if ymax is not None:
+        ax.set_ylim([0, ymax])
+
     plt.title(title)
     plt.savefig('/srv/glusterfs/vli/maps5/' + filename)
     plt.close()
@@ -1380,7 +1386,7 @@ for bdIdx, distance_errs in enumerate(cbm_bucket_distances):
         cbm_bucket_distances[bdIdx] = 0
 
 #bar(buckets, bucket_distances, 'Median Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Median Error (km) Over All Days vs. Photo Interval (min)', 'interval.png', bucket_rmses)
-bar(buckets, cbm_bucket_distances, 'Median Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Median Error (km) Over All Days vs. Photo Interval (min)', 'cbm_interval.png', cbm_bucket_rmses) #
+bar(buckets, cbm_bucket_distances, 'Median Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Median Error (km) Over All Days vs. Photo Interval (min)', 'cbm_interval.png', cbm_bucket_rmses, 6100)
 print('INTERVAL OVER ALL DAYS BUCKETS NUM DATA PTS: ' + str(cbm_bucket_num_data_pts)) #
 
 # Plot average distance error vs. sunrise, sunset available over ALL DAYS.
@@ -1431,7 +1437,7 @@ for sIdx, distance_errs in enumerate(cbm_sun_type_distances):
         cbm_sun_type_distances[sIdx] = 0
 
 #bar(sun_type_labels, sun_type_distances, 'Median Distance Error (km)', 'Sunrise and sunset in frame?', sun_type_labels, 'Median Error (km) Over All Days vs. Sunrise / Sunset In Frame', 'sun_in_frame.png', sun_type_stdevs)
-bar(sun_type_labels, cbm_sun_type_distances, 'Avg. Distance Error (km)', 'Sunrise and sunset in frame?', sun_type_labels, 'Avg. Error (km) Over All Days vs. Sunrise / Sunset In Frame', 'cbm_sun_in_frame.png', cbm_sun_type_stdevs)
+bar(sun_type_labels, cbm_sun_type_distances, 'Avg. Distance Error (km)', 'Sunrise and sunset in frame?', sun_type_labels, 'Avg. Error (km) Over All Days vs. Sunrise / Sunset In Frame', 'cbm_sun_in_frame.png', cbm_sun_type_stdevs, 5000)
 print('SUN OVER ALL DAYS BUCKETS NUM DATA PTS: ' + str(cbm_sun_type_num_data_pts)) #
 
 # Plot average distance error vs. season over ALL DAYS.
@@ -1491,7 +1497,7 @@ cbm_bucket_num_data_pts = [0] * len(buckets)
 
 for i in range(len(days)):
     for bIdx, bucket in enumerate(buckets):
-        if day_lengths[i] / 3600 < bucket + 1:
+        if actual_day_lengths[i] / 3600 < bucket + 1:
             break
 
     #distance_err = compute_distance(days[i].lat, days[i].lng, latitudes[i], longitudes[i])
@@ -1517,7 +1523,7 @@ for bdIdx, distance_errs in enumerate(cbm_bucket_distances):
         cbm_bucket_distances[bdIdx] = 0
 
 #bar(buckets, bucket_distances, 'Median Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Median Error (km) Over All Days vs. Photo Interval (min)', 'interval.png', bucket_rmses)
-bar(buckets, cbm_bucket_distances, 'Median Distance Error (km)', 'Day Length Hours', bucket_labels, 'Median Error (km) Over All Days vs. Day Length Hours', 'cbm_day_length.png', cbm_bucket_rmses) #
+bar(buckets, cbm_bucket_distances, 'Median Distance Error (km)', 'Day Length Hours', bucket_labels, 'Median Error (km) Over All Days vs. Day Length Hours', 'cbm_day_length.png', cbm_bucket_rmses, 26000)
 print('DAY LENGTH OVER ALL DAYS BUCKETS NUM DATA PTS: ' + str(cbm_bucket_num_data_pts)) #
 
 # Plot average latitude error vs. equinox offset over ALL DAYS.
@@ -1582,7 +1588,7 @@ for bdIdx, distance_errs in enumerate(cbm_bucket_distances):
 bar(buckets, cbm_bucket_distances, 'Median Longitude Distance Error (km)', 'Days From Solstice', bucket_labels, 'Median Longitude Error (km) Over All Days vs. Days From Solstice', 'cbm_solstice_lng.png', cbm_bucket_rmses)
 print('SOLSTICE (LNG) OVER ALL DAYS BUCKETS NUM DATA PTS: ' + str(cbm_bucket_num_data_pts))
 
-def plot_all_places(bucket_size, buckets, bucket_labels, locations, x_data, x_name, method_name, xlabel, ylabel, title, filename, sub_idx=None):
+def plot_all_places(bucket_size, buckets, bucket_labels, locations, x_data, x_name, method_name, xlabel, ylabel, title, filename, sub_idx=None, ymax=None):
     bucket_distances = [[] for x in range(len(buckets))]
     bucket_rmses = [0] * len(buckets) # for x in range(len(buckets))]
     bucket_num_data_pts = [0] * len(buckets)
@@ -1608,14 +1614,14 @@ def plot_all_places(bucket_size, buckets, bucket_labels, locations, x_data, x_na
         else:
             bucket_distances[bdIdx] = 0
 
-    bar(buckets, bucket_distances, ylabel, xlabel, bucket_labels, title, filename, bucket_rmses)
+    bar(buckets, bucket_distances, ylabel, xlabel, bucket_labels, title, filename, bucket_rmses, ymax)
 
     print(x_name + ' OVER ALL LOCATIONS (' + method_name + ') BUCKETS NUM DATA PTS: ' + str(bucket_num_data_pts))
 
 # Plot average distance error vs. days used over ALL PLACES.
 # Only using CBM model for now.
-bucket_size = 10 # days
-buckets = list(range(0, 125, bucket_size))
+bucket_size = 20 # days
+buckets = list(range(0, 130, bucket_size))
 bucket_labels = [str(x) + '-' + str(x + bucket_size) for x in buckets]
 bucket_labels[-1] = bucket_labels[-1] + '+'
 
@@ -1651,8 +1657,8 @@ plot_all_places(bucket_size, buckets, bucket_labels,
 
 # Plot average distance error vs. intervals over ALL PLACES.
 # Only using CBM model for now.
-bucket_size = 5 # minute intervals
-buckets = list(range(0, 30, bucket_size))
+bucket_size = 11 # minute intervals
+buckets = list(range(0, 34, bucket_size))
 bucket_labels = [str(x) + '-' + str(x + bucket_size) for x in buckets]
 bucket_labels[-1] = bucket_labels[-1] + '+'
 
@@ -2154,7 +2160,7 @@ print('LNG OVER ALL LOCATIONS (GMM) BUCKETS NUM DATA PTS: ' + str(gmm_lng_num_da
 
 # Num locations vs. error using all methods.
 bucket_size = 100 # 100 km buckets
-buckets = list(range(0, 2000, bucket_size))
+buckets = list(range(0, 1200, bucket_size))
 bucket_labels = [str(x // bucket_size) + '-' + str((x + bucket_size) // bucket_size) for x in buckets]
 bucket_labels[-1] = bucket_labels[-1] + '+'
 
@@ -2231,18 +2237,121 @@ for key in actual_locations:
     ransac_errors[ransac_idx] += 1
     particle_errors[particle_idx] += 1
     gmm_errors[gmm_idx] += 1
-    particle_m_errors[particle_idx] += 1
-    equinox_day_errors[particle_idx] += 1
-    equinox_declin_errors[particle_idx] += 1
+    particle_m_errors[particle_m_idx] += 1
+    equinox_day_errors[equinox_day_idx] += 1
+    equinox_declin_errors[equinox_declin_idx] += 1
 
-bar(buckets, cbm_median_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Median', 'cbm_error_median.png')
-bar(buckets, cbm_density_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Gaussian KDE', 'cbm_error_density.png')
-bar(buckets, ransac_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using RANSAC', 'cbm_error_ransac.png')
-bar(buckets, particle_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Particle Filter', 'cbm_error_particle.png')
-bar(buckets, gmm_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using GMM', 'cbm_error_gmm.png')
-bar(buckets, particle_m_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Particle Filter With Mahalanobis Distance', 'cbm_error_particle_m.png')
-bar(buckets, equinox_day_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Equinox Solstice Weighting (Day)', 'cbm_error_equinox_day.png')
-bar(buckets, equinox_declin_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Equinox Solstice Weighting (Solar Declination)', 'cbm_error_equinox_declin.png')
+bar(buckets, cbm_median_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Median', 'cbm_error_median.png', 120)
+bar(buckets, cbm_density_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Gaussian KDE', 'cbm_error_density.png', 120)
+bar(buckets, ransac_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using RANSAC', 'cbm_error_ransac.png', 120)
+bar(buckets, particle_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Particle Filter', 'cbm_error_particle.png', 120)
+bar(buckets, gmm_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using GMM', 'cbm_error_gmm.png', 120)
+bar(buckets, particle_m_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Particle Filter With Mahalanobis Distance', 'cbm_error_particle_m.png', 120)
+bar(buckets, equinox_day_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Equinox Solstice Weighting (Day)', 'cbm_error_equinox_day.png', 120)
+bar(buckets, equinox_declin_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Equinox Solstice Weighting (Solar Declination)', 'cbm_error_equinox_declin.png', 120)
+
+
+# Num locations vs. error LESS THAN 200 KM using all methods.
+bucket_size = 10 # 10 km buckets
+buckets = list(range(0, 200, bucket_size))
+bucket_labels = [str(x // bucket_size) + '-' + str((x + bucket_size) // bucket_size) for x in buckets]
+#bucket_labels[-1] = bucket_labels[-1] + '+'
+
+cbm_median_errors = [0] * len(buckets) #[[] for x in range(len(buckets))]
+cbm_density_errors = [0] * len(buckets)
+ransac_errors = [0] * len(buckets)
+particle_errors = [0] * len(buckets)
+gmm_errors = [0] * len(buckets)
+particle_m_errors = [0] * len(buckets)
+equinox_day_errors = [0] * len(buckets)
+equinox_declin_errors = [0] * len(buckets)
+
+cbm_median_error_rmses = [0 for x in range(len(buckets))]
+cbm_median_error_num_data_pts = [0] * len(buckets)
+cbm_density_error_rmses = [0 for x in range(len(buckets))]
+cbm_density_error_num_data_pts = [0] * len(buckets)
+ransac_error_rmses = [0 for x in range(len(buckets))]
+ransac_error_num_data_pts = [0] * len(buckets)
+particle_error_rmses = [0 for x in range(len(buckets))]
+particle_error_num_data_pts = [0] * len(buckets)
+gmm_error_rmses = [0 for x in range(len(buckets))]
+gmm_error_num_data_pts = [0] * len(buckets)
+particle_m_error_rmses = [0 for x in range(len(buckets))]
+particle_m_error_num_data_pts = [0] * len(buckets)
+equinox_day_error_rmses = [0 for x in range(len(buckets))]
+equinox_day_error_num_data_pts = [0] * len(buckets)
+equinox_declin_error_rmses = [0 for x in range(len(buckets))]
+equinox_declin_error_num_data_pts = [0] * len(buckets)
+
+for key in actual_locations:
+    cbm_median_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_median_locations[key][0], cbm_median_locations[key][1])
+    cbm_density_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_density_locations[key][0], cbm_density_locations[key][1])
+    ransac_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1], cbm_ransac_locations[key][0], cbm_ransac_locations[key][1])
+    particle_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1],
+                                           cbm_particle_locations[key][0], cbm_particle_locations[key][1])
+    gmm_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1],
+                                        cbm_gmm_locations[key][0], cbm_gmm_locations[key][1])
+    particle_m_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1],
+                                        cbm_particle_mahalanobis_locations[key][0], cbm_particle_mahalanobis_locations[key][1])
+    equinox_day_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1],
+                                        cbm_equinox_day_locations[key][0], cbm_equinox_day_locations[key][1])
+    equinox_declin_distance_err = compute_distance(actual_locations[key][0], actual_locations[key][1],
+                                        cbm_equinox_declin_locations[key][0], cbm_equinox_declin_locations[key][1])
+
+    median_idx = len(buckets)
+    density_idx = len(buckets)
+    ransac_idx = len(buckets)
+    particle_idx = len(buckets)
+    gmm_idx = len(buckets)
+    particle_m_idx = len(buckets)
+    equinox_day_idx = len(buckets)
+    equinox_declin_idx = len(buckets)
+
+    for bIdx, bucket in enumerate(buckets):
+        if cbm_median_distance_err <= bucket + bucket_size:
+            median_idx = min(bIdx, median_idx)
+        if cbm_density_distance_err <= bucket + bucket_size:
+            density_idx = min(bIdx, density_idx)
+        if ransac_distance_err <= bucket + bucket_size:
+            ransac_idx = min(bIdx, ransac_idx)
+        if particle_distance_err <= bucket + bucket_size:
+            particle_idx = min(bIdx, particle_idx)
+        if gmm_distance_err <= bucket + bucket_size:
+            gmm_idx = min(bIdx, gmm_idx)
+        if particle_m_distance_err <= bucket + bucket_size:
+            particle_m_idx = min(bIdx, particle_m_idx)
+        if equinox_day_distance_err <= bucket + bucket_size:
+            equinox_day_idx = min(bIdx, equinox_day_idx)
+        if equinox_declin_distance_err <= bucket + bucket_size:
+            equinox_declin_idx = min(bIdx, equinox_declin_idx)
+
+    if median_idx < len(buckets):
+        cbm_median_errors[median_idx] += 1
+    if density_idx < len(buckets):
+        cbm_density_errors[density_idx] += 1
+    if ransac_idx < len(buckets):
+        ransac_errors[ransac_idx] += 1
+    if particle_idx < len(buckets):
+        particle_errors[particle_idx] += 1
+    if gmm_idx < len(buckets):
+        gmm_errors[gmm_idx] += 1
+    if particle_m_idx < len(buckets):
+        particle_m_errors[particle_m_idx] += 1
+    if equinox_day_idx < len(buckets):
+        equinox_day_errors[equinox_day_idx] += 1
+    if equinox_declin_idx < len(buckets):
+        equinox_declin_errors[equinox_declin_idx] += 1
+
+under_200_highest_bucket = max([max(cbm_median_errors), max(cbm_density_errors), max(ransac_errors), max(particle_errors), max(gmm_errors), max(particle_m_errors), max(equinox_day_errors), max(equinox_declin_errors)]) + 5
+
+bar(buckets, cbm_median_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Median', 'cbm_200_error_median.png', under_200_highest_bucket)
+bar(buckets, cbm_density_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Gaussian KDE', 'cbm_200_error_density.png', under_200_highest_bucket)
+bar(buckets, ransac_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using RANSAC', 'cbm_200_error_ransac.png', under_200_highest_bucket)
+bar(buckets, particle_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Particle Filter', 'cbm_200_error_particle.png', under_200_highest_bucket)
+bar(buckets, gmm_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using GMM', 'cbm_200_error_gmm.png', under_200_highest_bucket)
+bar(buckets, particle_m_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Particle Filter With Mahalanobis Distance', 'cbm_200_error_particle_m.png', under_200_highest_bucket)
+bar(buckets, equinox_day_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Equinox Solstice Weighting (Day)', 'cbm_200_error_equinox_day.png', under_200_highest_bucket)
+bar(buckets, equinox_declin_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Equinox Solstice Weighting (Solar Declination)', 'cbm_200_error_equinox_declin.png', under_200_highest_bucket)
 
 green = 0
 sunrise_only = 0
@@ -2461,6 +2570,189 @@ cbm_particle_m_latitude_err = [cbm_particle_m_latitude_err[x] for x in subset_id
 cbm_equinox_day_latitude_err = [cbm_equinox_day_latitude_err[x] for x in subset_idx]
 cbm_equinox_declin_latitude_err = [cbm_equinox_declin_latitude_err[x] for x in subset_idx]
 
+# Num locations vs. error using all methods.
+bucket_size = 100 # 100 km buckets
+buckets = list(range(0, 1200, bucket_size))
+bucket_labels = [str(x // bucket_size) + '-' + str((x + bucket_size) // bucket_size) for x in buckets]
+bucket_labels[-1] = bucket_labels[-1] + '+'
+
+cbm_median_errors = [0] * len(buckets) #[[] for x in range(len(buckets))]
+cbm_density_errors = [0] * len(buckets)
+ransac_errors = [0] * len(buckets)
+particle_errors = [0] * len(buckets)
+gmm_errors = [0] * len(buckets)
+particle_m_errors = [0] * len(buckets)
+equinox_day_errors = [0] * len(buckets)
+equinox_declin_errors = [0] * len(buckets)
+
+cbm_median_error_rmses = [0 for x in range(len(buckets))]
+cbm_median_error_num_data_pts = [0] * len(buckets)
+cbm_density_error_rmses = [0 for x in range(len(buckets))]
+cbm_density_error_num_data_pts = [0] * len(buckets)
+ransac_error_rmses = [0 for x in range(len(buckets))]
+ransac_error_num_data_pts = [0] * len(buckets)
+particle_error_rmses = [0 for x in range(len(buckets))]
+particle_error_num_data_pts = [0] * len(buckets)
+gmm_error_rmses = [0 for x in range(len(buckets))]
+gmm_error_num_data_pts = [0] * len(buckets)
+particle_m_error_rmses = [0 for x in range(len(buckets))]
+particle_m_error_num_data_pts = [0] * len(buckets)
+equinox_day_error_rmses = [0 for x in range(len(buckets))]
+equinox_day_error_num_data_pts = [0] * len(buckets)
+equinox_declin_error_rmses = [0 for x in range(len(buckets))]
+equinox_declin_error_num_data_pts = [0] * len(buckets)
+
+for p_idx, _ in enumerate(cbm_mean_distances):
+    cbm_median_distance_err = cbm_median_distances[p_idx]
+    cbm_density_distance_err = cbm_density_distances[p_idx]
+    ransac_distance_err = cbm_density_distances[p_idx]
+    particle_distance_err = cbm_particle_distances[p_idx]
+    gmm_distance_err = cbm_gmm_distances[p_idx]
+    particle_m_distance_err = cbm_particle_m_distances[p_idx]
+    equinox_day_distance_err = cbm_equinox_day_distances[p_idx]
+    equinox_declin_distance_err = cbm_equinox_declin_distances[p_idx]
+
+    median_idx = len(buckets) - 1
+    density_idx = len(buckets) - 1
+    ransac_idx = len(buckets) - 1
+    particle_idx = len(buckets) - 1
+    gmm_idx = len(buckets) - 1
+    particle_m_idx = len(buckets) - 1
+    equinox_day_idx = len(buckets) - 1
+    equinox_declin_idx = len(buckets) - 1
+
+    for bIdx, bucket in enumerate(buckets):
+        if cbm_median_distance_err <= bucket + bucket_size:
+            median_idx = min(bIdx, median_idx)
+        if cbm_density_distance_err <= bucket + bucket_size:
+            density_idx = min(bIdx, density_idx)
+        if ransac_distance_err <= bucket + bucket_size:
+            ransac_idx = min(bIdx, ransac_idx)
+        if particle_distance_err <= bucket + bucket_size:
+            particle_idx = min(bIdx, particle_idx)
+        if gmm_distance_err <= bucket + bucket_size:
+            gmm_idx = min(bIdx, gmm_idx)
+        if particle_m_distance_err <= bucket + bucket_size:
+            particle_m_idx = min(bIdx, particle_m_idx)
+        if equinox_day_distance_err <= bucket + bucket_size:
+            equinox_day_idx = min(bIdx, equinox_day_idx)
+        if equinox_declin_distance_err <= bucket + bucket_size:
+            equinox_declin_idx = min(bIdx, equinox_declin_idx)
+
+    cbm_median_errors[median_idx] += 1
+    cbm_density_errors[density_idx] += 1
+    ransac_errors[ransac_idx] += 1
+    particle_errors[particle_idx] += 1
+    gmm_errors[gmm_idx] += 1
+    particle_m_errors[particle_m_idx] += 1
+    equinox_day_errors[equinox_day_idx] += 1
+    equinox_declin_errors[equinox_declin_idx] += 1
+
+bar(buckets, cbm_median_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Median', '50_cbm_error_median.png', 120)
+bar(buckets, cbm_density_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Gaussian KDE', '50_cbm_error_density.png', 120)
+bar(buckets, ransac_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using RANSAC', '50_cbm_error_ransac.png', 120)
+bar(buckets, particle_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Particle Filter', '50_cbm_error_particle.png', 120)
+bar(buckets, gmm_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using GMM', '50_cbm_error_gmm.png', 120)
+bar(buckets, particle_m_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Particle Filter With Mahalanobis Distance', '50_cbm_error_particle_m.png', 120)
+bar(buckets, equinox_day_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Equinox Solstice Weighting (Day)', '50_cbm_error_equinox_day.png', 120)
+bar(buckets, equinox_declin_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Equinox Solstice Weighting (Solar Declination)', '50_cbm_error_equinox_declin.png', 120)
+
+
+# Num locations vs. error LESS THAN 200 KM using all methods.
+bucket_size = 10 # 10 km buckets
+buckets = list(range(0, 200, bucket_size))
+bucket_labels = [str(x // bucket_size) + '-' + str((x + bucket_size) // bucket_size) for x in buckets]
+#bucket_labels[-1] = bucket_labels[-1] + '+'
+
+cbm_median_errors = [0] * len(buckets) #[[] for x in range(len(buckets))]
+cbm_density_errors = [0] * len(buckets)
+ransac_errors = [0] * len(buckets)
+particle_errors = [0] * len(buckets)
+gmm_errors = [0] * len(buckets)
+particle_m_errors = [0] * len(buckets)
+equinox_day_errors = [0] * len(buckets)
+equinox_declin_errors = [0] * len(buckets)
+
+cbm_median_error_rmses = [0 for x in range(len(buckets))]
+cbm_median_error_num_data_pts = [0] * len(buckets)
+cbm_density_error_rmses = [0 for x in range(len(buckets))]
+cbm_density_error_num_data_pts = [0] * len(buckets)
+ransac_error_rmses = [0 for x in range(len(buckets))]
+ransac_error_num_data_pts = [0] * len(buckets)
+particle_error_rmses = [0 for x in range(len(buckets))]
+particle_error_num_data_pts = [0] * len(buckets)
+gmm_error_rmses = [0 for x in range(len(buckets))]
+gmm_error_num_data_pts = [0] * len(buckets)
+particle_m_error_rmses = [0 for x in range(len(buckets))]
+particle_m_error_num_data_pts = [0] * len(buckets)
+equinox_day_error_rmses = [0 for x in range(len(buckets))]
+equinox_day_error_num_data_pts = [0] * len(buckets)
+equinox_declin_error_rmses = [0 for x in range(len(buckets))]
+equinox_declin_error_num_data_pts = [0] * len(buckets)
+
+for key in actual_locations:
+    cbm_median_distance_err = cbm_median_distances[p_idx]
+    cbm_density_distance_err = cbm_density_distances[p_idx]
+    ransac_distance_err = cbm_density_distances[p_idx]
+    particle_distance_err = cbm_particle_distances[p_idx]
+    gmm_distance_err = cbm_gmm_distances[p_idx]
+    particle_m_distance_err = cbm_particle_m_distances[p_idx]
+    equinox_day_distance_err = cbm_equinox_day_distances[p_idx]
+    equinox_declin_distance_err = cbm_equinox_declin_distances[p_idx]
+
+    median_idx = len(buckets)
+    density_idx = len(buckets)
+    ransac_idx = len(buckets)
+    particle_idx = len(buckets)
+    gmm_idx = len(buckets)
+    particle_m_idx = len(buckets)
+    equinox_day_idx = len(buckets)
+    equinox_declin_idx = len(buckets)
+
+    for bIdx, bucket in enumerate(buckets):
+        if cbm_median_distance_err <= bucket + bucket_size:
+            median_idx = min(bIdx, median_idx)
+        if cbm_density_distance_err <= bucket + bucket_size:
+            density_idx = min(bIdx, density_idx)
+        if ransac_distance_err <= bucket + bucket_size:
+            ransac_idx = min(bIdx, ransac_idx)
+        if particle_distance_err <= bucket + bucket_size:
+            particle_idx = min(bIdx, particle_idx)
+        if gmm_distance_err <= bucket + bucket_size:
+            gmm_idx = min(bIdx, gmm_idx)
+        if particle_m_distance_err <= bucket + bucket_size:
+            particle_m_idx = min(bIdx, particle_m_idx)
+        if equinox_day_distance_err <= bucket + bucket_size:
+            equinox_day_idx = min(bIdx, equinox_day_idx)
+        if equinox_declin_distance_err <= bucket + bucket_size:
+            equinox_declin_idx = min(bIdx, equinox_declin_idx)
+
+    if median_idx < len(buckets):
+        cbm_median_errors[median_idx] += 1
+    if density_idx < len(buckets):
+        cbm_density_errors[density_idx] += 1
+    if ransac_idx < len(buckets):
+        ransac_errors[ransac_idx] += 1
+    if particle_idx < len(buckets):
+        particle_errors[particle_idx] += 1
+    if gmm_idx < len(buckets):
+        gmm_errors[gmm_idx] += 1
+    if particle_m_idx < len(buckets):
+        particle_m_errors[particle_m_idx] += 1
+    if equinox_day_idx < len(buckets):
+        equinox_day_errors[equinox_day_idx] += 1
+    if equinox_declin_idx < len(buckets):
+        equinox_declin_errors[equinox_declin_idx] += 1
+
+bar(buckets, cbm_median_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Median', '50_cbm_200_error_median.png', under_200_highest_bucket)
+bar(buckets, cbm_density_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Gaussian KDE', '50_cbm_200_error_density.png', under_200_highest_bucket)
+bar(buckets, ransac_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using RANSAC', '50_cbm_200_error_ransac.png', under_200_highest_bucket)
+bar(buckets, particle_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Particle Filter', '50_cbm_200_error_particle.png', under_200_highest_bucket)
+bar(buckets, gmm_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using GMM', '50_cbm_200_error_gmm.png', under_200_highest_bucket)
+bar(buckets, particle_m_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Particle Filter With Mahalanobis Distance', '50_cbm_200_error_particle_m.png', under_200_highest_bucket)
+bar(buckets, equinox_day_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Equinox Solstice Weighting (Day)', '50_cbm_200_error_equinox_day.png', under_200_highest_bucket)
+bar(buckets, equinox_declin_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Equinox Solstice Weighting (Solar Declination)', '50_cbm_200_error_equinox_declin.png', under_200_highest_bucket)
+
 print('CBM Means Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_mean_distances)))
 print('CBM Medians Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_median_distances)))
 print('CBM Density Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_density_distances)))
@@ -2571,3 +2863,4 @@ print('Equinox (Day) Max Latitude Error: {:.6f}'.format(max(cbm_equinox_day_lati
 print('Equinox (Day) Min Latitude Error: {:.6f}'.format(min(cbm_equinox_day_latitude_err)))
 print('Equinox (Declin) Max Latitude Error: {:.6f}'.format(max(cbm_equinox_declin_latitude_err)))
 print('Equinox (Declin) Min Latitude Error: {:.6f}'.format(min(cbm_equinox_declin_latitude_err)))
+
