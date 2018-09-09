@@ -937,7 +937,7 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
     # Plot locations on a map.
     for place in lats:
-        if len(lats[place]) < 120: # Need at least 120 points.
+        if len(lats[place]) < 10: # Need at least 10 points.
             continue
 
         min_lat = max(min(lats[place]) - 0.03, -90)
@@ -1045,10 +1045,10 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
         plt.title(place)
 
-        if not os.path.isdir('/srv/glusterfs/vli/maps7/' + mode + '/'):
-            os.mkdir('/srv/glusterfs/vli/maps7/' + mode + '/')
+        if not os.path.isdir('/srv/glusterfs/vli/maps/' + mode + '/'):
+            os.mkdir('/srv/glusterfs/vli/maps/' + mode + '/')
 
-        plt.savefig('/srv/glusterfs/vli/maps7/' + mode + '/' + place + '.png')
+        plt.savefig('/srv/glusterfs/vli/maps/' + mode + '/' + place + '.png')
         plt.close()
 
     map_t1 = time.time()
@@ -1297,7 +1297,7 @@ def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker
     else:
         prefix = ''
 
-    plt.savefig('/srv/glusterfs/vli/maps7/' + prefix + label + '_days_used.png')
+    plt.savefig('/srv/glusterfs/vli/maps/' + prefix + label + '_days_used.png')
     plt.close()
 
 scatter_t0 = time.time()
@@ -1344,7 +1344,7 @@ def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None, ymax=None):
         ax.set_ylim([0, ymax])
 
     plt.title(title)
-    plt.savefig('/srv/glusterfs/vli/maps7/' + filename)
+    plt.savefig('/srv/glusterfs/vli/maps/' + filename)
     plt.close()
 
 # Plot average distance error vs. time interval OVER ALL DAYS.
@@ -2241,14 +2241,14 @@ for key in actual_locations:
     equinox_day_errors[equinox_day_idx] += 1
     equinox_declin_errors[equinox_declin_idx] += 1
 
-bar(buckets, cbm_median_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Median', 'cbm_error_median.png', 120)
-bar(buckets, cbm_density_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Gaussian KDE', 'cbm_error_density.png', 120)
-bar(buckets, ransac_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using RANSAC', 'cbm_error_ransac.png', 120)
-bar(buckets, particle_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Particle Filter', 'cbm_error_particle.png', 120)
-bar(buckets, gmm_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using GMM', 'cbm_error_gmm.png', 120)
-bar(buckets, particle_m_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Particle Filter With Mahalanobis Distance', 'cbm_error_particle_m.png', 120)
-bar(buckets, equinox_day_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Equinox Solstice Weighting (Day)', 'cbm_error_equinox_day.png', 120)
-bar(buckets, equinox_declin_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Equinox Solstice Weighting (Solar Declination)', 'cbm_error_equinox_declin.png', 120)
+bar(buckets, cbm_median_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Median', 'cbm_error_median.png', None, 120)
+bar(buckets, cbm_density_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Gaussian KDE', 'cbm_error_density.png', None, 120)
+bar(buckets, ransac_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using RANSAC', 'cbm_error_ransac.png', None, 120)
+bar(buckets, particle_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Particle Filter', 'cbm_error_particle.png', None, 120)
+bar(buckets, gmm_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using GMM', 'cbm_error_gmm.png', None, 120)
+bar(buckets, particle_m_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Particle Filter With Mahalanobis Distance', 'cbm_error_particle_m.png', None, 120)
+bar(buckets, equinox_day_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Equinox Solstice Weighting (Day)', 'cbm_error_equinox_day.png', None, 120)
+bar(buckets, equinox_declin_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Equinox Solstice Weighting (Solar Declination)', 'cbm_error_equinox_declin.png', None, 120)
 
 
 # Num locations vs. error LESS THAN 200 KM using all methods.
@@ -2344,14 +2344,14 @@ for key in actual_locations:
 
 under_200_highest_bucket = max([max(cbm_median_errors), max(cbm_density_errors), max(ransac_errors), max(particle_errors), max(gmm_errors), max(particle_m_errors), max(equinox_day_errors), max(equinox_declin_errors)]) + 5
 
-bar(buckets, cbm_median_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Median', 'cbm_200_error_median.png', under_200_highest_bucket)
-bar(buckets, cbm_density_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Gaussian KDE', 'cbm_200_error_density.png', under_200_highest_bucket)
-bar(buckets, ransac_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using RANSAC', 'cbm_200_error_ransac.png', under_200_highest_bucket)
-bar(buckets, particle_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Particle Filter', 'cbm_200_error_particle.png', under_200_highest_bucket)
-bar(buckets, gmm_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using GMM', 'cbm_200_error_gmm.png', under_200_highest_bucket)
-bar(buckets, particle_m_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Particle Filter With Mahalanobis Distance', 'cbm_200_error_particle_m.png', under_200_highest_bucket)
-bar(buckets, equinox_day_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Equinox Solstice Weighting (Day)', 'cbm_200_error_equinox_day.png', under_200_highest_bucket)
-bar(buckets, equinox_declin_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Equinox Solstice Weighting (Solar Declination)', 'cbm_200_error_equinox_declin.png', under_200_highest_bucket)
+bar(buckets, cbm_median_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Median', 'cbm_200_error_median.png', None, under_200_highest_bucket)
+bar(buckets, cbm_density_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Gaussian KDE', 'cbm_200_error_density.png', None, under_200_highest_bucket)
+bar(buckets, ransac_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using RANSAC', 'cbm_200_error_ransac.png', None, under_200_highest_bucket)
+bar(buckets, particle_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Particle Filter', 'cbm_200_error_particle.png', None, under_200_highest_bucket)
+bar(buckets, gmm_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using GMM', 'cbm_200_error_gmm.png', None, under_200_highest_bucket)
+bar(buckets, particle_m_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Particle Filter With Mahalanobis Distance', 'cbm_200_error_particle_m.png', None, under_200_highest_bucket)
+bar(buckets, equinox_day_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Equinox Solstice Weighting (Day)', 'cbm_200_error_equinox_day.png', None, under_200_highest_bucket)
+bar(buckets, equinox_declin_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Equinox Solstice Weighting (Solar Declination)', 'cbm_200_error_equinox_declin.png', None, under_200_highest_bucket)
 
 green = 0
 sunrise_only = 0
@@ -2648,14 +2648,14 @@ for p_idx, _ in enumerate(cbm_mean_distances):
     equinox_day_errors[equinox_day_idx] += 1
     equinox_declin_errors[equinox_declin_idx] += 1
 
-bar(buckets, cbm_median_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Median', '50_cbm_error_median.png', 120)
-bar(buckets, cbm_density_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Gaussian KDE', '50_cbm_error_density.png', 120)
-bar(buckets, ransac_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using RANSAC', '50_cbm_error_ransac.png', 120)
-bar(buckets, particle_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Particle Filter', '50_cbm_error_particle.png', 120)
-bar(buckets, gmm_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using GMM', '50_cbm_error_gmm.png', 120)
-bar(buckets, particle_m_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Particle Filter With Mahalanobis Distance', '50_cbm_error_particle_m.png', 120)
-bar(buckets, equinox_day_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Equinox Solstice Weighting (Day)', '50_cbm_error_equinox_day.png', 120)
-bar(buckets, equinox_declin_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Equinox Solstice Weighting (Solar Declination)', '50_cbm_error_equinox_declin.png', 120)
+bar(buckets, cbm_median_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Median', '50_cbm_error_median.png', None, 120)
+bar(buckets, cbm_density_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Gaussian KDE', '50_cbm_error_density.png', None, 120)
+bar(buckets, ransac_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using RANSAC', '50_cbm_error_ransac.png', None, 120)
+bar(buckets, particle_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Particle Filter', '50_cbm_error_particle.png', None, 120)
+bar(buckets, gmm_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using GMM', '50_cbm_error_gmm.png', None, 120)
+bar(buckets, particle_m_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Particle Filter With Mahalanobis Distance', '50_cbm_error_particle_m.png', None, 120)
+bar(buckets, equinox_day_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Equinox Solstice Weighting (Day)', '50_cbm_error_equinox_day.png', None, 120)
+bar(buckets, equinox_declin_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Using Equinox Solstice Weighting (Solar Declination)', '50_cbm_error_equinox_declin.png', None, 120)
 
 
 # Num locations vs. error LESS THAN 200 KM using all methods.
@@ -2744,14 +2744,14 @@ for key in actual_locations:
     if equinox_declin_idx < len(buckets):
         equinox_declin_errors[equinox_declin_idx] += 1
 
-bar(buckets, cbm_median_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Median', '50_cbm_200_error_median.png', under_200_highest_bucket)
-bar(buckets, cbm_density_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Gaussian KDE', '50_cbm_200_error_density.png', under_200_highest_bucket)
-bar(buckets, ransac_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using RANSAC', '50_cbm_200_error_ransac.png', under_200_highest_bucket)
-bar(buckets, particle_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Particle Filter', '50_cbm_200_error_particle.png', under_200_highest_bucket)
-bar(buckets, gmm_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using GMM', '50_cbm_200_error_gmm.png', under_200_highest_bucket)
-bar(buckets, particle_m_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Particle Filter With Mahalanobis Distance', '50_cbm_200_error_particle_m.png', under_200_highest_bucket)
-bar(buckets, equinox_day_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Equinox Solstice Weighting (Day)', '50_cbm_200_error_equinox_day.png', under_200_highest_bucket)
-bar(buckets, equinox_declin_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Equinox Solstice Weighting (Solar Declination)', '50_cbm_200_error_equinox_declin.png', under_200_highest_bucket)
+bar(buckets, cbm_median_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Median', '50_cbm_200_error_median.png', None, under_200_highest_bucket)
+bar(buckets, cbm_density_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Gaussian KDE', '50_cbm_200_error_density.png', None, under_200_highest_bucket)
+bar(buckets, ransac_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using RANSAC', '50_cbm_200_error_ransac.png', None, under_200_highest_bucket)
+bar(buckets, particle_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Particle Filter', '50_cbm_200_error_particle.png', None, under_200_highest_bucket)
+bar(buckets, gmm_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using GMM', '50_cbm_200_error_gmm.png', None, under_200_highest_bucket)
+bar(buckets, particle_m_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Particle Filter With Mahalanobis Distance', '50_cbm_200_error_particle_m.png', None, under_200_highest_bucket)
+bar(buckets, equinox_day_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Equinox Solstice Weighting (Day)', '50_cbm_200_error_equinox_day.png', None, under_200_highest_bucket)
+bar(buckets, equinox_declin_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Equinox Solstice Weighting (Solar Declination)', '50_cbm_200_error_equinox_declin.png', None, under_200_highest_bucket)
 
 print('CBM Means Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_mean_distances)))
 print('CBM Medians Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_median_distances)))
