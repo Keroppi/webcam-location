@@ -1045,10 +1045,10 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
         plt.title(place)
 
-        if not os.path.isdir('/srv/glusterfs/vli/maps3/' + mode + '/'):
-            os.mkdir('/srv/glusterfs/vli/maps3/' + mode + '/')
+        if not os.path.isdir('/srv/glusterfs/vli/maps6/' + mode + '/'):
+            os.mkdir('/srv/glusterfs/vli/maps6/' + mode + '/')
 
-        plt.savefig('/srv/glusterfs/vli/maps3/' + mode + '/' + place + '.png')
+        plt.savefig('/srv/glusterfs/vli/maps6/' + mode + '/' + place + '.png')
         plt.close()
 
     map_t1 = time.time()
@@ -1297,7 +1297,7 @@ def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker
     else:
         prefix = ''
 
-    plt.savefig('/srv/glusterfs/vli/maps3/' + prefix + label + '_days_used.png')
+    plt.savefig('/srv/glusterfs/vli/maps6/' + prefix + label + '_days_used.png')
     plt.close()
 
 scatter_t0 = time.time()
@@ -1344,7 +1344,7 @@ def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None, ymax=None):
         ax.set_ylim([0, ymax])
 
     plt.title(title)
-    plt.savefig('/srv/glusterfs/vli/maps3/' + filename)
+    plt.savefig('/srv/glusterfs/vli/maps6/' + filename)
     plt.close()
 
 # Plot average distance error vs. time interval OVER ALL DAYS.
@@ -1486,7 +1486,7 @@ bar(season_labels, cbm_season_distances, 'Median Distance Error (km)', 'Season',
 print('SEASON OVER ALL DAYS BUCKETS NUM DATA PTS: ' + str(cbm_season_num_data_pts))
 
 # Plot average distance error vs. day length hours over ALL DAYS.
-buckets = list(range(0, 25, 1)) # 1 hour intervals
+buckets = list(range(0, 24, 1)) # 1 hour intervals
 bucket_labels = [str(x) + '-' + str(x + 1) for x in buckets]
 bucket_distances = [[] for x in range(len(buckets))]
 cbm_bucket_distances = [[] for x in range(len(buckets))]
@@ -1657,8 +1657,8 @@ plot_all_places(bucket_size, buckets, bucket_labels,
 
 # Plot average distance error vs. intervals over ALL PLACES.
 # Only using CBM model for now.
-bucket_size = 11 # minute intervals
-buckets = list(range(0, 34, bucket_size))
+bucket_size = 5 # minute intervals
+buckets = list(range(0, 26, bucket_size))
 bucket_labels = [str(x) + '-' + str(x + bucket_size) for x in buckets]
 bucket_labels[-1] = bucket_labels[-1] + '+'
 
@@ -2342,7 +2342,7 @@ for key in actual_locations:
     if equinox_declin_idx < len(buckets):
         equinox_declin_errors[equinox_declin_idx] += 1
 
-under_200_highest_bucket = max([max(cbm_median_errors), max(cbm_density_errors), max(ransac_errors), max(particle_errors), max(gmm_errors), max(particle_m_errors), max(equinox_day_errors), max(equinox_declin_errors)]) + 5
+under_200_highest_bucket = max([max(cbm_median_errors), max(cbm_density_errors), max(ransac_errors), max(particle_errors), max(gmm_errors), max(particle_m_errors), max(equinox_day_errors), max(equinox_declin_errors)]) + 2
 
 bar(buckets, cbm_median_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Median', 'cbm_200_error_median.png', None, under_200_highest_bucket)
 bar(buckets, cbm_density_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Gaussian KDE', 'cbm_200_error_density.png', None, under_200_highest_bucket)
@@ -2528,8 +2528,6 @@ sys.stdout.flush()
 # Compute error for places under 50 km.
 print('Using only places with at least 50 days.')
 
-
-
 subset_idx = []
 for p_idx, place in enumerate(lats):
     if len(lats[place]) < 50:
@@ -2690,7 +2688,7 @@ equinox_day_error_num_data_pts = [0] * len(buckets)
 equinox_declin_error_rmses = [0 for x in range(len(buckets))]
 equinox_declin_error_num_data_pts = [0] * len(buckets)
 
-for key in actual_locations:
+for p_idx, _ in enumerate(cbm_mean_distances):
     cbm_median_distance_err = cbm_median_distances[p_idx]
     cbm_density_distance_err = cbm_density_distances[p_idx]
     ransac_distance_err = cbm_density_distances[p_idx]
