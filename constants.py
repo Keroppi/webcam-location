@@ -15,7 +15,7 @@ LOG_INTERVAL = 20
 SPLIT_TOTAL = 100
 SPLIT_TRAIN = 75 # 75% train
 SPLIT_TEST = 100 # 25% test, 0% validation
-BANDWIDTH = 0.1
+BANDWIDTH = 0.05
             # 1pass
             # 0.8 - ?, ? / 304, 183
             # 0.7 - 306, 184*
@@ -59,10 +59,11 @@ BANDWIDTH = 0.1
             # 0.4 -
             # 0.2 -
             # 0.1 -
+            # 0.05 -
 
 CENTER = False
 LAMBDA = 1 # REGULARIZER
-INLIER_THRESHOLD = 600
+INLIER_THRESHOLD = 400
                    # 1500 -
                    # 1400 - 271, 170 / 250, 167
                    # 1200 - 272, 171 / 250, 166
@@ -96,9 +97,10 @@ INLIER_THRESHOLD = 600
                    # 1000 -
                    # 800 -
                    # 600 -
+                   # 400 -
 
 # PARTICLE
-AZIMUTHAL_INLIER_THRESHOLD = 0.09407324668249435 # 600 km
+AZIMUTHAL_INLIER_THRESHOLD = 0.06283185307179587 # 400 km
 
 # 0.23561944901923448 # 1500 km -
 # 0.2195624199 # 1400 km - ?, ? / 248, 165
@@ -133,9 +135,10 @@ AZIMUTHAL_INLIER_THRESHOLD = 0.09407324668249435 # 600 km
                              # 1000 -
                              # 800 -
                              # 600 -
+                             # 400 -
 
 # GMM
-MAHALANOBIS_INLIER_THRESHOLD = 1.75
+MAHALANOBIS_INLIER_THRESHOLD = 1.25
                                # 2.5 -
                                # 2.25 - 299, 178 / 269, 153 -
                                # 2 - 298, 174*
@@ -168,9 +171,10 @@ MAHALANOBIS_INLIER_THRESHOLD = 1.75
                                # 2.75 -
                                # 2.25 -
                                # 1.75 -
+                               # 1.25 -
 
 # Particle Mahalanobis
-AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 0.75
+AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 0.25
                                          # 2.25 - 441, 199 / 425, 216
                                          # 2 -
                                          # 1.75 - 348, 190 / 334, 194
@@ -200,6 +204,7 @@ AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 0.75
                                          # 1.75 -
                                          # 1.25 -
                                          # 0.75 -
+                                         # 0.25 -
 BIGM = 100
 
 # UTC times below
