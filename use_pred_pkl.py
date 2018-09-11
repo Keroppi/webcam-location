@@ -1300,6 +1300,7 @@ def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker
     plt.savefig('/srv/glusterfs/vli/maps1/' + prefix + label + '_days_used.png', dpi=100)
     plt.close()
 
+'''
 scatter_t0 = time.time()
 
 scatter(days_used, mean_distances, 'mo', 'mean')
@@ -1318,6 +1319,7 @@ scatter(days_used, cbm_equinox_declin_distances, None, 'equinox solstice weighti
 
 scatter_t1 = time.time()
 print('Calculating scatter time (m): ' + str((scatter_t1 - scatter_t0) / 60))
+'''
 
 def median_rmse(data):
     median = statistics.median(data)
