@@ -30,6 +30,8 @@ print('Particle Mahalanobis: {}'.format(constants.AZIMUTHAL_MAHALANOBIS_INLIER_T
 print('Discard Days From Equinox: {}'.format(constants.EQUINOX_DISCARD_DAYS))
 sys.stdout.flush()
 
+
+
 parser = argparse.ArgumentParser(description='Predict Location')
 parser.add_argument('--pickle_file', default='', type=str, metavar='PATH',
                     help='path to prediction pickle file (default: none)')
@@ -983,7 +985,7 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
             elif mode == 'none':
                 colors.append('k')
 
-        plt.figure(figsize=(24,12))
+        plt.figure(figsize=(6,3))
         map = Basemap(projection='cyl', # This projection is equidistant.
                       llcrnrlat=min_lat, urcrnrlat=max_lat,
                       llcrnrlon=min_lng, urcrnrlon=max_lng,
@@ -1046,7 +1048,7 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
         if not os.path.isdir('/srv/glusterfs/vli/maps/' + mode + '/'):
             os.mkdir('/srv/glusterfs/vli/maps/' + mode + '/')
 
-        plt.savefig('/srv/glusterfs/vli/maps/' + mode + '/' + place + '.png')
+        plt.savefig('/srv/glusterfs/vli/maps/' + mode + '/' + place + '.png', dpi=100)
         plt.close()
 
     map_t1 = time.time()
@@ -1262,7 +1264,7 @@ for place in lats:
 
 # Plot Error vs Days Used
 def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker=None, cbm=False):
-    plt.figure(figsize=(24,12))
+    plt.figure(figsize=(6,3))
 
     days_used_medians = {}
     for d_idx, days in enumerate(days_used):
@@ -1295,7 +1297,7 @@ def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker
     else:
         prefix = ''
 
-    plt.savefig('/srv/glusterfs/vli/maps/' + prefix + label + '_days_used.png')
+    plt.savefig('/srv/glusterfs/vli/maps/' + prefix + label + '_days_used.png', dpi=100)
     plt.close()
 
 scatter_t0 = time.time()
@@ -1323,7 +1325,7 @@ def median_rmse(data):
     return math.sqrt(mse)
 
 def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None, ymax=None):
-    plt.figure(figsize=(24, 12))
+    plt.figure(figsize=(6,3))
 
     if yerr is not None:
         yerr = [(0,) * len(x), tuple(yerr)] # Only keep top half of error line.
@@ -1342,7 +1344,7 @@ def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None, ymax=None):
         ax.set_ylim([0, ymax])
 
     plt.title(title)
-    plt.savefig('/srv/glusterfs/vli/maps/' + filename)
+    plt.savefig('/srv/glusterfs/vli/maps/' + filename, dpi=100)
     plt.close()
 
 # Plot average distance error vs. time interval OVER ALL DAYS.
