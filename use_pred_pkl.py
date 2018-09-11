@@ -985,7 +985,7 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
             elif mode == 'none':
                 colors.append('k')
 
-        plt.figure(figsize=(6,3))
+        plt.figure(figsize=(24,12))
         map = Basemap(projection='cyl', # This projection is equidistant.
                       llcrnrlat=min_lat, urcrnrlat=max_lat,
                       llcrnrlon=min_lng, urcrnrlon=max_lng,
@@ -1264,7 +1264,7 @@ for place in lats:
 
 # Plot Error vs Days Used
 def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker=None, cbm=False):
-    plt.figure(figsize=(6,3))
+    plt.figure(figsize=(9,4.5))
 
     days_used_medians = {}
     for d_idx, days in enumerate(days_used):
@@ -1325,7 +1325,7 @@ def median_rmse(data):
     return math.sqrt(mse)
 
 def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None, ymax=None):
-    plt.figure(figsize=(6,3))
+    plt.figure(figsize=(9,4.5))
 
     if yerr is not None:
         yerr = [(0,) * len(x), tuple(yerr)] # Only keep top half of error line.
