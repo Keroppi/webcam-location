@@ -80,8 +80,8 @@ for place in predictions:
         solstice_days = days_from_solstice(predictions[place][d_idx].sunrise - datetime.timedelta(seconds=predictions[place][d_idx].time_offset))
 
         # VLI
-        #if equinox_days < constants.EQUINOX_DISCARD_DAYS: # ? weeks
-        #    continue
+        if equinox_days < constants.EQUINOX_DISCARD_DAYS: # ? weeks
+            continue
 
         days += [day]
 
@@ -710,13 +710,13 @@ def particle_filter(lats, lngs, mahalanobis=False):
     return particle_locations
 
 # VLI
-#brock_particle_locations = particle_filter(lats, lngs)
-#cbm_particle_locations = particle_filter(cbm_lats, lngs)
-#cbm_particle_mahalanobis_locations = particle_filter(cbm_lats, lngs, True)
+brock_particle_locations = particle_filter(lats, lngs)
+cbm_particle_locations = particle_filter(cbm_lats, lngs)
+cbm_particle_mahalanobis_locations = particle_filter(cbm_lats, lngs, True)
 
-brock_particle_locations = cbm_gmm_locations
-cbm_particle_locations = cbm_gmm_locations
-cbm_particle_mahalanobis_locations = cbm_gmm_locations
+#brock_particle_locations = cbm_gmm_locations
+#cbm_particle_locations = cbm_gmm_locations
+#cbm_particle_mahalanobis_locations = cbm_gmm_locations
 
 def ransac(lats, lngs, actual=False):
     ransac_t0 = time.time()
@@ -1045,10 +1045,10 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
         plt.title(place)
 
-        if not os.path.isdir('/srv/glusterfs/vli/maps6/' + mode + '/'):
-            os.mkdir('/srv/glusterfs/vli/maps6/' + mode + '/')
+        if not os.path.isdir('/srv/glusterfs/vli/maps/' + mode + '/'):
+            os.mkdir('/srv/glusterfs/vli/maps/' + mode + '/')
 
-        plt.savefig('/srv/glusterfs/vli/maps6/' + mode + '/' + place + '.png', dpi=100)
+        plt.savefig('/srv/glusterfs/vli/maps/' + mode + '/' + place + '.png', dpi=100)
         plt.close()
 
     map_t1 = time.time()
@@ -1297,7 +1297,7 @@ def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker
     else:
         prefix = ''
 
-    plt.savefig('/srv/glusterfs/vli/maps6/' + prefix + label + '_days_used.png', dpi=100)
+    plt.savefig('/srv/glusterfs/vli/maps/' + prefix + label + '_days_used.png', dpi=100)
     plt.close()
 
 '''
@@ -1346,7 +1346,7 @@ def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None, ymax=None):
         ax.set_ylim([0, ymax])
 
     plt.title(title)
-    plt.savefig('/srv/glusterfs/vli/maps6/' + filename, dpi=100)
+    plt.savefig('/srv/glusterfs/vli/maps/' + filename, dpi=100)
     plt.close()
 
 # Plot average distance error vs. time interval OVER ALL DAYS.
