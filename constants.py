@@ -15,7 +15,7 @@ LOG_INTERVAL = 20
 SPLIT_TOTAL = 100
 SPLIT_TRAIN = 75 # 75% train
 SPLIT_TEST = 100 # 25% test, 0% validation
-BANDWIDTH = 0.1
+BANDWIDTH = 0.2
             # 1pass
             # 0.8 - ?, ? / 304, 183
             # 0.7 - 306, 184*
@@ -100,7 +100,7 @@ INLIER_THRESHOLD = 800
                    # 400 -
 
 # PARTICLE
-AZIMUTHAL_INLIER_THRESHOLD = 0.15707963267948966 # 1000 km
+AZIMUTHAL_INLIER_THRESHOLD = 0.12566370614359174 # 800 km
 
 # 0.23561944901923448 # 1500 km -
 # 0.2195624199 # 1400 km - ?, ? / 248, 165
@@ -138,7 +138,7 @@ AZIMUTHAL_INLIER_THRESHOLD = 0.15707963267948966 # 1000 km
                              # 400 -
 
 # GMM
-MAHALANOBIS_INLIER_THRESHOLD = 1.75
+MAHALANOBIS_INLIER_THRESHOLD = 2.25
                                # 2.5 -
                                # 2.25 - 299, 178 / 269, 153 -
                                # 2 - 298, 174*
