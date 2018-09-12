@@ -30,8 +30,6 @@ print('Particle Mahalanobis: {}'.format(constants.AZIMUTHAL_MAHALANOBIS_INLIER_T
 print('Discard Days From Equinox: {}'.format(constants.EQUINOX_DISCARD_DAYS))
 sys.stdout.flush()
 
-
-
 parser = argparse.ArgumentParser(description='Predict Location')
 parser.add_argument('--pickle_file', default='', type=str, metavar='PATH',
                     help='path to prediction pickle file (default: none)')
@@ -1004,10 +1002,10 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
         plt.title(place)
 
-        if not os.path.isdir('/srv/glusterfs/vli/maps/' + mode + '/'):
-            os.mkdir('/srv/glusterfs/vli/maps/' + mode + '/')
+        if not os.path.isdir('/srv/glusterfs/vli/maps1/' + mode + '/'):
+            os.mkdir('/srv/glusterfs/vli/maps1/' + mode + '/')
 
-        plt.savefig('/srv/glusterfs/vli/maps/' + mode + '/' + place + '.png', dpi=100)
+        plt.savefig('/srv/glusterfs/vli/maps1/' + mode + '/' + place + '.png', dpi=100)
         plt.close()
 
     map_t1 = time.time()
@@ -1225,7 +1223,7 @@ for place in lats:
 
 # Plot Error vs Days Used
 def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker=None, cbm=False):
-    plt.figure(figsize=(9,4.5))
+    plt.figure(figsize=(12,6))
 
     days_used_medians = {}
     for d_idx, days in enumerate(days_used):
@@ -1258,7 +1256,7 @@ def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker
     else:
         prefix = ''
 
-    plt.savefig('/srv/glusterfs/vli/maps/' + prefix + label + '_days_used.png', dpi=100)
+    plt.savefig('/srv/glusterfs/vli/maps1/' + prefix + label + '_days_used.png', dpi=100)
     plt.close()
 
 # VLI
@@ -1281,6 +1279,7 @@ scatter(days_used, cbm_equinox_declin_distances, None, 'equinox solstice weighti
 
 scatter_t1 = time.time()
 print('Calculating scatter time (m): ' + str((scatter_t1 - scatter_t0) / 60))
+'''
 
 def median_rmse(data):
     median = statistics.median(data)
@@ -1288,7 +1287,7 @@ def median_rmse(data):
     return math.sqrt(mse)
 
 def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None, ymax=None):
-    plt.figure(figsize=(9,4.5))
+    plt.figure(figsize=(12,6))
 
     if yerr is not None:
         yerr = [(0,) * len(x), tuple(yerr)] # Only keep top half of error line.
@@ -1307,7 +1306,7 @@ def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None, ymax=None):
         ax.set_ylim([0, ymax])
 
     plt.title(title)
-    plt.savefig('/srv/glusterfs/vli/maps/' + filename, dpi=100)
+    plt.savefig('/srv/glusterfs/vli/maps1/' + filename, dpi=100)
     plt.close()
 
 # Plot average distance error vs. time interval OVER ALL DAYS.
@@ -1961,7 +1960,7 @@ print('')
 print('Average Interval (min): ' + str(avg_interval / len(days)))
 print('')
 sys.stdout.flush()
-'''
+
 print('Brock Means Avg. Distance Error: {:.6f}'.format(statistics.mean(mean_distances)))
 print('Brock Medians Avg. Distance Error: {:.6f}'.format(statistics.mean(median_distances)))
 print('Brock Density Avg. Distance Error: {:.6f}'.format(statistics.mean(density_distances)))
@@ -2153,7 +2152,6 @@ cbm_equinox_day_latitude_err = [cbm_equinox_day_latitude_err[x] for x in subset_
 cbm_equinox_declin_latitude_err = [cbm_equinox_declin_latitude_err[x] for x in subset_idx]
 
 # VLI
-'''
 # Num locations vs. error using all methods.
 bucket_size = 100 # 100 km buckets
 buckets = list(range(0, 1200, bucket_size))
@@ -2335,7 +2333,7 @@ bar(buckets, gmm_errors, '# of Places', 'Error ({} km)'.format(bucket_size), buc
 bar(buckets, particle_m_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Particle Filter With Mahalanobis Distance', '50_cbm_200_error_particle_m.png', None, under_200_highest_bucket)
 bar(buckets, equinox_day_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Equinox Solstice Weighting (Day)', '50_cbm_200_error_equinox_day.png', None, under_200_highest_bucket)
 bar(buckets, equinox_declin_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Equinox Solstice Weighting (Solar Declination)', '50_cbm_200_error_equinox_declin.png', None, under_200_highest_bucket)
-'''
+
 print('CBM Means Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_mean_distances)))
 print('CBM Medians Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_median_distances)))
 print('CBM Density Avg. Distance Error: {:.6f}'.format(statistics.mean(cbm_density_distances)))
