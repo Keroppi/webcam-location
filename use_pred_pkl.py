@@ -78,8 +78,8 @@ for place in predictions:
         solstice_days = days_from_solstice(predictions[place][d_idx].sunrise - datetime.timedelta(seconds=predictions[place][d_idx].time_offset))
 
         # VLI
-        if equinox_days < constants.EQUINOX_DISCARD_DAYS: # ? weeks
-            continue
+        #if equinox_days < constants.EQUINOX_DISCARD_DAYS: # ? weeks
+        #    continue
 
         days += [day]
 
@@ -2151,7 +2151,6 @@ cbm_particle_m_latitude_err = [cbm_particle_m_latitude_err[x] for x in subset_id
 cbm_equinox_day_latitude_err = [cbm_equinox_day_latitude_err[x] for x in subset_idx]
 cbm_equinox_declin_latitude_err = [cbm_equinox_declin_latitude_err[x] for x in subset_idx]
 
-# VLI
 # Num locations vs. error using all methods.
 bucket_size = 100 # 100 km buckets
 buckets = list(range(0, 1200, bucket_size))
