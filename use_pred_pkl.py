@@ -1223,7 +1223,7 @@ for place in lats:
 
 # Plot Error vs Days Used
 def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker=None, cbm=False):
-    plt.figure(figsize=(12,6))
+    plt.figure(figsize=(14.4,7.2))
 
     days_used_medians = {}
     for d_idx, days in enumerate(days_used):
@@ -1287,7 +1287,7 @@ def median_rmse(data):
     return math.sqrt(mse)
 
 def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None, ymax=None):
-    plt.figure(figsize=(12,6))
+    plt.figure(figsize=(14.4,7.2))
 
     if yerr is not None:
         yerr = [(0,) * len(x), tuple(yerr)] # Only keep top half of error line.
@@ -1485,7 +1485,7 @@ for bdIdx, distance_errs in enumerate(cbm_bucket_distances):
         cbm_bucket_distances[bdIdx] = 0
 
 #bar(buckets, bucket_distances, 'Median Distance Error (km)', 'Minutes Between Frames', bucket_labels, 'Median Error (km) Over All Days vs. Photo Interval (min)', 'interval.png', bucket_rmses)
-bar(buckets, cbm_bucket_distances, 'Median Distance Error (km)', 'Day Length Hours', bucket_labels, 'Median Error (km) Over All Days vs. Day Length Hours', 'cbm_day_length.png', cbm_bucket_rmses, 26000)
+bar(buckets, cbm_bucket_distances, 'Median Distance Error (km)', 'Day Length Hours', bucket_labels, 'Median Error (km) Over All Days vs. Day Length Hours', 'cbm_day_length.png', cbm_bucket_rmses, 35000)
 print('DAY LENGTH OVER ALL DAYS BUCKETS NUM DATA PTS: ' + str(cbm_bucket_num_data_pts)) #
 
 # Plot average latitude error vs. equinox offset over ALL DAYS.
@@ -1925,7 +1925,7 @@ for key in actual_locations:
     if equinox_declin_idx < len(buckets):
         equinox_declin_errors[equinox_declin_idx] += 1
 
-under_200_highest_bucket = max([max(cbm_median_errors), max(cbm_density_errors), max(ransac_errors), max(particle_errors), max(gmm_errors), max(particle_m_errors), max(equinox_day_errors), max(equinox_declin_errors)]) + 2
+under_200_highest_bucket = int(max([max(cbm_median_errors), max(cbm_density_errors), max(ransac_errors), max(particle_errors), max(gmm_errors), max(particle_m_errors), max(equinox_day_errors), max(equinox_declin_errors)]) + 2)
 
 bar(buckets, cbm_median_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Median', 'cbm_200_error_median.png', None, under_200_highest_bucket)
 bar(buckets, cbm_density_errors, '# of Places', 'Error ({} km)'.format(bucket_size), bucket_labels, 'Histogram of Error (km) Under 200 km Using Gaussian KDE', 'cbm_200_error_density.png', None, under_200_highest_bucket)
