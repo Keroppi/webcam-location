@@ -1,5 +1,8 @@
 #!/srv/glusterfs/vli/.pyenv/shims/python
 
+import matplotlib
+matplotlib.use('agg')
+
 import torch, torchvision, argparse, os, datetime, time, math, pandas as pd, sys, random, statistics, numpy as np, scipy, pickle
 
 sys.path.append('/home/vli/webcam-location') # For importing .py files in the same directory on the cluster.
@@ -10,6 +13,8 @@ from webcam_dataset import Test
 from custom_transforms import Resize, RandomPatch, Center, ToTensor
 from custom_model import WebcamLocation
 from torch.autograd import Variable
+import matplotlib.pyplot as plt
+from matplotlib import colors as mcolors
 
 from collections import namedtuple
 
@@ -202,7 +207,7 @@ for batch_idx, (input, _) in enumerate(test_loader):
             #locations[day.place] = Location(day.lat, day.lng, [], [], [])
             locations[day.place] = []
 
-        locations[day.place].append(SimpleDay(day.place, day.lat, day.lng, day.mali_solar_noon, day.time_offset, local_sunrise, None, day.sunrise_in_frames, day.sunset_in_frames, day.interval_min, day.season))
+        locations[day.place].append(SimpleDay(day.place, day.lat, day.lng, day.mali_solar_noon, day.time_offset, local_sunrise, None, day.sunrise_in_frames, day.sunset_in_frames, day.interval_min, day.season, day.sunrise, day.sunset))
         #day.uniform_frames()  # Reset the frames to be random instead of having a bias towards where sunrise is.
 
         #locations[day.place].sunrises.append(utc_sunrise)

@@ -1,7 +1,7 @@
 import numpy as np, sys, PIL, math, time, datetime, random, statistics
 
 class SimpleDay():
-    def __init__(self, place, lat, lng, mali_solar_noon, time_offset, sunrise, sunset, sunrise_in_frames, sunset_in_frames, interval_min, season):
+    def __init__(self, place, lat, lng, mali_solar_noon, time_offset, sunrise, sunset, sunrise_in_frames, sunset_in_frames, interval_min, season, actual_sunrise, actual_sunset):
         self.place = place  # Name of the location
 
         self.lat = lat # Latitude (Actual)
@@ -27,6 +27,9 @@ class SimpleDay():
         # Broken up into 3 month seasons:
         # For latitudes > 0: Dec - Feb is 'winter', Mar - May is 'spring', Jun - Aug is 'summer', Sep - Nov is 'fall'
         # For latitudes < 0: Dec - Feb is 'summer', Mar - May is 'fall', Jun - Aug is 'winter', Sep - Nov is 'spring'
+
+        self.actual_sunrise = actual_sunrise
+        self.actual_sunset = actual_sunset
 
 
 

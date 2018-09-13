@@ -64,7 +64,8 @@ def days_from_solstice(date):
 
     return days_away
 
-
+sunrise_errs = []
+sunset_errs = []
 sunrises = []
 sunsets = []
 equinox_offsets = []
@@ -88,6 +89,9 @@ for place in predictions:
 
         equinox_offsets.append(equinox_days)
         solstice_offsets.append(solstice_days)
+
+        sunrise_errs.append(math.fabs((predictions[place][d_idx].sunrise - predictions[place][d_idx].actual_sunrise).total_seconds() / 60))
+        sunset_errs.append(math.fabs((predictions[place][d_idx].sunset - predictions[place][d_idx].actual_sunset).total_seconds() / 60))
 
 print('Number of days: {}'.format(len(days)))
 
