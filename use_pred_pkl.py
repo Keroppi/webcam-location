@@ -1554,6 +1554,43 @@ for bdIdx, distance_errs in enumerate(cbm_bucket_distances):
 bar(buckets, cbm_bucket_distances, 'Median Longitude Distance Error (km)', 'Days From Solstice', bucket_labels, 'Median Longitude Error (km) Over All Days vs. Days From Solstice', 'cbm_solstice_lng.png', cbm_bucket_rmses)
 print('SOLSTICE (LNG) OVER ALL DAYS BUCKETS NUM DATA PTS: ' + str(cbm_bucket_num_data_pts))
 
+# Plot # of days vs. sunrise/sunset err (min) over ALL DAYS.
+bucket_size = 5 # minute
+buckets = list(range(0, 75, bucket_size))
+bucket_labels = [str(x) + '-' + str(x + bucket_size) for x in buckets]
+bucket_labels[-1] = bucket_labels[-1] + '+'
+sunrise_buckets = [0] * len(buckets)
+sunset_buckets = [0] * len(buckets)
+
+for i in range(len(sunrise_errs)):
+    for rIdx, bucket in enumerate(buckets):
+        if sunrise_errs[i] < bucket + bucket_size:
+            break
+
+    sunrise_buckets[rIdx] += 1
+
+for i in range(len(sunset_errs)):
+    for sIdx, bucket in enumerate(buckets):
+        if sunset_errs[i] < bucket + bucket_size:
+            break
+
+    sunset_buckets[sIdx] += 1
+
+plt.figure(figsize=(14.4,7.2))
+
+legend_labels = ['sunrise', 'sunset']
+handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in ['r', 'b']]
+
+sunrise_graph = plt.bar(list(range(len(buckets))), sunrise_buckets, 0.35, color='r')
+sunset_graph = plt.bar(list(range(len(buckets))), sunset_buckets, 0.35, bottom=sunrise_buckets, color='b')
+
+plt.legend(handlelist, legend_labels)
+plt.ylabel('# Days Used')
+plt.xlabel('Error (min)')
+plt.title('# of Days vs. Sunrise and Sunset Error (min)')
+plt.savefig('/srv/glusterfs/vli/maps1/sunrise_sunset_err.png', dpi=100)
+plt.close()
+
 def plot_all_places(bucket_size, buckets, bucket_labels, locations, x_data, x_name, method_name, xlabel, ylabel, title, filename, sub_idx=None, ymax=None):
     bucket_distances = [[] for x in range(len(buckets))]
     bucket_rmses = [0] * len(buckets) # for x in range(len(buckets))]
