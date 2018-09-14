@@ -1585,6 +1585,7 @@ sunrise_graph = plt.bar(list(range(len(buckets))), sunrise_buckets, 0.35, color=
 sunset_graph = plt.bar(list(range(len(buckets))), sunset_buckets, 0.35, bottom=sunrise_buckets, color='b')
 
 plt.xticks(np.arange(0, len(buckets), step=1), bucket_labels)
+plt.gca().set_ylim([0, 13000])
 plt.legend(handlelist, legend_labels)
 plt.ylabel('# Days Used')
 plt.xlabel('Error (min)')
