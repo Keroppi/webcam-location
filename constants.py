@@ -63,7 +63,7 @@ BANDWIDTH = 0.2
 
 CENTER = False
 LAMBDA = 1 # REGULARIZER
-INLIER_THRESHOLD = 800
+INLIER_THRESHOLD = 600
                    # 1500 -
                    # 1400 - 271, 170 / 250, 167
                    # 1200 - 272, 171 / 250, 166
@@ -138,7 +138,7 @@ AZIMUTHAL_INLIER_THRESHOLD = 0.12566370614359174 # 800 km
                              # 400 -
 
 # GMM
-MAHALANOBIS_INLIER_THRESHOLD = 2.25
+MAHALANOBIS_INLIER_THRESHOLD = 2
                                # 2.5 -
                                # 2.25 - 299, 178 / 269, 153 -
                                # 2 - 298, 174*
@@ -174,7 +174,7 @@ MAHALANOBIS_INLIER_THRESHOLD = 2.25
                                # 1.25 -
 
 # Particle Mahalanobis
-AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 1.25
+AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 1
                                          # 2.25 - 441, 199 / 425, 216
                                          # 2 -
                                          # 1.75 - 348, 190 / 334, 194
