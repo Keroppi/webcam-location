@@ -81,8 +81,8 @@ for place in predictions:
         solstice_days = days_from_solstice(predictions[place][d_idx].sunrise - datetime.timedelta(seconds=predictions[place][d_idx].time_offset))
 
         # VLI
-        if equinox_days < constants.EQUINOX_DISCARD_DAYS: # ? weeks
-            continue
+        #if equinox_days < constants.EQUINOX_DISCARD_DAYS: # ? weeks
+        #    continue
 
         days += [day]
 
@@ -1018,10 +1018,10 @@ def plot_map(lats, lngs, mean_locations, median_locations, density_locations, ra
 
         plt.title(place)
 
-        if not os.path.isdir('/srv/glusterfs/vli/maps2/' + mode + '/'):
-            os.mkdir('/srv/glusterfs/vli/maps2/' + mode + '/')
+        if not os.path.isdir('/srv/glusterfs/vli/maps3/' + mode + '/'):
+            os.mkdir('/srv/glusterfs/vli/maps3/' + mode + '/')
 
-        plt.savefig('/srv/glusterfs/vli/maps2/' + mode + '/' + place + '.png', dpi=100)
+        plt.savefig('/srv/glusterfs/vli/maps3/' + mode + '/' + place + '.png', dpi=100)
         plt.close()
 
     map_t1 = time.time()
@@ -1272,7 +1272,7 @@ def scatter(days_used, distances, fmt, label, color=None, linestyle=None, marker
     else:
         prefix = ''
 
-    plt.savefig('/srv/glusterfs/vli/maps2/' + prefix + label + '_days_used.png', dpi=100)
+    plt.savefig('/srv/glusterfs/vli/maps3/' + prefix + label + '_days_used.png', dpi=100)
     plt.close()
 
 # VLI
@@ -1322,7 +1322,7 @@ def bar(x, y, ylabel, xlabel, x_labels, title, filename, yerr=None, ymax=None):
         ax.set_ylim([0, ymax])
 
     plt.title(title)
-    plt.savefig('/srv/glusterfs/vli/maps2/' + filename, dpi=100)
+    plt.savefig('/srv/glusterfs/vli/maps3/' + filename, dpi=100)
     plt.close()
 
 # Plot average distance error vs. time interval OVER ALL DAYS.
@@ -1602,7 +1602,7 @@ plt.legend(handlelist, legend_labels)
 plt.ylabel('# Days')
 plt.xlabel('Error (min)')
 plt.title('# of Days vs. Sunrise and Sunset Error (min)')
-plt.savefig('/srv/glusterfs/vli/maps2/sunrise_sunset_err.png', dpi=100)
+plt.savefig('/srv/glusterfs/vli/maps3/sunrise_sunset_err.png', dpi=100)
 plt.close()
 
 # Plot # of days vs. sunrise/sunset OUTLIER errs (min) over ALL DAYS.
@@ -1647,7 +1647,7 @@ plt.legend(handlelist, legend_labels)
 plt.ylabel('# Days')
 plt.xlabel('Error (min)')
 plt.title('# of Days vs. Sunrise and Sunset Error (min)')
-plt.savefig('/srv/glusterfs/vli/maps2/sunrise_sunset_err_outliers.png', dpi=100)
+plt.savefig('/srv/glusterfs/vli/maps3/sunrise_sunset_err_outliers.png', dpi=100)
 plt.close()
 
 print('# outliers for sunrise err: {}'.format(sum(sunrise_buckets)))
@@ -1702,7 +1702,7 @@ plt.legend(handlelist, legend_labels)
 plt.ylabel('# Days')
 plt.xlabel('Signed Error (min)')
 plt.title('# of Days vs. Signed Sunrise and Sunset Error (min)')
-plt.savefig('/srv/glusterfs/vli/maps2/sunrise_sunset_signed_err.png', dpi=100)
+plt.savefig('/srv/glusterfs/vli/maps3/sunrise_sunset_signed_err.png', dpi=100)
 plt.close()
 
 def plot_all_places(bucket_size, buckets, bucket_labels, locations, x_data, x_name, method_name, xlabel, ylabel, title, filename, sub_idx=None, ymax=None):
