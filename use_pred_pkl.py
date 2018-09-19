@@ -1556,7 +1556,7 @@ print('SOLSTICE (LNG) OVER ALL DAYS BUCKETS NUM DATA PTS: ' + str(cbm_bucket_num
 
 # Plot # of days vs. sunrise/sunset err (min) over ALL DAYS.
 bucket_size = 5 # minute
-buckets = list(range(0, 150, bucket_size))
+buckets = list(range(0, 60, bucket_size))
 bucket_labels = [str(x) + '-' + str(x + bucket_size) for x in buckets]
 bucket_labels[-1] = bucket_labels[-1] + '+'
 sunrise_buckets = [0] * len(buckets)
@@ -1591,6 +1591,51 @@ plt.ylabel('# Days Used')
 plt.xlabel('Error (min)')
 plt.title('# of Days vs. Sunrise and Sunset Error (min)')
 plt.savefig('/srv/glusterfs/vli/maps3/sunrise_sunset_err.png', dpi=100)
+plt.close()
+
+# Plot # of days vs. sunrise/sunset err (min) over ALL DAYS.
+bucket_size = 10 # minute
+buckets = list(range(60, 500, bucket_size))
+bucket_labels = [str(x) + '-' + str(x + bucket_size) for x in buckets]
+bucket_labels[-1] = bucket_labels[-1] + '+'
+sunrise_buckets = [0] * len(buckets)
+sunset_buckets = [0] * len(buckets)
+
+for i in range(len(sunrise_errs)):
+    bucket_found = False
+    for rIdx, bucket in enumerate(buckets):
+        if sunrise_errs[i] < bucket + bucket_size and sunrise_errs[i] >= bucket:
+            bucket_found = True
+            break
+
+    if bucket_found or sunrise_errs[i] >= buckets[-1]:
+        sunrise_buckets[rIdx] += 1
+
+for i in range(len(sunset_errs)):
+    bucket_found = False
+    for sIdx, bucket in enumerate(buckets):
+        if sunset_errs[i] < bucket + bucket_size and sunset_errs[i] >= bucket:
+            bucket_found = True
+            break
+
+    if bucket_found or sunset_errs[i] >= buckets[-1]:
+        sunset_buckets[sIdx] += 1
+
+plt.figure(figsize=(14.4,7.2))
+
+legend_labels = ['sunrise', 'sunset']
+handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in ['r', 'b']]
+
+sunrise_graph = plt.bar(list(range(len(buckets))), sunrise_buckets, 0.35, color='r')
+sunset_graph = plt.bar(list(range(len(buckets))), sunset_buckets, 0.35, bottom=sunrise_buckets, color='b')
+
+plt.xticks(np.arange(0, len(buckets), step=1), bucket_labels)
+plt.gca().set_ylim([0, 450])
+plt.legend(handlelist, legend_labels)
+plt.ylabel('# Days Used')
+plt.xlabel('Error (min)')
+plt.title('# of Days vs. Sunrise and Sunset Error (min)')
+plt.savefig('/srv/glusterfs/vli/maps3/sunrise_sunset_err_outliers.png', dpi=100)
 plt.close()
 
 def plot_all_places(bucket_size, buckets, bucket_labels, locations, x_data, x_name, method_name, xlabel, ylabel, title, filename, sub_idx=None, ymax=None):
