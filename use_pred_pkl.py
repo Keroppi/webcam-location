@@ -64,6 +64,8 @@ def days_from_solstice(date):
 
     return days_away
 
+signed_sunrise_errs = []
+signed_sunset_errs = []
 sunrise_errs = []
 sunset_errs = []
 sunrises = []
@@ -93,7 +95,17 @@ for place in predictions:
         sunrise_errs.append(math.fabs((predictions[place][d_idx].sunrise - predictions[place][d_idx].actual_sunrise).total_seconds() / 60))
         sunset_errs.append(math.fabs((predictions[place][d_idx].sunset - predictions[place][d_idx].actual_sunset).total_seconds() / 60))
 
+        signed_sunrise_errs.append((predictions[place][d_idx].sunrise - predictions[place][d_idx].actual_sunrise).total_seconds() / 60)
+        signed_sunset_errs.append((predictions[place][d_idx].sunset - predictions[place][d_idx].actual_sunset).total_seconds() / 60)
+
+sun_corr_data = np.array([signed_sunrise_errs, signed_sunset_errs])
+sun_corr = np.corrcoef(sun_corr_data)[0, 1]
+print('Sun errors correlation coeff: {}'.format(sun_corr))
+print('Sunrise SIGNED errors mean/median/stdev/max/min: {}, {}, {}, {}, {}'.format(statistics.mean(signed_sunrise_errs), statistics.median(signed_sunrise_errs), statistics.stdev(signed_sunrise_errs), max(signed_sunrise_errs), min(signed_sunrise_errs)))
+print('Sunset SIGNED errors mean/median/stdev/max/min: {}, {}, {}, {}, {}'.format(statistics.mean(signed_sunset_errs), statistics.median(signed_sunset_errs), statistics.stdev(signed_sunset_errs), max(signed_sunset_errs), min(signed_sunset_errs)))
+
 print('Number of days: {}'.format(len(days)))
+sys.stdout.flush()
 
 # Calculate season based on equinoxes and solstices.
 # https://www.timeanddate.com/calendar/aboutseasons.html
@@ -1587,15 +1599,15 @@ sunset_graph = plt.bar(list(range(len(buckets))), sunset_buckets, 0.35, bottom=s
 plt.xticks(np.arange(0, len(buckets), step=1), bucket_labels)
 plt.gca().set_ylim([0, 13000])
 plt.legend(handlelist, legend_labels)
-plt.ylabel('# Days Used')
+plt.ylabel('# Days')
 plt.xlabel('Error (min)')
 plt.title('# of Days vs. Sunrise and Sunset Error (min)')
 plt.savefig('/srv/glusterfs/vli/maps/sunrise_sunset_err.png', dpi=100)
 plt.close()
 
-# Plot # of days vs. sunrise/sunset err (min) over ALL DAYS.
+# Plot # of days vs. sunrise/sunset OUTLIER errs (min) over ALL DAYS.
 bucket_size = 10 # minute
-buckets = list(range(60, 500, bucket_size))
+buckets = list(range(30, 180, bucket_size))
 bucket_labels = [str(x) + '-' + str(x + bucket_size) for x in buckets]
 bucket_labels[-1] = bucket_labels[-1] + '+'
 sunrise_buckets = [0] * len(buckets)
@@ -1630,12 +1642,67 @@ sunrise_graph = plt.bar(list(range(len(buckets))), sunrise_buckets, 0.35, color=
 sunset_graph = plt.bar(list(range(len(buckets))), sunset_buckets, 0.35, bottom=sunrise_buckets, color='b')
 
 plt.xticks(np.arange(0, len(buckets), step=1), bucket_labels)
-plt.gca().set_ylim([0, 450])
+plt.gca().set_ylim([0, 1700])
 plt.legend(handlelist, legend_labels)
-plt.ylabel('# Days Used')
+plt.ylabel('# Days')
 plt.xlabel('Error (min)')
 plt.title('# of Days vs. Sunrise and Sunset Error (min)')
 plt.savefig('/srv/glusterfs/vli/maps/sunrise_sunset_err_outliers.png', dpi=100)
+plt.close()
+
+print('# outliers for sunrise err: {}'.format(sum(sunrise_buckets)))
+print('# outliers for sunset err: {}'.format(sum(sunset_buckets)))
+sys.stdout.flush()
+
+
+# Plot # of days vs. SIGNED sunrise/sunset errs (min) over ALL DAYS.
+bucket_size = 5 # minute
+buckets = list(range(-60, 60, bucket_size))
+bucket_labels = ['[' + str(x) + ',' + str(x + bucket_size) + ')' for x in buckets]
+bucket_labels[-1] = '>=' + str(buckets[-1])
+bucket_labels[0] = '<' + str(buckets[1])
+sunrise_buckets = [0] * len(buckets)
+sunset_buckets = [0] * len(buckets)
+
+for i in range(len(signed_sunrise_errs)):
+    if signed_sunrise_errs[i] < buckets[1]:
+        rIdx = 0
+    elif signed_sunrise_errs[i] >= buckets[-1]:
+        rIdx = len(buckets) - 1
+    else:
+        for rIdx, bucket in enumerate(buckets):
+            if signed_sunrise_errs[i] < bucket + bucket_size and signed_sunrise_errs[i] >= bucket:
+                break
+
+    sunrise_buckets[rIdx] += 1
+
+for i in range(len(signed_sunset_errs)):
+    if signed_sunset_errs[i] < buckets[1]:
+        rIdx = 0
+    elif signed_sunset_errs[i] >= buckets[-1]:
+        rIdx = len(buckets) - 1
+    else:
+        for rIdx, bucket in enumerate(buckets):
+            if signed_sunset_errs[i] < bucket + bucket_size and signed_sunset_errs[i] >= bucket:
+                break
+
+    sunset_buckets[rIdx] += 1
+
+plt.figure(figsize=(14.4,7.2))
+
+legend_labels = ['sunrise', 'sunset']
+handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in ['r', 'b']]
+
+sunrise_graph = plt.bar(list(range(len(buckets))), sunrise_buckets, 0.35, color='r')
+sunset_graph = plt.bar(list(range(len(buckets))), sunset_buckets, 0.35, bottom=sunrise_buckets, color='b')
+
+plt.xticks(np.arange(0, len(buckets), step=1), bucket_labels)
+#plt.gca().set_ylim([0, 2000])
+plt.legend(handlelist, legend_labels)
+plt.ylabel('# Days')
+plt.xlabel('Signed Error (min)')
+plt.title('# of Days vs. Signed Sunrise and Sunset Error (min)')
+plt.savefig('/srv/glusterfs/vli/maps/sunrise_sunset_signed_err.png', dpi=100)
 plt.close()
 
 def plot_all_places(bucket_size, buckets, bucket_labels, locations, x_data, x_name, method_name, xlabel, ylabel, title, filename, sub_idx=None, ymax=None):
@@ -1768,6 +1835,7 @@ plot_all_places(bucket_size, buckets, bucket_labels,
                 cbm_equinox_declin_locations, sun_visibles, 'SUN', 'EQUINOX SOLSTICE (DECLIN)',
                 '% of Days With Both Sunrise and Sunset Visible', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Equinox Solstice Weighting (Solar Declination) vs. % of Days with Sunrise and Sunset Visible', 'cbm_sun_equinox_declin_places.png', 0)
 
+'''
 # Average distance error vs. latitude over ALL PLACES.
 bucket_size = 5 # 5 degree buckets
 buckets = list(range(-90, 90, bucket_size))
@@ -1828,6 +1896,7 @@ plot_all_places(bucket_size, buckets, bucket_labels,
 plot_all_places(bucket_size, buckets, bucket_labels,
                 cbm_equinox_declin_locations, cbm_equinox_declin_locations, 'LNG', 'EQUINOX SOLSTICE (DECLIN)',
                 'Longitude', 'Median Distance Error (km)', 'Median Error (km) Over All Locations Using Equinox Solstice Weighting (Solar Declination) vs. Longitude', 'cbm_lng_equinox_declin_places.png', 1)
+'''
 
 # Num locations vs. error using all methods.
 bucket_size = 100 # 100 km buckets
