@@ -138,7 +138,7 @@ AZIMUTHAL_INLIER_THRESHOLD = 0.12566370614359174 # 800 km
                              # 400 -
 
 # GMM
-MAHALANOBIS_INLIER_THRESHOLD = 2
+MAHALANOBIS_INLIER_THRESHOLD = 2.25
                                # 2.5 -
                                # 2.25 - 299, 178 / 269, 153 -
                                # 2 - 298, 174*
@@ -174,7 +174,7 @@ MAHALANOBIS_INLIER_THRESHOLD = 2
                                # 1.25 -
 
 # Particle Mahalanobis
-AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 1
+AZIMUTHAL_MAHALANOBIS_INLIER_THRESHOLD = 1.25
                                          # 2.25 - 441, 199 / 425, 216
                                          # 2 -
                                          # 1.75 - 348, 190 / 334, 194
