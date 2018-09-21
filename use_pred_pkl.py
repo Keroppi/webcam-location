@@ -81,8 +81,8 @@ for place in predictions:
         solstice_days = days_from_solstice(predictions[place][d_idx].sunrise - datetime.timedelta(seconds=predictions[place][d_idx].time_offset))
 
         # VLI
-        #if equinox_days < constants.EQUINOX_DISCARD_DAYS: # ? weeks
-        #    continue
+        if equinox_days < constants.EQUINOX_DISCARD_DAYS: # ? weeks
+            continue
 
         days += [day]
 
@@ -1657,7 +1657,7 @@ sys.stdout.flush()
 
 # Plot # of days vs. SIGNED sunrise/sunset errs (min) over ALL DAYS.
 bucket_size = 5 # minute
-buckets = list(range(-60, 60, bucket_size))
+buckets = list(range(-50, 50, bucket_size))
 bucket_labels = ['[' + str(x) + ',' + str(x + bucket_size) + ')' for x in buckets]
 bucket_labels[-1] = '>=' + str(buckets[-1])
 bucket_labels[0] = '<' + str(buckets[1])
@@ -1690,20 +1690,37 @@ for i in range(len(signed_sunset_errs)):
 
 plt.figure(figsize=(14.4,7.2))
 
-legend_labels = ['sunrise', 'sunset']
-handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in ['r', 'b']]
+#legend_labels = ['sunrise', 'sunset']
+#handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in ['r', 'b']]
 
 sunrise_graph = plt.bar(list(range(len(buckets))), sunrise_buckets, 0.35, color='r')
-sunset_graph = plt.bar(list(range(len(buckets))), sunset_buckets, 0.35, bottom=sunrise_buckets, color='b')
+#sunset_graph = plt.bar(list(range(len(buckets))), sunset_buckets, 0.35, bottom=sunrise_buckets, color='b')
 
 plt.xticks(np.arange(0, len(buckets), step=1), bucket_labels)
-plt.gca().set_ylim([0, 9000])
-plt.legend(handlelist, legend_labels)
+plt.gca().set_ylim([0, 2500])
+#plt.legend(handlelist, legend_labels)
 plt.ylabel('# Days')
-plt.xlabel('Signed Error (min)')
-plt.title('# of Days vs. Signed Sunrise and Sunset Error (min)')
-plt.savefig('/srv/glusterfs/vli/maps3/sunrise_sunset_signed_err.png', dpi=100)
+plt.xlabel('Signed Sunrise Error (min)')
+plt.title('# of Days vs. Signed Sunrise Error (min)')
+plt.savefig('/srv/glusterfs/vli/maps3/sunrise_signed_err.png', dpi=100)
 plt.close()
+
+plt.figure(figsize=(14.4,7.2))
+
+#legend_labels = ['sunrise', 'sunset']
+#handlelist = [plt.plot([], marker="o", ls="", color=color)[0] for color in ['r', 'b']]
+
+sunset_graph = plt.bar(list(range(len(buckets))), sunset_buckets, 0.35, color='b')
+
+plt.xticks(np.arange(0, len(buckets), step=1), bucket_labels)
+plt.gca().set_ylim([0, 2500])
+#plt.legend(handlelist, legend_labels)
+plt.ylabel('# Days')
+plt.xlabel('Signed Sunset Error (min)')
+plt.title('# of Days vs. Signed Sunset Error (min)')
+plt.savefig('/srv/glusterfs/vli/maps3/sunset_signed_err.png', dpi=100)
+plt.close()
+
 
 def plot_all_places(bucket_size, buckets, bucket_labels, locations, x_data, x_name, method_name, xlabel, ylabel, title, filename, sub_idx=None, ymax=None):
     bucket_distances = [[] for x in range(len(buckets))]
