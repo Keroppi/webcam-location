@@ -1657,7 +1657,7 @@ sys.stdout.flush()
 
 # Plot # of days vs. SIGNED sunrise/sunset errs (min) over ALL DAYS.
 bucket_size = 5 # minute
-buckets = list(range(-50, 50, bucket_size))
+buckets = list(range(-45, 45, bucket_size))
 bucket_labels = ['[' + str(x) + ',' + str(x + bucket_size) + ')' for x in buckets]
 bucket_labels[-1] = '>=' + str(buckets[-1])
 bucket_labels[0] = '<' + str(buckets[1])
